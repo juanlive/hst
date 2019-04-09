@@ -6,6 +6,10 @@ import './components/HSTEscrow.sol';
 import './components/SnowflakeOwnable.sol';
 import './interfaces/IdentityRegistryInterface.sol';
 
+// TO DO
+// check if token exists, then check if it is active
+// allow new deployment if any of both is false, if both are true reject deployment
+
  /*********************************
  * Hydro addresses on Rinkeby blockchain
  *********************************
@@ -31,9 +35,14 @@ import './interfaces/IdentityRegistryInterface.sol';
  */
 contract HSTFactory is SnowflakeOwnable {
 
-    address token;
-    address issuer;
-    address escrow;
+    // name of the token => address of the token
+    mapping(bytes32 => address) tokens;
+
+    // name of the token => address of the issuer
+    mapping(bytes32 => address) issuers;
+
+    // name of the token => address of the escrow
+    mapping(bytes32 => address) escrows;
 
    /**
    * @notice Constructor
@@ -42,11 +51,33 @@ contract HSTFactory is SnowflakeOwnable {
     }
 
    /**
-    * @notice Get a Hydro Securities Token deployed address
+    * @notice Get a Hydro Securities token contract deployed address
     * @dev    
     * @param  _tokenName The name of the token contract set to be deployed
+    * @return the address of the token contract corresponding to that name
     */
     function getSecuritiesTokenAddress(bytes32 _tokenName) public returns(address) {
+      return tokens[_tokenName];
+    }
+
+       /**
+    * @notice Get a Hydro Securities issuer contract deployed address
+    * @dev    
+    * @param  _tokenName The name of the token contract set to be deployed
+    * @return the address of the issuer contract corresponding to that name
+    */
+    function getSecuritiesIssuerAddress(bytes32 _tokenName) public returns(address) {
+      return issuers[_tokenName];
+    }
+
+       /**
+    * @notice Get a Hydro Securities escrow contract deployed address
+    * @dev    
+    * @param  _tokenName The name of the token contract set to be deployed
+    * @return the address of the escrow contract corresponding to that name
+    */
+    function getSecuritiesEscrowAddress(bytes32 _tokenName) public returns(address) {
+      return escrows[_tokenName];
     }
 
     /**
@@ -71,9 +102,9 @@ contract HSTFactory is SnowflakeOwnable {
     */
     function deploySecuritiesTokenContractSet(bytes32 _tokenName) public payable onlySnowflakeOwner returns(bool) {
       emit SecuritiesDeployStarted(_tokenName);
-      token = deployToken;
-      issuer = deployIssuer;
-      escrow = deployEscrow;
+      tokens[_tokenName]  = deployToken;
+      issuers[_tokenName] = deployIssuer;
+      escrows[_tokenName] = deployEscrow;
       emit SecuritiesDeployFinished(_tokenName);
     }
 
