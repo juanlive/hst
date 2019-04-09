@@ -4,7 +4,7 @@ interface IdentityRegistryInterface {
     function isSigned(address _address, bytes32 messageHash, uint8 v, bytes32 r, bytes32 s)
         external pure returns (bool);
 
-    // Identity View Functions /////////////////////////////////////////////////////////////////////////////////////////
+    // Identity View Functions //
     function identityExists(uint ein) external view returns (bool);
     function hasIdentity(address _address) external view returns (bool);
     function getEIN(address _address) external view returns (uint ein);
@@ -16,7 +16,7 @@ interface IdentityRegistryInterface {
         address[] memory associatedAddresses, address[] memory providers, address[] memory resolvers
     );
 
-    // Identity Management Functions ///////////////////////////////////////////////////////////////////////////////////
+    // Identity Management Functions //
     function createIdentity(address recoveryAddress, address[] calldata providers, address[] calldata resolvers)
         external returns (uint ein);
     function createIdentityDelegated(
@@ -42,7 +42,7 @@ interface IdentityRegistryInterface {
     function removeResolvers(address[] calldata resolvers) external;
     function removeResolversFor(uint ein, address[] calldata resolvers) external;
 
-    // Recovery Management Functions ///////////////////////////////////////////////////////////////////////////////////
+    // Recovery Management Functions //
     function triggerRecoveryAddressChange(address newRecoveryAddress) external;
     function triggerRecoveryAddressChangeFor(uint ein, address newRecoveryAddress) external;
     function triggerRecovery(uint ein, address newAssociatedAddress, uint8 v, bytes32 r, bytes32 s, uint timestamp)

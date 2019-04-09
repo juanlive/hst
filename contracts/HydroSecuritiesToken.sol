@@ -27,6 +27,7 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
     address public raindropAddress = address(0);
 
     mapping (address => uint256) public balances;
+    
     // `allowed` tracks any extra transfer rights as in all ERC20 tokens
     mapping (address => mapping (address => uint256)) public allowed;
 
