@@ -9,7 +9,7 @@ import '../HydroSecuritiesToken.sol';
  * @dev
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
-contract HydroEscrow {
+contract HSTEscrow {
     uint256 public issuingEndingTimestamp;
     address public hydroSecurityTokenAddress;
     address public hydroTokenAddress;

@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import './HydroSecuritiesToken.sol';
+import './components/HSTEscrow.sol';
 import './HSTIssuer.sol';
 import './components/HSTEscrow.sol';
 import './components/SnowflakeOwnable.sol';
@@ -124,9 +125,9 @@ contract HSTFactory is SnowflakeOwnable {
     * @dev    
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deployIssuer(bytes32 _name) public payable onlySnowflakeOwner returns(address) {
+    function deployIssuer(bytes32 _tokenName) public payable onlySnowflakeOwner returns(address) {
       HSTIssuer _issuer = (new HSTIssuer).value(msg.value)(address(msg.sender));
-      emit ContractDeployed(_name, "ISSUER", _issuer);
+      emit ContractDeployed(_tokenName, "ISSUER", _issuer);
       return _issuer;
     }
 
@@ -135,9 +136,9 @@ contract HSTFactory is SnowflakeOwnable {
     * @dev    
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deployEscrow(bytes32 _name) public payable onlySnowflakeOwner returns(address) {
+    function deployEscrow(bytes32 _tokenName) public payable onlySnowflakeOwner returns(address) {
       HSTEscrow _escrow = (new HSTEscrow).value(msg.value)(address(msg.sender));
-      emit ContractDeployed(_name, "ESCROW", _escrow);
+      emit ContractDeployed(_tokenName, "ESCROW", _escrow);
       return _escrow;
     }
 
