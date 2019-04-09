@@ -4,6 +4,7 @@ import './components/SnowflakeOwnable.sol';
 import './components/HSTEscrow.sol';
 import './components/TokenWithDates.sol';
 import './interfaces/HydroInterface.sol';
+import './interfaces/ApproverInterface.sol';
 import './interfaces/IdentityRegistryInterface.sol';
 import './interfaces/SnowflakeViaInterface.sol';
 import './zeppelin/math/SafeMath.sol';
@@ -99,9 +100,16 @@ contract HSTIssuer is
 	address RegistryRules;
 
 	// Links to Registries
-    address KYCResolver;
-    address AMLResolver;
-    address LegalResolver;
+    address[5] KYCResolverArray;
+    address[5] AMLResolverArray;
+    address[5] LegalResolverArray;
+    mapping(address => uint8) KYCResolver;
+    mapping(address => uint8) AMLResolver;
+    mapping(address => uint8) LegalResolver;
+    uint8 KYCResolverQ;
+    uint8 AMLResolverQ;
+    uint8 LegalResolverQ;
+
     address InterestSolver;
 
     // Mappings
@@ -253,41 +261,84 @@ contract HSTIssuer is
     }
 
 
-    // Only at Prelaunch functions, to configure the token
+    // Only at Prelaunch functions: adding and removing resolvers
 
     // Feature #3
-    function addKYCApproval(address _address) public onlyAdmin onlyAtPreLaunch {
-        interface = IdentityRegistryInterface(_address);
-        interface.addResolver(address(this)); // See which function to call
-        KYCresolver = _address;
-
+    function addKYCResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+        require(KYCResolver[_address] == 0, "Resolver already exists");
+        require(KYCResolverQ <= 5, "No more resolvers allowed");
+        identityRegistry.addResolver(_address);
+        KYCResolverQ ++;
+        KYCResolver[_address] = KYCResolverQ;
+        KYCresolverArray[KYCResolverQ-1] = _address;
     }
 
+    function removeKYCResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+        require(KYCResolver[_address] != 0, "Resolver does not exist");
+        uint8 memory _number = KYCResolver[_address];
+        if (KYCResolverArray.length > _number) {
+            for (uint8 i = _number; i < KYCResolverArray.length; i++) {
+                KYCResolverArray[i-1] = KYCResolverArray[i];
+            }
+        }
+        KYCResolverArray[KYCResolverQ - 1] = address(0x0);
+        KYCResolverQ --;
+        KYCResolver[_address] = 0;
+        identityRegistry.removeResolver(_address); 
+    }
+    function addAMLResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+        require(AMLResolver[_address] == 0, "Resolver already exists");
+        require(AMLResolverQ <= 5, "No more resolvers allowed");
+        identityRegistry.addResolver(_address);
+        AMLResolverQ ++;
+        AMLResolver[_address] = AMLResolverQ;
+        AMLresolverArray[AMLResolverQ-1] = _address;
+    }
+
+    function removeAMLResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+        require(AMLResolver[_address] != 0, "Resolver does not exist");
+        uint8 memory _number = AMLResolver[_address];
+        if (AMLResolverArray.length > _number) {
+            for (uint8 i = _number; i < AMLResolverArray.length; i++) {
+                AMLResolverArray[i-1] = AMLResolverArray[i];
+            }
+        }
+        AMLResolverArray[AMLResolverQ - 1] = address(0x0);
+        AMLResolverQ --;
+        AMLResolver[_address] = 0;
+        identityRegistry.removeResolver(_address); 
+    }
+        function addLegalResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+        require(LegalResolver[_address] == 0, "Resolver already exists");
+        require(LegalResolverQ <= 5, "No more resolvers allowed");
+        identityRegistry.addResolver(_address);
+        LegalResolverQ ++;
+        LegalResolver[_address] = LegalResolverQ;
+        LegalresolverArray[LegalResolverQ-1] = _address;
+    }
+
+    function removeLegalResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+        require(LegalResolver[_address] != 0, "Resolver does not exist");
+        uint8 memory _number = LegalResolver[_address];
+        if (LegalResolverArray.length > _number) {
+            for (uint8 i = _number; i < LegalResolverArray.length; i++) {
+                LegalResolverArray[i-1] = LegalResolverArray[i];
+            }
+        }
+        LegalResolverArray[LegalResolverQ - 1] = address(0x0);
+        LegalResolverQ --;
+        LegalResolver[_address] = 0;
+        identityRegistry.removeResolver(_address); 
+    }
     // Feature #4
-    function addAMLApproval(address _address) public onlyAdmin onlyAtPreLaunch {
-        interface = IdentityRegistryInterface(_address);
-        interface.addResolver(address(this)); // See which function to call
-        AMLresolver = _address;
-    }
-
-    // Registry updaters
-    function updateKYCResolver(address _resolver) public onlyAdmin onlyAtSetup {
-        require(KYCResolver==0x0, "KYC Resolver is already set");
-        KYCResolver = _resolver;
-    }
-
-    function updateAMLResolver(address _resolver) public onlyAdmin onlyAtSetup {
-        require(AMLResolver==0x0, "AML Resolver is already set");
-        AMLResolver = _resolver;
-    }
-
-    function updateLegalResolver(address _resolver) public onlyAdmin onlyAtSetup {
-        require(LegalResolver==0x0, "Legal Resolver is already set");
-        LegalResolver = _resolver;
+    function addAMLResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+        identityRegistry.addResolver(_address);
+        AMLresolver.push(_address);
     }
 
 
-    // Only after escrow is released
+
+    // Release gains. Only after escrow is released
 
     // Retrieve tokens and ethers
     function releaseHydroTokens() public onlyAdmin scrowReleased {
@@ -310,6 +361,7 @@ contract HSTIssuer is
     function buyTokens(string _coin, uint256 _amount) public payable return(bool) onlyActive {
 
         uint256 memory total;
+        uint256 memory _ein = identityRegistry.getEIN(msg.sender);
 
         require(stage == Stage.ACTIVE, "Current stage is not active");
 
@@ -325,21 +377,21 @@ contract HSTIssuer is
             require((ethReceived + msg.value) <= ethAllowed, "Ether amount exceeded");
         }
         // Check for whitelists
-        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(msg.sender, _amount);
-        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(msg.sender, _amount);
+        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_ein, _amount);
+        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_ein, _amount);
         // Calculate total
         if (_coin == "HYDRO") {
-            total = _amount * hydroPrice;
-            hydroReceived = hydroReceived + _amount;      
+            total = _amount.mul(hydroPrice);
+            hydroReceived = hydroReceived.add(_amount);      
         }
 
         if (_coin == "ETH") {
-            total = msg.value * ethPrice;
+            total = msg.value.mul(ethPrice);
             ethReceived = ethReceived + msg.value;
         }
         // Check for ownership percentage 
         if (PERC_OWNERSHIP_TYPE) {
-            require (((issuedTokens + total) / ownedTokens) < percAllowedTokens, 
+            require ((issuedTokens.add(total) / ownedTokens) < percAllowedTokens, 
                 "Perc ownership exceeded");
         }
         // Transfer Hydrotokens
@@ -361,7 +413,7 @@ contract HSTIssuer is
 
 
 
-    // Token ERC-20 wrapper ------------------------------------------------------
+    // Token ERC-20 wrapper -----------------------------------------------------------
 
     // Feature #11
     function transfer(address _to, uint256 _amount) public returns(bool) 
@@ -411,13 +463,23 @@ contract HSTIssuer is
     // Permissions checking
 
     // Feature #8
-    function _checkKYCWhitelist(_to, _amount) private {
-            KYC = new SnowflakeViaInterface(KYCresolver);
-            require (KYC.snowflakeCall(KYCresolver, _to, _amount), "Not in KYC whitelist"); // Which function to call?
+    function _checkKYCWhitelist(uint256 _to, uint256 _amount) private {
+        for (uint8 i = 1; i <= KYCResolverQ; i++) {
+            approver = new ApproverInterface(KYCResolver[i]);
+            require(approver.isApproved(_to, _amount));
         }
-    function _checkAMLWhitelist(_to, _amount) private {
-            AML = new SnowflakeViaInterface(AMLresolver);  
-            require (AML.snowflakeCall(KYCresolver, _to, _amount), "Not in AML whitelist"); // Which function to call?
+    }
+    function _checkAMLWhitelist(uint256 _to, uint256 _amount) private {
+        for (uint8 i = 1; i <= AMLResolverQ; i++) {
+            approver = new ApproverInterface(AMLResolver[i]);
+            require(approver.isApproved(_to, _amount));
+        }
+    }
+    function _checkLegalWhitelist(uint256 _to, uint256 _amount) private {
+        for (uint8 i = 1; i <= LegalResolverQ; i++) {
+            approver = new ApproverInterface(LegalResolver[i]);
+            require(approver.isApproved(_to, _amount));
+        }
     }
 
 }
