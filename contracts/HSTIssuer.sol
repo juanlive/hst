@@ -1,7 +1,6 @@
 pragma solidity ^0.5.0;
 
 import './components/SnowflakeOwnable.sol';
-import './components/HSTEscrow.sol';
 import './components/TokenWithDates.sol';
 import './interfaces/HydroInterface.sol';
 import './interfaces/ApproverInterface.sol';

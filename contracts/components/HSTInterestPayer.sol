@@ -48,7 +48,7 @@ contract HSTInterestPayer {
     // Modifiers
 
     modifier onlyOwner() {
-        require( msg.sender == _owner, "Not called from Secutiry Token contract");
+        require( msg.sender == Owner, "Not called from Secutiry Token contract");
         _;
     }
 
@@ -60,7 +60,7 @@ contract HSTInterestPayer {
 
     // Contract constructor
     constructor() public {  
-        _owner = msg.sender;        
+        Owner = msg.sender;        
 
         token = TokenWithDates(msg.sender);
         
@@ -182,7 +182,7 @@ contract HSTInterestPayer {
         Owner = _owner;
     }
 
-    function changeRoot(address _root) onlyRoot public {
+    function changeRoot(address _root) onlyOwner public {
         rootAddress = _root;
     }
 

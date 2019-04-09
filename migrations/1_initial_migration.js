@@ -1,5 +1,6 @@
-const Migrations = artifacts.require("Migrations");
+const HSTIssuer = artifacts.require('./HSTIssuer.sol')
 
 module.exports = function(deployer) {
-  deployer.deploy(Migrations);
+	await deployer.deploy(HSTIssuer)
+  	
 };
