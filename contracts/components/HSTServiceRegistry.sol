@@ -1,6 +1,6 @@
 pragma solidity ^0.5.4;
 
-import './HSTControlService.sol';
+import '../interfaces/HSTControlService.sol';
 import './SnowflakeOwnable.sol';
 
 // DONE
@@ -9,6 +9,7 @@ import './SnowflakeOwnable.sol';
 // add services for a token
 // replace services for a token
 // create contract SnowflakeOwnable and modifier onlySnowflakeOwner
+
 // TODO
 // create modifier afterEndOfIssuance
 
@@ -31,23 +32,30 @@ import './SnowflakeOwnable.sol';
  */
 contract HSTServiceRegistry is SnowflakeOwnable {
 
-  // category symbol => category description
+  // service category symbol => category description
   mapping(bytes32 => string) serviceCategories;
 
-  // token address => service category => service address
+  // token address => service category symbol => service address
   mapping(address => mapping(bytes32 => address)) public serviceRegistry;
 
   /**
-   * @notice Triggered when service address is added or replaced
+   * @notice Triggered when category is added
    */
-  event AddCategory(bytes32 name, string description);
-  event AddService(address token, bytes32 category, address service);
-  event ReplaceService(address token, bytes32 category, address oldService, address newService);
+  event AddCategory(bytes32 _name, string _description);
 
   /**
-   * @dev Validate contract address
+   * @notice Triggered when service address is added
+   */
+  event AddService(address _token, bytes32 _category, address service);
+
+  /**
+   * @notice Triggered when service address is replaced
+   */
+  event ReplaceService(address _token, bytes32 _category, address _oldService, address _newService);
+
+  /**
+   * @dev Validate that a contract exists in an address received as such
    * Credit: https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/ERC223_Token.sol#L107-L114
-   *
    * @param _addr The address of a smart contract
    */
   modifier withContract(address _addr) {
@@ -59,36 +67,33 @@ contract HSTServiceRegistry is SnowflakeOwnable {
 
   /**
    * @notice Constructor
-   *
+   * @dev    Create basic service categories
    */
   function ServiceRegistry() public {
     // create default categories
     serviceCategories["KYC"]   = "Know Your Customer";
-    AddCategory("KYC", "Know Your Customer");
+    emit AddCategory("KYC", "Know Your Customer");
     serviceCategories["AML"]   = "Anti Money Laundering - Origin of funds";
-    AddCategory("AML", "Anti Money Laundering - Origin of funds");
+    emit AddCategory("AML", "Anti Money Laundering - Origin of funds");
     serviceCategories["CFT"]   = "Counter Financing of Terrorism - Destination of funds";
-    AddCategory("CFT", "Counter Financing of Terrorism - Destination of funds");
+    emit AddCategory("CFT", "Counter Financing of Terrorism - Destination of funds");
     serviceCategories["LEGAL"] = "Legal advisor for issuance";
-    AddCategory("LEGAL", "Legal advisor for issuance");
+    emit AddCategory("LEGAL", "Legal advisor for issuance");
   }
 
   /**
    * @notice Add a new service
-   *
-   * @dev This method is only callable by the contract's owner
-   *
+   * @dev    This method is only callable by the contract's owner
    * @param _name Name of the new service category
    * @param _description Description of the new service category
    */
-  function addCategory(bytes32 _name, string _description) onlyOwner public {
+  function addCategory(bytes32 _name, string memory _description) onlyOwner public {
     serviceCategories[_name] = _description;
-    AddCategory(_name, _description);
+    emit AddCategory(_name, _description);
   }
 
   /**
    * @notice Add a new service
-   *
    * @dev This method is only callable by the contract's owner
    *
    * @param _token Address of the token that will use the service
@@ -97,7 +102,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    */
   function addService(address _token, bytes32 _category, address _service) onlyOwner withContract(_token) withContract(_service) public {
     serviceRegistry[_token][_category] = _service;
-    AddService(_token, _category, _service);
+    emit AddService(_token, _category, _service);
   }
 
     /**
@@ -111,8 +116,8 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _newService New address for the service to use
    */
   function replaceService(address _token, bytes32 _category, address _oldService, address _newService) onlyOwner withContract(_token) withContract(_newService) public {
-    serviceCategories[_token][_category] = _newService;
-    ReplaceService(_token, _category, _oldService, _newService);
+    serviceRegistry[_token][_category] = _newService;
+    emit ReplaceService(_token, _category, _oldService, _newService);
   }
 
 }

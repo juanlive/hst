@@ -7,10 +7,6 @@ import '../interfaces/IdentityRegistryInterface.sol';
 // contructor
 // function isOwner()
 
-// TO DO
-
-// record Rinkeby contract address for relevant Snowflake contract
-
 /**
  * @title SnowflakeOwnable
  * @notice Snowflake-based authorizations
@@ -21,18 +17,22 @@ contract SnowflakeOwnable {
 
     //address private _owner;
     uint ownerEIN;
+
     // access identity registry to get EINs for addresses
     IdentityRegistryInterface public identityRegistry;
 
-    // event OwnershipTransferred(
-    //     address indexed previousOwner,
-    //     address indexed newOwner
-    // );
-    event OwnershipTransferred(uint previousOwnerEIN, uint newOwnerEIN);
+    /**
+    * @notice Emit when transferring ownership
+    * @param  _previousOwnerEIN The EIN of the previous owner
+    * @param  _newOwnerEIN The EIN of the new owner
+    */
+    event OwnershipTransferred(uint _previousOwnerEIN, uint _newOwnerEIN);
 
     /**
+    * @notice Constructor
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-    * account.
+    * account
+    * @param _identityRegistryAddress The address of the IdentityRegistry contract
     */
     constructor(address _identityRegistryAddress) public {
         require(_identityRegistryAddress != address(0), 'The identity registry address is required');
@@ -43,14 +43,17 @@ contract SnowflakeOwnable {
     }
 
     /**
-    * @return the address of the owner.
+    * @notice Get EIN of the current owner
+    * @dev This contracts allows you to set ownership based on EIN instead of address
+    * @return the address of the owner
     */
-    function owner() public view returns(uint) {
+    function getOwnerEIN() public view returns(uint) {
         return ownerEIN;
     }
 
     /**
-    * @dev Throws if called by any account other than the owner.
+    * @notice Throws if called by any account other than the owner
+    * @dev This works on EINs, not on addresses
     */
     modifier onlyOwner() {
         require(isOwner());
@@ -58,7 +61,9 @@ contract SnowflakeOwnable {
     }
 
     /**
-    * @return true if `msg.sender` is the owner of the contract.
+    * @notice Check if caller is owner
+    * @dev This works on EINs, not on addresses
+    * @return true if `msg.sender` is the owner of the contract
     */
     function isOwner() public view returns(bool) {
         uint caller = identityRegistry.getEIN(msg.sender);
@@ -66,10 +71,8 @@ contract SnowflakeOwnable {
     }
 
     /**
-    * @dev Allows the current owner to relinquish control of the contract.
-    * @notice Renouncing to ownership will leave the contract without an owner.
-    * It will not be possible to call the functions with the `onlyOwner`
-    * modifier anymore.
+    * @notice Allows the current owner to relinquish control of the contract
+    * @dev Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner modifier anymore.
     */
     function renounceOwnership() public onlyOwner {
         emit OwnershipTransferred(ownerEIN, 0);
@@ -77,16 +80,18 @@ contract SnowflakeOwnable {
     }
 
     /**
-    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-    * @param _newOwner EIN to transfer ownership to.
+    * @notice Allows the current owner to transfer control of the contract to a newOwner
+    * @dev This works on EINs, not on addresses
+    * @param _newOwner EIN to transfer ownership to
     */
     function transferOwnership(uint _newOwner) public onlyOwner {
         _transferOwnership(_newOwner);
     }
 
     /**
-    * @dev Transfers control of the contract to a newOwner.
-    * @param _newOwner EIN to transfer ownership to.
+    * @notice Transfers control of the contract to a newOwner
+    * @dev This works on EINs, not on addresses
+    * @param _newOwner EIN to transfer ownership to
     */
     function _transferOwnership(uint _newOwner) internal {
         require(_newOwner != 0);

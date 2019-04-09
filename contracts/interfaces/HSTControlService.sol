@@ -1,7 +1,7 @@
 pragma solidity ^0.5.4;
 
 /**
- * @title HydroSecuritiesToken
+ * @title HSTControlService
  * @notice Standard interface for `Transfer Control Service`s
  * @dev 
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>

@@ -29,11 +29,11 @@
                     {
                         "constant": true,
                         "inputs": [],
-                        "name": "owner",
+                        "name": "isOwner",
                         "outputs": [
                             {
                                 "name": "",
-                                "type": "uint256"
+                                "type": "bool"
                             }
                         ],
                         "payable": false,
@@ -43,11 +43,11 @@
                     {
                         "constant": true,
                         "inputs": [],
-                        "name": "isOwner",
+                        "name": "getOwnerEIN",
                         "outputs": [
                             {
                                 "name": "",
-                                "type": "bool"
+                                "type": "uint256"
                             }
                         ],
                         "payable": false,
@@ -84,12 +84,12 @@
                         "inputs": [
                             {
                                 "indexed": false,
-                                "name": "previousOwnerEIN",
+                                "name": "_previousOwnerEIN",
                                 "type": "uint256"
                             },
                             {
                                 "indexed": false,
-                                "name": "newOwnerEIN",
+                                "name": "_newOwnerEIN",
                                 "type": "uint256"
                             }
                         ],
@@ -102,21 +102,26 @@
                     "details": "The SnowflakeOwnable contract has an owner EIN, and provides basic authorization control functions, not based on an address as it is usual, but based on an EIN. This simplifies the implementation of \"user permissions\" when using Snowflakes.",
                     "methods": {
                         "constructor": {
-                            "details": "The Ownable constructor sets the original `owner` of the contract to the sender account."
+                            "details": "The Ownable constructor sets the original `owner` of the contract to the sender account",
+                            "params": {
+                                "_identityRegistryAddress": "The address of the IdentityRegistry contract"
+                            }
+                        },
+                        "getOwnerEIN()": {
+                            "details": "This contracts allows you to set ownership based on EIN instead of address",
+                            "return": "the address of the owner"
                         },
                         "isOwner()": {
-                            "return": "true if `msg.sender` is the owner of the contract."
-                        },
-                        "owner()": {
-                            "return": "the address of the owner."
+                            "details": "This works on EINs, not on addresses",
+                            "return": "true if `msg.sender` is the owner of the contract"
                         },
                         "renounceOwnership()": {
-                            "details": "Allows the current owner to relinquish control of the contract."
+                            "details": "Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner modifier anymore."
                         },
                         "transferOwnership(uint256)": {
-                            "details": "Allows the current owner to transfer control of the contract to a newOwner.",
+                            "details": "This works on EINs, not on addresses",
                             "params": {
-                                "_newOwner": "EIN to transfer ownership to."
+                                "_newOwner": "EIN to transfer ownership to"
                             }
                         }
                     },
@@ -125,9 +130,9 @@
                 "evm": {
                     "bytecode": {
                         "linkReferences": {},
-                        "object": "608060405234801561001057600080fd5b5060405160208061041b8339810180604052602081101561003057600080fd5b50516001600160a01b038116610091576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260298152602001806103f26029913960400191505060405180910390fd5b600180546001600160a01b0319166001600160a01b038381169190911791829055604080517f05c62c2f000000000000000000000000000000000000000000000000000000008152336004820152905192909116916305c62c2f91602480820192602092909190829003018186803b15801561010c57600080fd5b505afa158015610120573d6000803e3d6000fd5b505050506040513d602081101561013657600080fd5b5051600081815560408051918252602082019290925281517f41545563b5478d4a04f861e33b36e455316904e9fe15096d35d14a5f9885212a929181900390910190a150610269806101896000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c8063134e18f41461005c578063715018a6146100805780638da5cb5b1461008a5780638f32d59b146100a4578063d23e8489146100c0575b600080fd5b6100646100dd565b604080516001600160a01b039092168252519081900360200190f35b6100886100ec565b005b610092610145565b60408051918252519081900360200190f35b6100ac61014b565b604080519115158252519081900360200190f35b610088600480360360208110156100d657600080fd5b50356101d4565b6001546001600160a01b031681565b6100f461014b565b6100fd57600080fd5b7f41545563b5478d4a04f861e33b36e455316904e9fe15096d35d14a5f9885212a6000546000604051808381526020018281526020019250505060405180910390a160008055565b60005490565b60015460408051600160e01b6305c62c2f028152336004820152905160009283926001600160a01b03909116916305c62c2f91602480820192602092909190829003018186803b15801561019e57600080fd5b505afa1580156101b2573d6000803e3d6000fd5b505050506040513d60208110156101c857600080fd5b50516000541491505090565b6101dc61014b565b6101e557600080fd5b6101ee816101f1565b50565b806101fb57600080fd5b600054604080519182526020820183905280517f41545563b5478d4a04f861e33b36e455316904e9fe15096d35d14a5f9885212a9281900390910190a160005556fea165627a7a72305820fed9f095cd98c9a5330755b625967fdee171cfe0bb1152eb86201917acd6c76c0029546865206964656e746974792072656769737472792061646472657373206973207265717569726564",
-                        "opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE CALLVALUE DUP1 ISZERO PUSH2 0x10 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP PUSH1 0x40 MLOAD PUSH1 0x20 DUP1 PUSH2 0x41B DUP4 CODECOPY DUP2 ADD DUP1 PUSH1 0x40 MSTORE PUSH1 0x20 DUP2 LT ISZERO PUSH2 0x30 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP MLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP2 AND PUSH2 0x91 JUMPI PUSH1 0x40 MLOAD PUSH32 0x8C379A000000000000000000000000000000000000000000000000000000000 DUP2 MSTORE PUSH1 0x4 ADD DUP1 DUP1 PUSH1 0x20 ADD DUP3 DUP2 SUB DUP3 MSTORE PUSH1 0x29 DUP2 MSTORE PUSH1 0x20 ADD DUP1 PUSH2 0x3F2 PUSH1 0x29 SWAP2 CODECOPY PUSH1 0x40 ADD SWAP2 POP POP PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 REVERT JUMPDEST PUSH1 0x1 DUP1 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB NOT AND PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP4 DUP2 AND SWAP2 SWAP1 SWAP2 OR SWAP2 DUP3 SWAP1 SSTORE PUSH1 0x40 DUP1 MLOAD PUSH32 0x5C62C2F00000000000000000000000000000000000000000000000000000000 DUP2 MSTORE CALLER PUSH1 0x4 DUP3 ADD MSTORE SWAP1 MLOAD SWAP3 SWAP1 SWAP2 AND SWAP2 PUSH4 0x5C62C2F SWAP2 PUSH1 0x24 DUP1 DUP3 ADD SWAP3 PUSH1 0x20 SWAP3 SWAP1 SWAP2 SWAP1 DUP3 SWAP1 SUB ADD DUP2 DUP7 DUP1 EXTCODESIZE ISZERO DUP1 ISZERO PUSH2 0x10C JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP GAS STATICCALL ISZERO DUP1 ISZERO PUSH2 0x120 JUMPI RETURNDATASIZE PUSH1 0x0 DUP1 RETURNDATACOPY RETURNDATASIZE PUSH1 0x0 REVERT JUMPDEST POP POP POP POP PUSH1 0x40 MLOAD RETURNDATASIZE PUSH1 0x20 DUP2 LT ISZERO PUSH2 0x136 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP MLOAD PUSH1 0x0 DUP2 DUP2 SSTORE PUSH1 0x40 DUP1 MLOAD SWAP2 DUP3 MSTORE PUSH1 0x20 DUP3 ADD SWAP3 SWAP1 SWAP3 MSTORE DUP2 MLOAD PUSH32 0x41545563B5478D4A04F861E33B36E455316904E9FE15096D35D14A5F9885212A SWAP3 SWAP2 DUP2 SWAP1 SUB SWAP1 SWAP2 ADD SWAP1 LOG1 POP PUSH2 0x269 DUP1 PUSH2 0x189 PUSH1 0x0 CODECOPY PUSH1 0x0 RETURN INVALID PUSH1 0x80 PUSH1 0x40 MSTORE CALLVALUE DUP1 ISZERO PUSH2 0x10 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP PUSH1 0x4 CALLDATASIZE LT PUSH2 0x57 JUMPI PUSH1 0x0 CALLDATALOAD PUSH1 0xE0 SHR DUP1 PUSH4 0x134E18F4 EQ PUSH2 0x5C JUMPI DUP1 PUSH4 0x715018A6 EQ PUSH2 0x80 JUMPI DUP1 PUSH4 0x8DA5CB5B EQ PUSH2 0x8A JUMPI DUP1 PUSH4 0x8F32D59B EQ PUSH2 0xA4 JUMPI DUP1 PUSH4 0xD23E8489 EQ PUSH2 0xC0 JUMPI JUMPDEST PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x64 PUSH2 0xDD JUMP JUMPDEST PUSH1 0x40 DUP1 MLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB SWAP1 SWAP3 AND DUP3 MSTORE MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 RETURN JUMPDEST PUSH2 0x88 PUSH2 0xEC JUMP JUMPDEST STOP JUMPDEST PUSH2 0x92 PUSH2 0x145 JUMP JUMPDEST PUSH1 0x40 DUP1 MLOAD SWAP2 DUP3 MSTORE MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 RETURN JUMPDEST PUSH2 0xAC PUSH2 0x14B JUMP JUMPDEST PUSH1 0x40 DUP1 MLOAD SWAP2 ISZERO ISZERO DUP3 MSTORE MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 RETURN JUMPDEST PUSH2 0x88 PUSH1 0x4 DUP1 CALLDATASIZE SUB PUSH1 0x20 DUP2 LT ISZERO PUSH2 0xD6 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP CALLDATALOAD PUSH2 0x1D4 JUMP JUMPDEST PUSH1 0x1 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND DUP2 JUMP JUMPDEST PUSH2 0xF4 PUSH2 0x14B JUMP JUMPDEST PUSH2 0xFD JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH32 0x41545563B5478D4A04F861E33B36E455316904E9FE15096D35D14A5F9885212A PUSH1 0x0 SLOAD PUSH1 0x0 PUSH1 0x40 MLOAD DUP1 DUP4 DUP2 MSTORE PUSH1 0x20 ADD DUP3 DUP2 MSTORE PUSH1 0x20 ADD SWAP3 POP POP POP PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 LOG1 PUSH1 0x0 DUP1 SSTORE JUMP JUMPDEST PUSH1 0x0 SLOAD SWAP1 JUMP JUMPDEST PUSH1 0x1 SLOAD PUSH1 0x40 DUP1 MLOAD PUSH1 0x1 PUSH1 0xE0 SHL PUSH4 0x5C62C2F MUL DUP2 MSTORE CALLER PUSH1 0x4 DUP3 ADD MSTORE SWAP1 MLOAD PUSH1 0x0 SWAP3 DUP4 SWAP3 PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB SWAP1 SWAP2 AND SWAP2 PUSH4 0x5C62C2F SWAP2 PUSH1 0x24 DUP1 DUP3 ADD SWAP3 PUSH1 0x20 SWAP3 SWAP1 SWAP2 SWAP1 DUP3 SWAP1 SUB ADD DUP2 DUP7 DUP1 EXTCODESIZE ISZERO DUP1 ISZERO PUSH2 0x19E JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP GAS STATICCALL ISZERO DUP1 ISZERO PUSH2 0x1B2 JUMPI RETURNDATASIZE PUSH1 0x0 DUP1 RETURNDATACOPY RETURNDATASIZE PUSH1 0x0 REVERT JUMPDEST POP POP POP POP PUSH1 0x40 MLOAD RETURNDATASIZE PUSH1 0x20 DUP2 LT ISZERO PUSH2 0x1C8 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP MLOAD PUSH1 0x0 SLOAD EQ SWAP2 POP POP SWAP1 JUMP JUMPDEST PUSH2 0x1DC PUSH2 0x14B JUMP JUMPDEST PUSH2 0x1E5 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x1EE DUP2 PUSH2 0x1F1 JUMP JUMPDEST POP JUMP JUMPDEST DUP1 PUSH2 0x1FB JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1 0x0 SLOAD PUSH1 0x40 DUP1 MLOAD SWAP2 DUP3 MSTORE PUSH1 0x20 DUP3 ADD DUP4 SWAP1 MSTORE DUP1 MLOAD PUSH32 0x41545563B5478D4A04F861E33B36E455316904E9FE15096D35D14A5F9885212A SWAP3 DUP2 SWAP1 SUB SWAP1 SWAP2 ADD SWAP1 LOG1 PUSH1 0x0 SSTORE JUMP INVALID LOG1 PUSH6 0x627A7A723058 KECCAK256 INVALID 0xd9 CREATE SWAP6 0xcd SWAP9 0xc9 0xa5 CALLER SMOD SSTORE 0xb6 0x25 SWAP7 PUSH32 0xDEE171CFE0BB1152EB86201917ACD6C76C0029546865206964656E7469747920 PUSH19 0x65676973747279206164647265737320697320 PUSH19 0x65717569726564000000000000000000000000 ",
-                        "sourceMap": "639:2392:0:-;;;1153:377;8:9:-1;5:2;;;30:1;27;20:12;5:2;1153:377:0;;;;;;;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1153:377:0;-1:-1:-1;;;;;1224:38:0;;1216:92;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1318:16;:70;;-1:-1:-1;;;;;;1318:70:0;-1:-1:-1;;;;;1318:70:0;;;;;;;;;;;1440:35;;;;;;1464:10;1440:35;;;;;;:16;;;;;:23;;:35;;;;;;;;;;;;;;;:16;:35;;;5:2:-1;;;;30:1;27;20:12;5:2;1440:35:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;1440:35:0;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1440:35:0;1429:8;:46;;;1490:33;;;;;;1440:35;1490:33;;;;;;;;;;;;;;;;;;;1153:377;639:2392;;;;;;"
+                        "object": "608060405234801561001057600080fd5b5060405160208061041b8339810180604052602081101561003057600080fd5b50516001600160a01b038116610091576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260298152602001806103f26029913960400191505060405180910390fd5b600180546001600160a01b0319166001600160a01b038381169190911791829055604080517f05c62c2f000000000000000000000000000000000000000000000000000000008152336004820152905192909116916305c62c2f91602480820192602092909190829003018186803b15801561010c57600080fd5b505afa158015610120573d6000803e3d6000fd5b505050506040513d602081101561013657600080fd5b5051600081815560408051918252602082019290925281517f41545563b5478d4a04f861e33b36e455316904e9fe15096d35d14a5f9885212a929181900390910190a150610269806101896000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c8063134e18f41461005c578063715018a6146100805780638f32d59b1461008a578063c44a5a35146100a6578063d23e8489146100c0575b600080fd5b6100646100dd565b604080516001600160a01b039092168252519081900360200190f35b6100886100ec565b005b610092610145565b604080519115158252519081900360200190f35b6100ae6101ce565b60408051918252519081900360200190f35b610088600480360360208110156100d657600080fd5b50356101d4565b6001546001600160a01b031681565b6100f4610145565b6100fd57600080fd5b7f41545563b5478d4a04f861e33b36e455316904e9fe15096d35d14a5f9885212a6000546000604051808381526020018281526020019250505060405180910390a160008055565b60015460408051600160e01b6305c62c2f028152336004820152905160009283926001600160a01b03909116916305c62c2f91602480820192602092909190829003018186803b15801561019857600080fd5b505afa1580156101ac573d6000803e3d6000fd5b505050506040513d60208110156101c257600080fd5b50516000541491505090565b60005490565b6101dc610145565b6101e557600080fd5b6101ee816101f1565b50565b806101fb57600080fd5b600054604080519182526020820183905280517f41545563b5478d4a04f861e33b36e455316904e9fe15096d35d14a5f9885212a9281900390910190a160005556fea165627a7a723058201df59f748b8a9c2bab1b0ec36ce02afacf1da43a3b7c642a38faefedcc6764e40029546865206964656e746974792072656769737472792061646472657373206973207265717569726564",
+                        "opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE CALLVALUE DUP1 ISZERO PUSH2 0x10 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP PUSH1 0x40 MLOAD PUSH1 0x20 DUP1 PUSH2 0x41B DUP4 CODECOPY DUP2 ADD DUP1 PUSH1 0x40 MSTORE PUSH1 0x20 DUP2 LT ISZERO PUSH2 0x30 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP MLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP2 AND PUSH2 0x91 JUMPI PUSH1 0x40 MLOAD PUSH32 0x8C379A000000000000000000000000000000000000000000000000000000000 DUP2 MSTORE PUSH1 0x4 ADD DUP1 DUP1 PUSH1 0x20 ADD DUP3 DUP2 SUB DUP3 MSTORE PUSH1 0x29 DUP2 MSTORE PUSH1 0x20 ADD DUP1 PUSH2 0x3F2 PUSH1 0x29 SWAP2 CODECOPY PUSH1 0x40 ADD SWAP2 POP POP PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 REVERT JUMPDEST PUSH1 0x1 DUP1 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB NOT AND PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP4 DUP2 AND SWAP2 SWAP1 SWAP2 OR SWAP2 DUP3 SWAP1 SSTORE PUSH1 0x40 DUP1 MLOAD PUSH32 0x5C62C2F00000000000000000000000000000000000000000000000000000000 DUP2 MSTORE CALLER PUSH1 0x4 DUP3 ADD MSTORE SWAP1 MLOAD SWAP3 SWAP1 SWAP2 AND SWAP2 PUSH4 0x5C62C2F SWAP2 PUSH1 0x24 DUP1 DUP3 ADD SWAP3 PUSH1 0x20 SWAP3 SWAP1 SWAP2 SWAP1 DUP3 SWAP1 SUB ADD DUP2 DUP7 DUP1 EXTCODESIZE ISZERO DUP1 ISZERO PUSH2 0x10C JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP GAS STATICCALL ISZERO DUP1 ISZERO PUSH2 0x120 JUMPI RETURNDATASIZE PUSH1 0x0 DUP1 RETURNDATACOPY RETURNDATASIZE PUSH1 0x0 REVERT JUMPDEST POP POP POP POP PUSH1 0x40 MLOAD RETURNDATASIZE PUSH1 0x20 DUP2 LT ISZERO PUSH2 0x136 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP MLOAD PUSH1 0x0 DUP2 DUP2 SSTORE PUSH1 0x40 DUP1 MLOAD SWAP2 DUP3 MSTORE PUSH1 0x20 DUP3 ADD SWAP3 SWAP1 SWAP3 MSTORE DUP2 MLOAD PUSH32 0x41545563B5478D4A04F861E33B36E455316904E9FE15096D35D14A5F9885212A SWAP3 SWAP2 DUP2 SWAP1 SUB SWAP1 SWAP2 ADD SWAP1 LOG1 POP PUSH2 0x269 DUP1 PUSH2 0x189 PUSH1 0x0 CODECOPY PUSH1 0x0 RETURN INVALID PUSH1 0x80 PUSH1 0x40 MSTORE CALLVALUE DUP1 ISZERO PUSH2 0x10 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP PUSH1 0x4 CALLDATASIZE LT PUSH2 0x57 JUMPI PUSH1 0x0 CALLDATALOAD PUSH1 0xE0 SHR DUP1 PUSH4 0x134E18F4 EQ PUSH2 0x5C JUMPI DUP1 PUSH4 0x715018A6 EQ PUSH2 0x80 JUMPI DUP1 PUSH4 0x8F32D59B EQ PUSH2 0x8A JUMPI DUP1 PUSH4 0xC44A5A35 EQ PUSH2 0xA6 JUMPI DUP1 PUSH4 0xD23E8489 EQ PUSH2 0xC0 JUMPI JUMPDEST PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x64 PUSH2 0xDD JUMP JUMPDEST PUSH1 0x40 DUP1 MLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB SWAP1 SWAP3 AND DUP3 MSTORE MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 RETURN JUMPDEST PUSH2 0x88 PUSH2 0xEC JUMP JUMPDEST STOP JUMPDEST PUSH2 0x92 PUSH2 0x145 JUMP JUMPDEST PUSH1 0x40 DUP1 MLOAD SWAP2 ISZERO ISZERO DUP3 MSTORE MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 RETURN JUMPDEST PUSH2 0xAE PUSH2 0x1CE JUMP JUMPDEST PUSH1 0x40 DUP1 MLOAD SWAP2 DUP3 MSTORE MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 RETURN JUMPDEST PUSH2 0x88 PUSH1 0x4 DUP1 CALLDATASIZE SUB PUSH1 0x20 DUP2 LT ISZERO PUSH2 0xD6 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP CALLDATALOAD PUSH2 0x1D4 JUMP JUMPDEST PUSH1 0x1 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND DUP2 JUMP JUMPDEST PUSH2 0xF4 PUSH2 0x145 JUMP JUMPDEST PUSH2 0xFD JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH32 0x41545563B5478D4A04F861E33B36E455316904E9FE15096D35D14A5F9885212A PUSH1 0x0 SLOAD PUSH1 0x0 PUSH1 0x40 MLOAD DUP1 DUP4 DUP2 MSTORE PUSH1 0x20 ADD DUP3 DUP2 MSTORE PUSH1 0x20 ADD SWAP3 POP POP POP PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 LOG1 PUSH1 0x0 DUP1 SSTORE JUMP JUMPDEST PUSH1 0x1 SLOAD PUSH1 0x40 DUP1 MLOAD PUSH1 0x1 PUSH1 0xE0 SHL PUSH4 0x5C62C2F MUL DUP2 MSTORE CALLER PUSH1 0x4 DUP3 ADD MSTORE SWAP1 MLOAD PUSH1 0x0 SWAP3 DUP4 SWAP3 PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB SWAP1 SWAP2 AND SWAP2 PUSH4 0x5C62C2F SWAP2 PUSH1 0x24 DUP1 DUP3 ADD SWAP3 PUSH1 0x20 SWAP3 SWAP1 SWAP2 SWAP1 DUP3 SWAP1 SUB ADD DUP2 DUP7 DUP1 EXTCODESIZE ISZERO DUP1 ISZERO PUSH2 0x198 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP GAS STATICCALL ISZERO DUP1 ISZERO PUSH2 0x1AC JUMPI RETURNDATASIZE PUSH1 0x0 DUP1 RETURNDATACOPY RETURNDATASIZE PUSH1 0x0 REVERT JUMPDEST POP POP POP POP PUSH1 0x40 MLOAD RETURNDATASIZE PUSH1 0x20 DUP2 LT ISZERO PUSH2 0x1C2 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP MLOAD PUSH1 0x0 SLOAD EQ SWAP2 POP POP SWAP1 JUMP JUMPDEST PUSH1 0x0 SLOAD SWAP1 JUMP JUMPDEST PUSH2 0x1DC PUSH2 0x145 JUMP JUMPDEST PUSH2 0x1E5 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x1EE DUP2 PUSH2 0x1F1 JUMP JUMPDEST POP JUMP JUMPDEST DUP1 PUSH2 0x1FB JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1 0x0 SLOAD PUSH1 0x40 DUP1 MLOAD SWAP2 DUP3 MSTORE PUSH1 0x20 DUP3 ADD DUP4 SWAP1 MSTORE DUP1 MLOAD PUSH32 0x41545563B5478D4A04F861E33B36E455316904E9FE15096D35D14A5F9885212A SWAP3 DUP2 SWAP1 SUB SWAP1 SWAP2 ADD SWAP1 LOG1 PUSH1 0x0 SSTORE JUMP INVALID LOG1 PUSH6 0x627A7A723058 KECCAK256 SAR CREATE2 SWAP16 PUSH21 0x8B8A9C2BAB1B0EC36CE02AFACF1DA43A3B7C642A38 STATICCALL 0xef 0xed 0xcc PUSH8 0x64E4002954686520 PUSH10 0x64656E74697479207265 PUSH8 0x6973747279206164 PUSH5 0x7265737320 PUSH10 0x73207265717569726564 ",
+                        "sourceMap": "562:2910:0:-;;;1240:377;8:9:-1;5:2;;;30:1;27;20:12;5:2;1240:377:0;;;;;;;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1240:377:0;-1:-1:-1;;;;;1311:38:0;;1303:92;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1405:16;:70;;-1:-1:-1;;;;;;1405:70:0;-1:-1:-1;;;;;1405:70:0;;;;;;;;;;;1527:35;;;;;;1551:10;1527:35;;;;;;:16;;;;;:23;;:35;;;;;;;;;;;;;;;:16;:35;;;5:2:-1;;;;30:1;27;20:12;5:2;1527:35:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;1527:35:0;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1527:35:0;1516:8;:46;;;1577:33;;;;;;1527:35;1577:33;;;;;;;;;;;;;;;;;;;1240:377;562:2910;;;;;;"
                     },
                     "gasEstimates": {
                         "creation": {
@@ -136,9 +141,9 @@
                             "totalCost": "infinite"
                         },
                         "external": {
+                            "getOwnerEIN()": "442",
                             "identityRegistry()": "415",
                             "isOwner()": "infinite",
-                            "owner()": "420",
                             "renounceOwnership()": "infinite",
                             "transferOwnership(uint256)": "infinite"
                         },
@@ -147,18 +152,28 @@
                         }
                     },
                     "methodIdentifiers": {
+                        "getOwnerEIN()": "c44a5a35",
                         "identityRegistry()": "134e18f4",
                         "isOwner()": "8f32d59b",
-                        "owner()": "8da5cb5b",
                         "renounceOwnership()": "715018a6",
                         "transferOwnership(uint256)": "d23e8489"
                     }
                 },
-                "metadata": "{\"compiler\":{\"version\":\"0.5.6+commit.b259423e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"identityRegistry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_newOwner\",\"type\":\"uint256\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_identityRegistryAddress\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousOwnerEIN\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newOwnerEIN\",\"type\":\"uint256\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}],\"devdoc\":{\"author\":\"Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>\",\"details\":\"The SnowflakeOwnable contract has an owner EIN, and provides basic authorization control functions, not based on an address as it is usual, but based on an EIN. This simplifies the implementation of \\\"user permissions\\\" when using Snowflakes.\",\"methods\":{\"constructor\":{\"details\":\"The Ownable constructor sets the original `owner` of the contract to the sender account.\"},\"isOwner()\":{\"return\":\"true if `msg.sender` is the owner of the contract.\"},\"owner()\":{\"return\":\"the address of the owner.\"},\"renounceOwnership()\":{\"details\":\"Allows the current owner to relinquish control of the contract.\"},\"transferOwnership(uint256)\":{\"details\":\"Allows the current owner to transfer control of the contract to a newOwner.\",\"params\":{\"_newOwner\":\"EIN to transfer ownership to.\"}}},\"title\":\"SnowflakeOwnable\"},\"userdoc\":{\"methods\":{\"renounceOwnership()\":{\"notice\":\"Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner` modifier anymore.\"}},\"notice\":\"Snowflake-based authorizations\"}},\"settings\":{\"compilationTarget\":{\"/home/fatima/Downloads/Hydro/code/hst/contracts/components/SnowflakeOwnable.sol\":\"SnowflakeOwnable\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/fatima/Downloads/Hydro/code/hst/contracts/components/SnowflakeOwnable.sol\":{\"keccak256\":\"0xad3ec4352617bb08371acb331fd89ce2f2bed0332d245c2bebec3a9814c9029c\",\"urls\":[\"bzzr://a8d2a582c71dc5bd6bb55eb1dca3c14ae4a0dec6a09c5c59a71bd5bc1164fa52\"]},\"/home/fatima/Downloads/Hydro/code/hst/contracts/interfaces/IdentityRegistryInterface.sol\":{\"keccak256\":\"0x3f53bcedb9332e200c5078921caf192b608c86184e94b4469036b90a34daad96\",\"urls\":[\"bzzr://43459e4fb12709518f2777ce0fd070dbc7a9e922e984de9646e5bf9b43a779e9\"]}},\"version\":1}",
+                "metadata": "{\"compiler\":{\"version\":\"0.5.6+commit.b259423e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"identityRegistry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getOwnerEIN\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_newOwner\",\"type\":\"uint256\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_identityRegistryAddress\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_previousOwnerEIN\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_newOwnerEIN\",\"type\":\"uint256\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}],\"devdoc\":{\"author\":\"Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>\",\"details\":\"The SnowflakeOwnable contract has an owner EIN, and provides basic authorization control functions, not based on an address as it is usual, but based on an EIN. This simplifies the implementation of \\\"user permissions\\\" when using Snowflakes.\",\"methods\":{\"constructor\":{\"details\":\"The Ownable constructor sets the original `owner` of the contract to the sender account\",\"params\":{\"_identityRegistryAddress\":\"The address of the IdentityRegistry contract\"}},\"getOwnerEIN()\":{\"details\":\"This contracts allows you to set ownership based on EIN instead of address\",\"return\":\"the address of the owner\"},\"isOwner()\":{\"details\":\"This works on EINs, not on addresses\",\"return\":\"true if `msg.sender` is the owner of the contract\"},\"renounceOwnership()\":{\"details\":\"Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner modifier anymore.\"},\"transferOwnership(uint256)\":{\"details\":\"This works on EINs, not on addresses\",\"params\":{\"_newOwner\":\"EIN to transfer ownership to\"}}},\"title\":\"SnowflakeOwnable\"},\"userdoc\":{\"methods\":{\"constructor\":\"Constructor\",\"getOwnerEIN()\":{\"notice\":\"Get EIN of the current owner\"},\"isOwner()\":{\"notice\":\"Check if caller is owner\"},\"renounceOwnership()\":{\"notice\":\"Allows the current owner to relinquish control of the contract\"},\"transferOwnership(uint256)\":{\"notice\":\"Allows the current owner to transfer control of the contract to a newOwner\"}},\"notice\":\"Snowflake-based authorizations\"}},\"settings\":{\"compilationTarget\":{\"/home/fatima/Downloads/Hydro/code/hst/contracts/components/SnowflakeOwnable.sol\":\"SnowflakeOwnable\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/fatima/Downloads/Hydro/code/hst/contracts/components/SnowflakeOwnable.sol\":{\"keccak256\":\"0x3d09ec67fc8a312dbc9820ec5f2d5e18b886340c474477be8c077459a7e6bb9c\",\"urls\":[\"bzzr://4e82ceafa617aaa02ebcc43c3a236c5b2b66a32390c21ee761a9b74febd91bec\"]},\"/home/fatima/Downloads/Hydro/code/hst/contracts/interfaces/IdentityRegistryInterface.sol\":{\"keccak256\":\"0x3f53bcedb9332e200c5078921caf192b608c86184e94b4469036b90a34daad96\",\"urls\":[\"bzzr://43459e4fb12709518f2777ce0fd070dbc7a9e922e984de9646e5bf9b43a779e9\"]}},\"version\":1}",
                 "userdoc": {
                     "methods": {
+                        "constructor": "Constructor",
+                        "getOwnerEIN()": {
+                            "notice": "Get EIN of the current owner"
+                        },
+                        "isOwner()": {
+                            "notice": "Check if caller is owner"
+                        },
                         "renounceOwnership()": {
-                            "notice": "Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner` modifier anymore."
+                            "notice": "Allows the current owner to relinquish control of the contract"
+                        },
+                        "transferOwnership(uint256)": {
+                            "notice": "Allows the current owner to transfer control of the contract to a newOwner"
                         }
                     },
                     "notice": "Snowflake-based authorizations"
@@ -862,7 +877,7 @@
                                 "name": "ownerEIN",
                                 "nodeType": "VariableDeclaration",
                                 "scope": 131,
-                                "src": "702:13:0",
+                                "src": "625:13:0",
                                 "stateVariable": true,
                                 "storageLocation": "default",
                                 "typeDescriptions": {
@@ -873,7 +888,7 @@
                                     "id": 3,
                                     "name": "uint",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "702:4:0",
+                                    "src": "625:4:0",
                                     "typeDescriptions": {
                                         "typeIdentifier": "t_uint256",
                                         "typeString": "uint256"
@@ -888,7 +903,7 @@
                                 "name": "identityRegistry",
                                 "nodeType": "VariableDeclaration",
                                 "scope": 131,
-                                "src": "779:49:0",
+                                "src": "703:49:0",
                                 "stateVariable": true,
                                 "storageLocation": "default",
                                 "typeDescriptions": {
@@ -901,7 +916,7 @@
                                     "name": "IdentityRegistryInterface",
                                     "nodeType": "UserDefinedTypeName",
                                     "referencedDeclaration": 399,
-                                    "src": "779:25:0",
+                                    "src": "703:25:0",
                                     "typeDescriptions": {
                                         "typeIdentifier": "t_contract$_IdentityRegistryInterface_$399",
                                         "typeString": "contract IdentityRegistryInterface"
@@ -912,7 +927,7 @@
                             },
                             {
                                 "anonymous": false,
-                                "documentation": null,
+                                "documentation": "@notice Emit when transferring ownership\n@param  _previousOwnerEIN The EIN of the previous owner\n@param  _newOwnerEIN The EIN of the new owner",
                                 "id": 12,
                                 "name": "OwnershipTransferred",
                                 "nodeType": "EventDefinition",
@@ -924,10 +939,10 @@
                                             "constant": false,
                                             "id": 8,
                                             "indexed": false,
-                                            "name": "previousOwnerEIN",
+                                            "name": "_previousOwnerEIN",
                                             "nodeType": "VariableDeclaration",
                                             "scope": 12,
-                                            "src": "985:21:0",
+                                            "src": "962:22:0",
                                             "stateVariable": false,
                                             "storageLocation": "default",
                                             "typeDescriptions": {
@@ -938,7 +953,7 @@
                                                 "id": 7,
                                                 "name": "uint",
                                                 "nodeType": "ElementaryTypeName",
-                                                "src": "985:4:0",
+                                                "src": "962:4:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
@@ -951,10 +966,10 @@
                                             "constant": false,
                                             "id": 10,
                                             "indexed": false,
-                                            "name": "newOwnerEIN",
+                                            "name": "_newOwnerEIN",
                                             "nodeType": "VariableDeclaration",
                                             "scope": 12,
-                                            "src": "1008:16:0",
+                                            "src": "986:17:0",
                                             "stateVariable": false,
                                             "storageLocation": "default",
                                             "typeDescriptions": {
@@ -965,7 +980,7 @@
                                                 "id": 9,
                                                 "name": "uint",
                                                 "nodeType": "ElementaryTypeName",
-                                                "src": "1008:4:0",
+                                                "src": "986:4:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
@@ -975,15 +990,15 @@
                                             "visibility": "internal"
                                         }
                                     ],
-                                    "src": "984:41:0"
+                                    "src": "961:43:0"
                                 },
-                                "src": "958:68:0"
+                                "src": "935:70:0"
                             },
                             {
                                 "body": {
                                     "id": 45,
                                     "nodeType": "Block",
-                                    "src": "1206:324:0",
+                                    "src": "1293:324:0",
                                     "statements": [
                                         {
                                             "expression": {
@@ -1007,7 +1022,7 @@
                                                             "nodeType": "Identifier",
                                                             "overloadedDeclarations": [],
                                                             "referencedDeclaration": 14,
-                                                            "src": "1224:24:0",
+                                                            "src": "1311:24:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_address",
                                                                 "typeString": "address"
@@ -1028,7 +1043,7 @@
                                                                     "kind": "number",
                                                                     "lValueRequested": false,
                                                                     "nodeType": "Literal",
-                                                                    "src": "1260:1:0",
+                                                                    "src": "1347:1:0",
                                                                     "subdenomination": null,
                                                                     "typeDescriptions": {
                                                                         "typeIdentifier": "t_rational_0_by_1",
@@ -1050,7 +1065,7 @@
                                                                 "isPure": true,
                                                                 "lValueRequested": false,
                                                                 "nodeType": "ElementaryTypeNameExpression",
-                                                                "src": "1252:7:0",
+                                                                "src": "1339:7:0",
                                                                 "typeDescriptions": {
                                                                     "typeIdentifier": "t_type$_t_address_$",
                                                                     "typeString": "type(address)"
@@ -1065,13 +1080,13 @@
                                                             "lValueRequested": false,
                                                             "names": [],
                                                             "nodeType": "FunctionCall",
-                                                            "src": "1252:10:0",
+                                                            "src": "1339:10:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_address_payable",
                                                                 "typeString": "address payable"
                                                             }
                                                         },
-                                                        "src": "1224:38:0",
+                                                        "src": "1311:38:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_bool",
                                                             "typeString": "bool"
@@ -1087,7 +1102,7 @@
                                                         "kind": "string",
                                                         "lValueRequested": false,
                                                         "nodeType": "Literal",
-                                                        "src": "1264:43:0",
+                                                        "src": "1351:43:0",
                                                         "subdenomination": null,
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_stringliteral_b04d01f65d761409608b0696e2ca14dbbabc97e565bcc7ddd0d764065824b4b6",
@@ -1115,7 +1130,7 @@
                                                         418
                                                     ],
                                                     "referencedDeclaration": 418,
-                                                    "src": "1216:7:0",
+                                                    "src": "1303:7:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                                                         "typeString": "function (bool,string memory) pure"
@@ -1129,7 +1144,7 @@
                                                 "lValueRequested": false,
                                                 "names": [],
                                                 "nodeType": "FunctionCall",
-                                                "src": "1216:92:0",
+                                                "src": "1303:92:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_tuple$__$",
                                                     "typeString": "tuple()"
@@ -1137,7 +1152,7 @@
                                             },
                                             "id": 25,
                                             "nodeType": "ExpressionStatement",
-                                            "src": "1216:92:0"
+                                            "src": "1303:92:0"
                                         },
                                         {
                                             "expression": {
@@ -1154,7 +1169,7 @@
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
                                                     "referencedDeclaration": 6,
-                                                    "src": "1318:16:0",
+                                                    "src": "1405:16:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_contract$_IdentityRegistryInterface_$399",
                                                         "typeString": "contract IdentityRegistryInterface"
@@ -1172,7 +1187,7 @@
                                                             "nodeType": "Identifier",
                                                             "overloadedDeclarations": [],
                                                             "referencedDeclaration": 14,
-                                                            "src": "1363:24:0",
+                                                            "src": "1450:24:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_address",
                                                                 "typeString": "address"
@@ -1191,7 +1206,7 @@
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
                                                         "referencedDeclaration": 399,
-                                                        "src": "1337:25:0",
+                                                        "src": "1424:25:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_type$_t_contract$_IdentityRegistryInterface_$399_$",
                                                             "typeString": "type(contract IdentityRegistryInterface)"
@@ -1205,13 +1220,13 @@
                                                     "lValueRequested": false,
                                                     "names": [],
                                                     "nodeType": "FunctionCall",
-                                                    "src": "1337:51:0",
+                                                    "src": "1424:51:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_contract$_IdentityRegistryInterface_$399",
                                                         "typeString": "contract IdentityRegistryInterface"
                                                     }
                                                 },
-                                                "src": "1318:70:0",
+                                                "src": "1405:70:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_contract$_IdentityRegistryInterface_$399",
                                                     "typeString": "contract IdentityRegistryInterface"
@@ -1219,7 +1234,7 @@
                                             },
                                             "id": 31,
                                             "nodeType": "ExpressionStatement",
-                                            "src": "1318:70:0"
+                                            "src": "1405:70:0"
                                         },
                                         {
                                             "expression": {
@@ -1236,7 +1251,7 @@
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
                                                     "referencedDeclaration": 4,
-                                                    "src": "1429:8:0",
+                                                    "src": "1516:8:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_uint256",
                                                         "typeString": "uint256"
@@ -1256,7 +1271,7 @@
                                                                 "nodeType": "Identifier",
                                                                 "overloadedDeclarations": [],
                                                                 "referencedDeclaration": 414,
-                                                                "src": "1464:3:0",
+                                                                "src": "1551:3:0",
                                                                 "typeDescriptions": {
                                                                     "typeIdentifier": "t_magic_message",
                                                                     "typeString": "msg"
@@ -1270,7 +1285,7 @@
                                                             "memberName": "sender",
                                                             "nodeType": "MemberAccess",
                                                             "referencedDeclaration": null,
-                                                            "src": "1464:10:0",
+                                                            "src": "1551:10:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_address_payable",
                                                                 "typeString": "address payable"
@@ -1291,7 +1306,7 @@
                                                             "nodeType": "Identifier",
                                                             "overloadedDeclarations": [],
                                                             "referencedDeclaration": 6,
-                                                            "src": "1440:16:0",
+                                                            "src": "1527:16:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_contract$_IdentityRegistryInterface_$399",
                                                                 "typeString": "contract IdentityRegistryInterface"
@@ -1305,7 +1320,7 @@
                                                         "memberName": "getEIN",
                                                         "nodeType": "MemberAccess",
                                                         "referencedDeclaration": 169,
-                                                        "src": "1440:23:0",
+                                                        "src": "1527:23:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
                                                             "typeString": "function (address) view external returns (uint256)"
@@ -1319,13 +1334,13 @@
                                                     "lValueRequested": false,
                                                     "names": [],
                                                     "nodeType": "FunctionCall",
-                                                    "src": "1440:35:0",
+                                                    "src": "1527:35:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_uint256",
                                                         "typeString": "uint256"
                                                     }
                                                 },
-                                                "src": "1429:46:0",
+                                                "src": "1516:46:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
@@ -1333,7 +1348,7 @@
                                             },
                                             "id": 39,
                                             "nodeType": "ExpressionStatement",
-                                            "src": "1429:46:0"
+                                            "src": "1516:46:0"
                                         },
                                         {
                                             "eventCall": {
@@ -1349,7 +1364,7 @@
                                                         "kind": "number",
                                                         "lValueRequested": false,
                                                         "nodeType": "Literal",
-                                                        "src": "1511:1:0",
+                                                        "src": "1598:1:0",
                                                         "subdenomination": null,
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_rational_0_by_1",
@@ -1364,7 +1379,7 @@
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
                                                         "referencedDeclaration": 4,
-                                                        "src": "1514:8:0",
+                                                        "src": "1601:8:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_uint256",
                                                             "typeString": "uint256"
@@ -1387,7 +1402,7 @@
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
                                                     "referencedDeclaration": 12,
-                                                    "src": "1490:20:0",
+                                                    "src": "1577:20:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_uint256_$returns$__$",
                                                         "typeString": "function (uint256,uint256)"
@@ -1401,7 +1416,7 @@
                                                 "lValueRequested": false,
                                                 "names": [],
                                                 "nodeType": "FunctionCall",
-                                                "src": "1490:33:0",
+                                                "src": "1577:33:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_tuple$__$",
                                                     "typeString": "tuple()"
@@ -1409,11 +1424,11 @@
                                             },
                                             "id": 44,
                                             "nodeType": "EmitStatement",
-                                            "src": "1485:38:0"
+                                            "src": "1572:38:0"
                                         }
                                     ]
                                 },
-                                "documentation": "@dev The Ownable constructor sets the original `owner` of the contract to the sender\naccount.",
+                                "documentation": "@notice Constructor\n@dev The Ownable constructor sets the original `owner` of the contract to the sender\naccount\n@param _identityRegistryAddress The address of the IdentityRegistry contract",
                                 "id": 46,
                                 "implemented": true,
                                 "kind": "constructor",
@@ -1430,7 +1445,7 @@
                                             "name": "_identityRegistryAddress",
                                             "nodeType": "VariableDeclaration",
                                             "scope": 46,
-                                            "src": "1165:32:0",
+                                            "src": "1252:32:0",
                                             "stateVariable": false,
                                             "storageLocation": "default",
                                             "typeDescriptions": {
@@ -1441,7 +1456,7 @@
                                                 "id": 13,
                                                 "name": "address",
                                                 "nodeType": "ElementaryTypeName",
-                                                "src": "1165:7:0",
+                                                "src": "1252:7:0",
                                                 "stateMutability": "nonpayable",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_address",
@@ -1452,16 +1467,16 @@
                                             "visibility": "internal"
                                         }
                                     ],
-                                    "src": "1164:34:0"
+                                    "src": "1251:34:0"
                                 },
                                 "returnParameters": {
                                     "id": 16,
                                     "nodeType": "ParameterList",
                                     "parameters": [],
-                                    "src": "1206:0:0"
+                                    "src": "1293:0:0"
                                 },
                                 "scope": 131,
-                                "src": "1153:377:0",
+                                "src": "1240:377:0",
                                 "stateMutability": "nonpayable",
                                 "superFunction": null,
                                 "visibility": "public"
@@ -1470,7 +1485,7 @@
                                 "body": {
                                     "id": 53,
                                     "nodeType": "Block",
-                                    "src": "1634:32:0",
+                                    "src": "1855:32:0",
                                     "statements": [
                                         {
                                             "expression": {
@@ -1480,7 +1495,7 @@
                                                 "nodeType": "Identifier",
                                                 "overloadedDeclarations": [],
                                                 "referencedDeclaration": 4,
-                                                "src": "1651:8:0",
+                                                "src": "1872:8:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
@@ -1489,22 +1504,22 @@
                                             "functionReturnParameters": 50,
                                             "id": 52,
                                             "nodeType": "Return",
-                                            "src": "1644:15:0"
+                                            "src": "1865:15:0"
                                         }
                                     ]
                                 },
-                                "documentation": "@return the address of the owner.",
+                                "documentation": "@notice Get EIN of the current owner\n@dev This contracts allows you to set ownership based on EIN instead of address\n@return the address of the owner",
                                 "id": 54,
                                 "implemented": true,
                                 "kind": "function",
                                 "modifiers": [],
-                                "name": "owner",
+                                "name": "getOwnerEIN",
                                 "nodeType": "FunctionDefinition",
                                 "parameters": {
                                     "id": 47,
                                     "nodeType": "ParameterList",
                                     "parameters": [],
-                                    "src": "1605:2:0"
+                                    "src": "1826:2:0"
                                 },
                                 "returnParameters": {
                                     "id": 50,
@@ -1516,7 +1531,7 @@
                                             "name": "",
                                             "nodeType": "VariableDeclaration",
                                             "scope": 54,
-                                            "src": "1628:4:0",
+                                            "src": "1849:4:0",
                                             "stateVariable": false,
                                             "storageLocation": "default",
                                             "typeDescriptions": {
@@ -1527,7 +1542,7 @@
                                                 "id": 48,
                                                 "name": "uint",
                                                 "nodeType": "ElementaryTypeName",
-                                                "src": "1628:4:0",
+                                                "src": "1849:4:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
@@ -1537,10 +1552,10 @@
                                             "visibility": "internal"
                                         }
                                     ],
-                                    "src": "1627:6:0"
+                                    "src": "1848:6:0"
                                 },
                                 "scope": 131,
-                                "src": "1591:75:0",
+                                "src": "1806:81:0",
                                 "stateMutability": "view",
                                 "superFunction": null,
                                 "visibility": "public"
@@ -1549,7 +1564,7 @@
                                 "body": {
                                     "id": 62,
                                     "nodeType": "Block",
-                                    "src": "1773:46:0",
+                                    "src": "2044:46:0",
                                     "statements": [
                                         {
                                             "expression": {
@@ -1565,7 +1580,7 @@
                                                             "nodeType": "Identifier",
                                                             "overloadedDeclarations": [],
                                                             "referencedDeclaration": 82,
-                                                            "src": "1791:7:0",
+                                                            "src": "2062:7:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_function_internal_view$__$returns$_t_bool_$",
                                                                 "typeString": "function () view returns (bool)"
@@ -1579,7 +1594,7 @@
                                                         "lValueRequested": false,
                                                         "names": [],
                                                         "nodeType": "FunctionCall",
-                                                        "src": "1791:9:0",
+                                                        "src": "2062:9:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_bool",
                                                             "typeString": "bool"
@@ -1601,7 +1616,7 @@
                                                         418
                                                     ],
                                                     "referencedDeclaration": 417,
-                                                    "src": "1783:7:0",
+                                                    "src": "2054:7:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
                                                         "typeString": "function (bool) pure"
@@ -1615,7 +1630,7 @@
                                                 "lValueRequested": false,
                                                 "names": [],
                                                 "nodeType": "FunctionCall",
-                                                "src": "1783:18:0",
+                                                "src": "2054:18:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_tuple$__$",
                                                     "typeString": "tuple()"
@@ -1623,16 +1638,16 @@
                                             },
                                             "id": 60,
                                             "nodeType": "ExpressionStatement",
-                                            "src": "1783:18:0"
+                                            "src": "2054:18:0"
                                         },
                                         {
                                             "id": 61,
                                             "nodeType": "PlaceholderStatement",
-                                            "src": "1811:1:0"
+                                            "src": "2082:1:0"
                                         }
                                     ]
                                 },
-                                "documentation": "@dev Throws if called by any account other than the owner.",
+                                "documentation": "@notice Throws if called by any account other than the owner\n@dev This works on EINs, not on addresses",
                                 "id": 63,
                                 "name": "onlyOwner",
                                 "nodeType": "ModifierDefinition",
@@ -1640,16 +1655,16 @@
                                     "id": 55,
                                     "nodeType": "ParameterList",
                                     "parameters": [],
-                                    "src": "1770:2:0"
+                                    "src": "2041:2:0"
                                 },
-                                "src": "1752:67:0",
+                                "src": "2023:67:0",
                                 "visibility": "internal"
                             },
                             {
                                 "body": {
                                     "id": 81,
                                     "nodeType": "Block",
-                                    "src": "1950:103:0",
+                                    "src": "2307:103:0",
                                     "statements": [
                                         {
                                             "assignments": [
@@ -1662,7 +1677,7 @@
                                                     "name": "caller",
                                                     "nodeType": "VariableDeclaration",
                                                     "scope": 81,
-                                                    "src": "1960:11:0",
+                                                    "src": "2317:11:0",
                                                     "stateVariable": false,
                                                     "storageLocation": "default",
                                                     "typeDescriptions": {
@@ -1673,7 +1688,7 @@
                                                         "id": 68,
                                                         "name": "uint",
                                                         "nodeType": "ElementaryTypeName",
-                                                        "src": "1960:4:0",
+                                                        "src": "2317:4:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_uint256",
                                                             "typeString": "uint256"
@@ -1696,7 +1711,7 @@
                                                             "nodeType": "Identifier",
                                                             "overloadedDeclarations": [],
                                                             "referencedDeclaration": 414,
-                                                            "src": "1998:3:0",
+                                                            "src": "2355:3:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_magic_message",
                                                                 "typeString": "msg"
@@ -1710,7 +1725,7 @@
                                                         "memberName": "sender",
                                                         "nodeType": "MemberAccess",
                                                         "referencedDeclaration": null,
-                                                        "src": "1998:10:0",
+                                                        "src": "2355:10:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_address_payable",
                                                             "typeString": "address payable"
@@ -1731,7 +1746,7 @@
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
                                                         "referencedDeclaration": 6,
-                                                        "src": "1974:16:0",
+                                                        "src": "2331:16:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_contract$_IdentityRegistryInterface_$399",
                                                             "typeString": "contract IdentityRegistryInterface"
@@ -1745,7 +1760,7 @@
                                                     "memberName": "getEIN",
                                                     "nodeType": "MemberAccess",
                                                     "referencedDeclaration": 169,
-                                                    "src": "1974:23:0",
+                                                    "src": "2331:23:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
                                                         "typeString": "function (address) view external returns (uint256)"
@@ -1759,14 +1774,14 @@
                                                 "lValueRequested": false,
                                                 "names": [],
                                                 "nodeType": "FunctionCall",
-                                                "src": "1974:35:0",
+                                                "src": "2331:35:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
                                                 }
                                             },
                                             "nodeType": "VariableDeclarationStatement",
-                                            "src": "1960:49:0"
+                                            "src": "2317:49:0"
                                         },
                                         {
                                             "expression": {
@@ -1790,7 +1805,7 @@
                                                             "nodeType": "Identifier",
                                                             "overloadedDeclarations": [],
                                                             "referencedDeclaration": 69,
-                                                            "src": "2027:6:0",
+                                                            "src": "2384:6:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_uint256",
                                                                 "typeString": "uint256"
@@ -1805,13 +1820,13 @@
                                                             "nodeType": "Identifier",
                                                             "overloadedDeclarations": [],
                                                             "referencedDeclaration": 4,
-                                                            "src": "2037:8:0",
+                                                            "src": "2394:8:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_uint256",
                                                                 "typeString": "uint256"
                                                             }
                                                         },
-                                                        "src": "2027:18:0",
+                                                        "src": "2384:18:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_bool",
                                                             "typeString": "bool"
@@ -1825,7 +1840,7 @@
                                                 "isPure": false,
                                                 "lValueRequested": false,
                                                 "nodeType": "TupleExpression",
-                                                "src": "2026:20:0",
+                                                "src": "2383:20:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_bool",
                                                     "typeString": "bool"
@@ -1834,11 +1849,11 @@
                                             "functionReturnParameters": 67,
                                             "id": 80,
                                             "nodeType": "Return",
-                                            "src": "2019:27:0"
+                                            "src": "2376:27:0"
                                         }
                                     ]
                                 },
-                                "documentation": "@return true if `msg.sender` is the owner of the contract.",
+                                "documentation": "@notice Check if caller is owner\n@dev This works on EINs, not on addresses\n@return true if `msg.sender` is the owner of the contract",
                                 "id": 82,
                                 "implemented": true,
                                 "kind": "function",
@@ -1849,7 +1864,7 @@
                                     "id": 64,
                                     "nodeType": "ParameterList",
                                     "parameters": [],
-                                    "src": "1921:2:0"
+                                    "src": "2278:2:0"
                                 },
                                 "returnParameters": {
                                     "id": 67,
@@ -1861,7 +1876,7 @@
                                             "name": "",
                                             "nodeType": "VariableDeclaration",
                                             "scope": 82,
-                                            "src": "1944:4:0",
+                                            "src": "2301:4:0",
                                             "stateVariable": false,
                                             "storageLocation": "default",
                                             "typeDescriptions": {
@@ -1872,7 +1887,7 @@
                                                 "id": 65,
                                                 "name": "bool",
                                                 "nodeType": "ElementaryTypeName",
-                                                "src": "1944:4:0",
+                                                "src": "2301:4:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_bool",
                                                     "typeString": "bool"
@@ -1882,10 +1897,10 @@
                                             "visibility": "internal"
                                         }
                                     ],
-                                    "src": "1943:6:0"
+                                    "src": "2300:6:0"
                                 },
                                 "scope": 131,
-                                "src": "1905:148:0",
+                                "src": "2262:148:0",
                                 "stateMutability": "view",
                                 "superFunction": null,
                                 "visibility": "public"
@@ -1894,7 +1909,7 @@
                                 "body": {
                                     "id": 96,
                                     "nodeType": "Block",
-                                    "src": "2372:77:0",
+                                    "src": "2715:77:0",
                                     "statements": [
                                         {
                                             "eventCall": {
@@ -1907,7 +1922,7 @@
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
                                                         "referencedDeclaration": 4,
-                                                        "src": "2408:8:0",
+                                                        "src": "2751:8:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_uint256",
                                                             "typeString": "uint256"
@@ -1923,7 +1938,7 @@
                                                         "kind": "number",
                                                         "lValueRequested": false,
                                                         "nodeType": "Literal",
-                                                        "src": "2418:1:0",
+                                                        "src": "2761:1:0",
                                                         "subdenomination": null,
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_rational_0_by_1",
@@ -1948,7 +1963,7 @@
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
                                                     "referencedDeclaration": 12,
-                                                    "src": "2387:20:0",
+                                                    "src": "2730:20:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_uint256_$returns$__$",
                                                         "typeString": "function (uint256,uint256)"
@@ -1962,7 +1977,7 @@
                                                 "lValueRequested": false,
                                                 "names": [],
                                                 "nodeType": "FunctionCall",
-                                                "src": "2387:33:0",
+                                                "src": "2730:33:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_tuple$__$",
                                                     "typeString": "tuple()"
@@ -1970,7 +1985,7 @@
                                             },
                                             "id": 91,
                                             "nodeType": "EmitStatement",
-                                            "src": "2382:38:0"
+                                            "src": "2725:38:0"
                                         },
                                         {
                                             "expression": {
@@ -1987,7 +2002,7 @@
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
                                                     "referencedDeclaration": 4,
-                                                    "src": "2430:8:0",
+                                                    "src": "2773:8:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_uint256",
                                                         "typeString": "uint256"
@@ -2005,7 +2020,7 @@
                                                     "kind": "number",
                                                     "lValueRequested": false,
                                                     "nodeType": "Literal",
-                                                    "src": "2441:1:0",
+                                                    "src": "2784:1:0",
                                                     "subdenomination": null,
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_rational_0_by_1",
@@ -2013,7 +2028,7 @@
                                                     },
                                                     "value": "0"
                                                 },
-                                                "src": "2430:12:0",
+                                                "src": "2773:12:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
@@ -2021,11 +2036,11 @@
                                             },
                                             "id": 95,
                                             "nodeType": "ExpressionStatement",
-                                            "src": "2430:12:0"
+                                            "src": "2773:12:0"
                                         }
                                     ]
                                 },
-                                "documentation": "@dev Allows the current owner to relinquish control of the contract.\n@notice Renouncing to ownership will leave the contract without an owner.\nIt will not be possible to call the functions with the `onlyOwner`\nmodifier anymore.",
+                                "documentation": "@notice Allows the current owner to relinquish control of the contract\n@dev Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner modifier anymore.",
                                 "id": 97,
                                 "implemented": true,
                                 "kind": "function",
@@ -2040,14 +2055,14 @@
                                             "nodeType": "Identifier",
                                             "overloadedDeclarations": [],
                                             "referencedDeclaration": 63,
-                                            "src": "2362:9:0",
+                                            "src": "2705:9:0",
                                             "typeDescriptions": {
                                                 "typeIdentifier": "t_modifier$__$",
                                                 "typeString": "modifier ()"
                                             }
                                         },
                                         "nodeType": "ModifierInvocation",
-                                        "src": "2362:9:0"
+                                        "src": "2705:9:0"
                                     }
                                 ],
                                 "name": "renounceOwnership",
@@ -2056,16 +2071,16 @@
                                     "id": 83,
                                     "nodeType": "ParameterList",
                                     "parameters": [],
-                                    "src": "2352:2:0"
+                                    "src": "2695:2:0"
                                 },
                                 "returnParameters": {
                                     "id": 86,
                                     "nodeType": "ParameterList",
                                     "parameters": [],
-                                    "src": "2372:0:0"
+                                    "src": "2715:0:0"
                                 },
                                 "scope": 131,
-                                "src": "2326:123:0",
+                                "src": "2669:123:0",
                                 "stateMutability": "nonpayable",
                                 "superFunction": null,
                                 "visibility": "public"
@@ -2074,7 +2089,7 @@
                                 "body": {
                                     "id": 108,
                                     "nodeType": "Block",
-                                    "src": "2670:46:0",
+                                    "src": "3062:46:0",
                                     "statements": [
                                         {
                                             "expression": {
@@ -2087,7 +2102,7 @@
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
                                                         "referencedDeclaration": 99,
-                                                        "src": "2699:9:0",
+                                                        "src": "3091:9:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_uint256",
                                                             "typeString": "uint256"
@@ -2106,7 +2121,7 @@
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
                                                     "referencedDeclaration": 130,
-                                                    "src": "2680:18:0",
+                                                    "src": "3072:18:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_function_internal_nonpayable$_t_uint256_$returns$__$",
                                                         "typeString": "function (uint256)"
@@ -2120,7 +2135,7 @@
                                                 "lValueRequested": false,
                                                 "names": [],
                                                 "nodeType": "FunctionCall",
-                                                "src": "2680:29:0",
+                                                "src": "3072:29:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_tuple$__$",
                                                     "typeString": "tuple()"
@@ -2128,11 +2143,11 @@
                                             },
                                             "id": 107,
                                             "nodeType": "ExpressionStatement",
-                                            "src": "2680:29:0"
+                                            "src": "3072:29:0"
                                         }
                                     ]
                                 },
-                                "documentation": "@dev Allows the current owner to transfer control of the contract to a newOwner.\n@param _newOwner EIN to transfer ownership to.",
+                                "documentation": "@notice Allows the current owner to transfer control of the contract to a newOwner\n@dev This works on EINs, not on addresses\n@param _newOwner EIN to transfer ownership to",
                                 "id": 109,
                                 "implemented": true,
                                 "kind": "function",
@@ -2147,14 +2162,14 @@
                                             "nodeType": "Identifier",
                                             "overloadedDeclarations": [],
                                             "referencedDeclaration": 63,
-                                            "src": "2660:9:0",
+                                            "src": "3052:9:0",
                                             "typeDescriptions": {
                                                 "typeIdentifier": "t_modifier$__$",
                                                 "typeString": "modifier ()"
                                             }
                                         },
                                         "nodeType": "ModifierInvocation",
-                                        "src": "2660:9:0"
+                                        "src": "3052:9:0"
                                     }
                                 ],
                                 "name": "transferOwnership",
@@ -2169,7 +2184,7 @@
                                             "name": "_newOwner",
                                             "nodeType": "VariableDeclaration",
                                             "scope": 109,
-                                            "src": "2637:14:0",
+                                            "src": "3029:14:0",
                                             "stateVariable": false,
                                             "storageLocation": "default",
                                             "typeDescriptions": {
@@ -2180,7 +2195,7 @@
                                                 "id": 98,
                                                 "name": "uint",
                                                 "nodeType": "ElementaryTypeName",
-                                                "src": "2637:4:0",
+                                                "src": "3029:4:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
@@ -2190,16 +2205,16 @@
                                             "visibility": "internal"
                                         }
                                     ],
-                                    "src": "2636:16:0"
+                                    "src": "3028:16:0"
                                 },
                                 "returnParameters": {
                                     "id": 103,
                                     "nodeType": "ParameterList",
                                     "parameters": [],
-                                    "src": "2670:0:0"
+                                    "src": "3062:0:0"
                                 },
                                 "scope": 131,
-                                "src": "2610:106:0",
+                                "src": "3002:106:0",
                                 "stateMutability": "nonpayable",
                                 "superFunction": null,
                                 "visibility": "public"
@@ -2208,7 +2223,7 @@
                                 "body": {
                                     "id": 129,
                                     "nodeType": "Block",
-                                    "src": "2903:126:0",
+                                    "src": "3344:126:0",
                                     "statements": [
                                         {
                                             "expression": {
@@ -2232,7 +2247,7 @@
                                                             "nodeType": "Identifier",
                                                             "overloadedDeclarations": [],
                                                             "referencedDeclaration": 111,
-                                                            "src": "2921:9:0",
+                                                            "src": "3362:9:0",
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_uint256",
                                                                 "typeString": "uint256"
@@ -2250,7 +2265,7 @@
                                                             "kind": "number",
                                                             "lValueRequested": false,
                                                             "nodeType": "Literal",
-                                                            "src": "2934:1:0",
+                                                            "src": "3375:1:0",
                                                             "subdenomination": null,
                                                             "typeDescriptions": {
                                                                 "typeIdentifier": "t_rational_0_by_1",
@@ -2258,7 +2273,7 @@
                                                             },
                                                             "value": "0"
                                                         },
-                                                        "src": "2921:14:0",
+                                                        "src": "3362:14:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_bool",
                                                             "typeString": "bool"
@@ -2280,7 +2295,7 @@
                                                         418
                                                     ],
                                                     "referencedDeclaration": 417,
-                                                    "src": "2913:7:0",
+                                                    "src": "3354:7:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
                                                         "typeString": "function (bool) pure"
@@ -2294,7 +2309,7 @@
                                                 "lValueRequested": false,
                                                 "names": [],
                                                 "nodeType": "FunctionCall",
-                                                "src": "2913:23:0",
+                                                "src": "3354:23:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_tuple$__$",
                                                     "typeString": "tuple()"
@@ -2302,7 +2317,7 @@
                                             },
                                             "id": 119,
                                             "nodeType": "ExpressionStatement",
-                                            "src": "2913:23:0"
+                                            "src": "3354:23:0"
                                         },
                                         {
                                             "eventCall": {
@@ -2315,7 +2330,7 @@
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
                                                         "referencedDeclaration": 4,
-                                                        "src": "2972:8:0",
+                                                        "src": "3413:8:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_uint256",
                                                             "typeString": "uint256"
@@ -2328,7 +2343,7 @@
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
                                                         "referencedDeclaration": 111,
-                                                        "src": "2982:9:0",
+                                                        "src": "3423:9:0",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_uint256",
                                                             "typeString": "uint256"
@@ -2351,7 +2366,7 @@
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
                                                     "referencedDeclaration": 12,
-                                                    "src": "2951:20:0",
+                                                    "src": "3392:20:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_uint256_$returns$__$",
                                                         "typeString": "function (uint256,uint256)"
@@ -2365,7 +2380,7 @@
                                                 "lValueRequested": false,
                                                 "names": [],
                                                 "nodeType": "FunctionCall",
-                                                "src": "2951:41:0",
+                                                "src": "3392:41:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_tuple$__$",
                                                     "typeString": "tuple()"
@@ -2373,7 +2388,7 @@
                                             },
                                             "id": 124,
                                             "nodeType": "EmitStatement",
-                                            "src": "2946:46:0"
+                                            "src": "3387:46:0"
                                         },
                                         {
                                             "expression": {
@@ -2390,7 +2405,7 @@
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
                                                     "referencedDeclaration": 4,
-                                                    "src": "3002:8:0",
+                                                    "src": "3443:8:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_uint256",
                                                         "typeString": "uint256"
@@ -2405,13 +2420,13 @@
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
                                                     "referencedDeclaration": 111,
-                                                    "src": "3013:9:0",
+                                                    "src": "3454:9:0",
                                                     "typeDescriptions": {
                                                         "typeIdentifier": "t_uint256",
                                                         "typeString": "uint256"
                                                     }
                                                 },
-                                                "src": "3002:20:0",
+                                                "src": "3443:20:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
@@ -2419,11 +2434,11 @@
                                             },
                                             "id": 128,
                                             "nodeType": "ExpressionStatement",
-                                            "src": "3002:20:0"
+                                            "src": "3443:20:0"
                                         }
                                     ]
                                 },
-                                "documentation": "@dev Transfers control of the contract to a newOwner.\n@param _newOwner EIN to transfer ownership to.",
+                                "documentation": "@notice Transfers control of the contract to a newOwner\n@dev This works on EINs, not on addresses\n@param _newOwner EIN to transfer ownership to",
                                 "id": 130,
                                 "implemented": true,
                                 "kind": "function",
@@ -2440,7 +2455,7 @@
                                             "name": "_newOwner",
                                             "nodeType": "VariableDeclaration",
                                             "scope": 130,
-                                            "src": "2878:14:0",
+                                            "src": "3319:14:0",
                                             "stateVariable": false,
                                             "storageLocation": "default",
                                             "typeDescriptions": {
@@ -2451,7 +2466,7 @@
                                                 "id": 110,
                                                 "name": "uint",
                                                 "nodeType": "ElementaryTypeName",
-                                                "src": "2878:4:0",
+                                                "src": "3319:4:0",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_uint256",
                                                     "typeString": "uint256"
@@ -2461,26 +2476,26 @@
                                             "visibility": "internal"
                                         }
                                     ],
-                                    "src": "2877:16:0"
+                                    "src": "3318:16:0"
                                 },
                                 "returnParameters": {
                                     "id": 113,
                                     "nodeType": "ParameterList",
                                     "parameters": [],
-                                    "src": "2903:0:0"
+                                    "src": "3344:0:0"
                                 },
                                 "scope": 131,
-                                "src": "2850:179:0",
+                                "src": "3291:179:0",
                                 "stateMutability": "nonpayable",
                                 "superFunction": null,
                                 "visibility": "internal"
                             }
                         ],
                         "scope": 132,
-                        "src": "639:2392:0"
+                        "src": "562:2910:0"
                     }
                 ],
-                "src": "0:3032:0"
+                "src": "0:3473:0"
             },
             "id": 0
         },

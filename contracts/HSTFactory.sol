@@ -6,8 +6,8 @@ import './components/HSTEscrow.sol';
 import './components/SnowflakeOwnable.sol';
 import './interfaces/IdentityRegistryInterface.sol';
 
-/*********************************
- * Hydro token on Rinkeby blockchain
+ /*********************************
+ * Hydro addresses on Rinkeby blockchain
  *********************************
  *
  * Token contract Rinkeby: 
@@ -25,7 +25,7 @@ import './interfaces/IdentityRegistryInterface.sol';
 
 /**
  * @title HSTFactory
- * @notice Contract deployer for the issuance of Securities
+ * @notice Perform deployment of contracts for the issuance of Hydro Securities
  * @dev 
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
@@ -35,39 +35,79 @@ contract HSTFactory is SnowflakeOwnable {
     address issuer;
     address escrow;
 
-    /// @notice Constructor
+   /**
+   * @notice Constructor
+   */
     constructor() public {
     }
 
-    event SecuritiesDeployed(bytes32 _name, string _description);
+   /**
+    * @notice Get a Hydro Securities Token deployed address
+    * @dev    
+    * @param  _tokenName The name of the token contract set to be deployed
+    */
+    function getSecuritiesTokenAddress(bytes32 _tokenName) public returns(address) {
+    }
+
+    /**
+    * @notice Triggered when a whole set of contracts for a hydro securities token deploy is started
+    */
+    event SecuritiesDeployStarted(bytes32 _tokenName);
+
+   /**
+    * @notice Triggered when a whole set of contracts for a hydro securities token deploy is finished
+    */
+    event SecuritiesDeployFinished(bytes32 _tokenName);
+
+    /**
+    * @notice Triggered when each contract is deployed
+    */
     event ContractDeployed(bytes32 _name, bytes32 _type, address indexed _addr);
 
-    // deploy a new Securities Token contract set
-    function deploySecuritiesTokenContractSet() public payable onlySnowflakeOwner returns(bool) {
-        token = deployToken;
-        issuer = deployIssuer;
-        escrow = deployEscrow;
+    /**
+    * @notice Deploy a Hydro Securities Token contract set
+    * @dev    
+    * @param  _tokenName The name of the token contract set to be deployed
+    */
+    function deploySecuritiesTokenContractSet(bytes32 _tokenName) public payable onlySnowflakeOwner returns(bool) {
+      emit SecuritiesDeployStarted(_tokenName);
+      token = deployToken;
+      issuer = deployIssuer;
+      escrow = deployEscrow;
+      emit SecuritiesDeployFinished(_tokenName);
     }
 
-    // deploy a new Securities Token contract
-    function deployToken(bytes32 _name) public payable onlySnowflakeOwner returns(address) {
-		HydroSecuritiesToken _token = (new HydroSecuritiesToken).value(msg.value)(address(msg.sender));
-		emit ContractDeployed(_name, "TOKEN", _token);
-		return _token;
+    /**
+    * @notice Deploy a Hydro Securities Token contract
+    * @dev    
+    * @param  _tokenName The name of the token contract set to be deployed
+    */
+    function deployToken(bytes32 _tokenName) public payable onlySnowflakeOwner returns(address) {
+      HydroSecuritiesToken _token = (new HydroSecuritiesToken).value(msg.value)(address(msg.sender));
+      emit ContractDeployed(_tokenName, "TOKEN", _token);
+      return _token;
     }
 
-    // deploy a new Securities Issuer contract
+    /**
+    * @notice Deploy a Hydro Securities Issuer contract
+    * @dev    
+    * @param  _tokenName The name of the token contract set to be deployed
+    */
     function deployIssuer(bytes32 _name) public payable onlySnowflakeOwner returns(address) {
-		HSTIssuer _issuer = (new HSTIssuer).value(msg.value)(address(msg.sender));
-		emit ContractDeployed(_name, "ISSUER", _issuer);
-		return _issuer;
+      HSTIssuer _issuer = (new HSTIssuer).value(msg.value)(address(msg.sender));
+      emit ContractDeployed(_name, "ISSUER", _issuer);
+      return _issuer;
     }
 
-    // deploy a new Securities Escrow contract
+    /**
+    * @notice Deploy a Hydro Securities Escrow contract
+    * @dev    
+    * @param  _tokenName The name of the token contract set to be deployed
+    */
     function deployEscrow(bytes32 _name) public payable onlySnowflakeOwner returns(address) {
-		HSTEscrow _escrow = (new HSTEscrow).value(msg.value)(address(msg.sender));
-		emit ContractDeployed(_name, "ESCROW", _escrow);
-		return _escrow;
+      HSTEscrow _escrow = (new HSTEscrow).value(msg.value)(address(msg.sender));
+      emit ContractDeployed(_name, "ESCROW", _escrow);
+      return _escrow;
     }
 
 }
