@@ -13,14 +13,11 @@ import './zeppelin/ownership/Ownable.sol';
 // Rinkeby testnet addresses
 // HydroToken: 0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20
 // IdentityRegistry: 0xa7ba71305be9b2dfead947dc0e5730ba2abd28ea
-// Most recent HydroST deployed address:
 
 // TODO
 //
 // A global Registry with data of all Securities issued, to check for repeated ids or symbols
 //
-// Feature #2: Define and implement HST rules (ongoing)
-// Feature #10: Admin functions (ongoing)
 // Feature #11: Participant functions -> send and receive token
 // Feature #15: Carried interest ?
 // Feature #16: Interest payout ?
@@ -134,13 +131,12 @@ contract HSTIssuer is
     HydroInterface public hydroToken;
     SnowflakeViaInterface public snowflakeVia;
 
-
     event HydroSTCreated(
         uint256 indexed id, 
         string name,
         string symbol,
         uint8 decimals,
-        bytes32 EINowner
+        bytes32 einOwner
         );
 
     event Sell(address indexed _owner, uint256 _amount);
@@ -181,27 +177,86 @@ contract HSTIssuer is
     }
 
     constructor(
-        address _identityRegistryAddress, 
-        address _HSToken,
-        uint256 _lockPeriod,
-        uint256 _minInvestors,
-        uint256 _maxInvestors,
-        uint256 _percForInvestors,
+        uint256 _id,
         bytes32 _name,
         string _description,
-        uint256 _fee,
-        address _feeReceiver,
-        address _KYCResolver,
-        bytes32 _KYCbytes,
-        bool PERC_OWNERSHIP_TYPE,
-        bool HYDRO_AMOUNT_TYPE,
-        ) 
-    public {
-        require(_identityRegistryAddress != address(0), 'The identity registry address is required');
-        require(_HSToken != address(0), 'You must setup the token rinkeby address');
-        hydroToken = HydroInterface(_HSToken);
-        identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
+        string _symbol,
+        uint256 _hydroPrice,
+        uint256 _etherPrice,
+        uint256 _beginningDate,
+        uint256 _lockEnds, // Date of end of locking period
+        uint256 _endDate,
+        uint256 _maxSupply,
+        uint256 _escrowLimitPeriod,
 
+        // STO types / flags
+        bool _LIMITED_OWNERSHIP,
+        bool _IS_LOCKED,
+        bool _PERIOD_LOCKED, 
+        bool _PERC_OWNERSHIP_TYPE,
+        bool _HYDRO_AMOUNT_TYPE, 
+        bool _ETH_AMOUNT_TYPE, 
+        bool _HYDRO_ALLOWED, 
+        bool _ETH_ALLOWED,
+        bool _KYC_WHITELIST_RESTRICTED,
+        bool _AML_WHITELIST_RESTRICTED,
+
+        // STO parameters
+        uint256 _percAllowedTokens, // considered if PERC_OWNERSHIP_TYPE
+        uint256 _hydroAllowed, // considered if HYDRO_AMOUNT_TYPE
+        uint256 _ethAllowed, // considered if ETH_AMOUNT_TYPE
+        uint256 _lockPeriod, // in days
+        uint256 _minInvestors,
+        uint256 _maxInvestors,
+        address _owner) public {
+
+        id = _id; 
+        name = _name;
+        description = _description;
+        symbol = _symbol;
+        hydroPrice = _hydroPrice;
+        etherPrice = _etherPrice;
+        beginningDate = _beginningDate;
+        lockEnds = _lockEnds;
+        endDate = _endDate;
+        maxSupply = _maxSupply;
+        escrowLimitPeriod = _escrowLimitPeriod;
+
+        // STO types / flags
+        LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP;
+        IS_LOCKED = _IS_LOCKED;
+        PERIOD_LOCKED = _PERIOD_LOCKED;
+        PERC_OWNERSHIP_TYPE = _PERC_OWNERSHIP_TYPE;
+        HYDRO_AMOUNT_TYPE = _HYDRO_AMOUNT_TYPE;
+        ETH_AMOUNT_TYPE = _ETH_AMOUNT_TYPE; 
+        HYDRO_ALLOWED = _HYDRO_ALLOWED; 
+        ETH_ALLOWED = _ETH_ALLOWED; 
+        KYC_WHITELIST_RESTRICTED = _KYC_WHITELIST_RESTRICTED;
+        AML_WHITELIST_RESTRICTED = _AML_WHITELIST_RESTRICTED;
+
+        // STO parameters
+        percAllowedTokens = _percAllowedTokens; 
+        hydroAllowed = _hydroAllowed; 
+        ethAllowed = _ethAllowed; 
+        lockPeriod = _lockPeriod; 
+        minInvestors = _minInvestors;
+        maxInvestors = _maxInvestors;
+
+        // State Memory
+        stage = Stage.SETUP;
+
+        // Links to Modules
+        HSToken = address(0x0);
+        RegistryRules = address(0x0);
+        InterestSolver = address(0x0);
+
+        hydroToken = HydroInterface(address(0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20));
+        identityRegistry = IdentityRegistryInterface(address(0xa7ba71305be9b2dfead947dc0e5730ba2abd28ea));
+
+        if (_owner == 0x0) _owner = msg.sender; else _owner = _owner;
+        einOwner = identityRegistry.getEIN(_owner);
+
+        emit HydroSTCreated(indexed id, name, symbol, decimals, einOwner);
     }
 
     // Feature #10: ADMIN FUNCTIONS
