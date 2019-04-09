@@ -1,4 +1,4 @@
-pragma solidity ^0.5.4;
+pragma solidity ^0.5.0;
 
 import '../interfaces/HSTControlService.sol';
 import './SnowflakeOwnable.sol';
