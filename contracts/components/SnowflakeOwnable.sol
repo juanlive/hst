@@ -55,7 +55,7 @@ contract SnowflakeOwnable {
     * @notice Throws if called by any account other than the owner
     * @dev This works on EINs, not on addresses
     */
-    modifier onlyOwner() {
+    modifier onlySnowflakeOwner() {
         require(isOwner());
         _;
     }
@@ -74,7 +74,7 @@ contract SnowflakeOwnable {
     * @notice Allows the current owner to relinquish control of the contract
     * @dev Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner modifier anymore.
     */
-    function renounceOwnership() public onlyOwner {
+    function renounceOwnership() public onlySnowflakeOwner {
         emit OwnershipTransferred(ownerEIN, 0);
         ownerEIN = 0;
     }
@@ -84,7 +84,7 @@ contract SnowflakeOwnable {
     * @dev This works on EINs, not on addresses
     * @param _newOwner EIN to transfer ownership to
     */
-    function transferOwnership(uint _newOwner) public onlyOwner {
+    function transferOwnership(uint _newOwner) public onlySnowflakeOwner {
         _transferOwnership(_newOwner);
     }
 
@@ -93,7 +93,7 @@ contract SnowflakeOwnable {
     * @dev This works on EINs, not on addresses
     * @param _newOwner EIN to transfer ownership to
     */
-    function _transferOwnership(uint _newOwner) internal {
+    function _transferOwnership(uint _newOwner) internal onlySnowflakeOwner {
         require(_newOwner != 0);
         emit OwnershipTransferred(ownerEIN, _newOwner);
         ownerEIN = _newOwner;
