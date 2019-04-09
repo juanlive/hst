@@ -87,7 +87,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _name Name of the new service category
    * @param _description Description of the new service category
    */
-  function addCategory(bytes32 _name, string memory _description) onlyOwner public {
+  function addCategory(bytes32 _name, string memory _description) onlySnowflakeOwner public {
     serviceCategories[_name] = _description;
     emit AddCategory(_name, _description);
   }
@@ -100,7 +100,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _category Name of the category the service belongs to
    * @param _service Address of the service to use
    */
-  function addService(address _token, bytes32 _category, address _service) onlyOwner withContract(_token) withContract(_service) public {
+  function addService(address _token, bytes32 _category, address _service) onlySnowflakeOwner withContract(_token) withContract(_service) public {
     serviceRegistry[_token][_category] = _service;
     emit AddService(_token, _category, _service);
   }
@@ -115,7 +115,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _oldService Old address for the service
    * @param _newService New address for the service to use
    */
-  function replaceService(address _token, bytes32 _category, address _oldService, address _newService) onlyOwner withContract(_token) withContract(_newService) public {
+  function replaceService(address _token, bytes32 _category, address _oldService, address _newService) onlySnowflakeOwner withContract(_token) withContract(_newService) public {
     serviceRegistry[_token][_category] = _newService;
     emit ReplaceService(_token, _category, _oldService, _newService);
   }

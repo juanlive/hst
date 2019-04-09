@@ -44,20 +44,6 @@
         {
             "constant": true,
             "inputs": [],
-            "name": "owner",
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [],
             "name": "isOwner",
             "outputs": [
                 {
@@ -115,6 +101,20 @@
             "outputs": [],
             "payable": false,
             "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "getOwnerEIN",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
             "type": "function"
         },
         {
@@ -234,12 +234,12 @@
             "inputs": [
                 {
                     "indexed": false,
-                    "name": "previousOwnerEIN",
+                    "name": "_previousOwnerEIN",
                     "type": "uint256"
                 },
                 {
                     "indexed": false,
-                    "name": "newOwnerEIN",
+                    "name": "_newOwnerEIN",
                     "type": "uint256"
                 }
             ],
@@ -252,9 +252,9 @@
         "ServiceRegistry()": "fef83508",
         "addCategory(bytes32,string)": "297d574e",
         "addService(address,bytes32,address)": "a77a48bf",
+        "getOwnerEIN()": "c44a5a35",
         "identityRegistry()": "134e18f4",
         "isOwner()": "8f32d59b",
-        "owner()": "8da5cb5b",
         "renounceOwnership()": "715018a6",
         "replaceService(address,bytes32,address,address)": "930a6990",
         "serviceRegistry(address,bytes32)": "dbcfaf19",

@@ -100,7 +100,7 @@ contract HSTFactory is SnowflakeOwnable {
     * @dev    
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deploySecuritiesTokenContractSet(bytes32 _tokenName) public payable onlySnowflakeOwner returns(bool) {
+    function deploySecuritiesTokenContractSet(bytes32 _tokenName) public payable returns(bool) {
       emit SecuritiesDeployStarted(_tokenName);
       tokens[_tokenName]  = deployToken;
       issuers[_tokenName] = deployIssuer;

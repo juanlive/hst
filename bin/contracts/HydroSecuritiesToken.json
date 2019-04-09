@@ -207,20 +207,6 @@
         {
             "constant": true,
             "inputs": [],
-            "name": "owner",
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [],
             "name": "isOwner",
             "outputs": [
                 {
@@ -299,6 +285,20 @@
             "outputs": [],
             "payable": false,
             "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "getOwnerEIN",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
             "type": "function"
         },
         {
@@ -451,12 +451,12 @@
             "inputs": [
                 {
                     "indexed": false,
-                    "name": "previousOwnerEIN",
+                    "name": "_previousOwnerEIN",
                     "type": "uint256"
                 },
                 {
                     "indexed": false,
-                    "name": "newOwnerEIN",
+                    "name": "_newOwnerEIN",
                     "type": "uint256"
                 }
             ],
@@ -474,11 +474,11 @@
         "balances(address)": "27e235e3",
         "burn(uint256)": "42966c68",
         "decimals()": "313ce567",
+        "getOwnerEIN()": "c44a5a35",
         "getTotalSupply()": "c4e41b22",
         "identityRegistry()": "134e18f4",
         "isOwner()": "8f32d59b",
         "name()": "06fdde03",
-        "owner()": "8da5cb5b",
         "raindropAddress()": "03960631",
         "renounceOwnership()": "715018a6",
         "setBalances(address[],uint256[])": "b7e39b4f",

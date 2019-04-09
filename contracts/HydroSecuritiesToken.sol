@@ -118,7 +118,7 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
         }
     }
 
-    function burn(uint256 _value) public onlyOwner {
+    function burn(uint256 _value) public onlySnowflakeOwner {
         require(balances[msg.sender] >= _value);
         balances[msg.sender] = balances[msg.sender].sub(_value);
         totalSupply = totalSupply.sub(_value);
@@ -141,7 +141,7 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
         return totalSupply;
     }
 
-    function setRaindropAddress(address _raindrop) public onlyOwner {
+    function setRaindropAddress(address _raindrop) public onlySnowflakeOwner {
         raindropAddress = _raindrop;
     }
 
@@ -151,7 +151,7 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
     //     doTransfer(msg.sender, owner, _value);
     // }
 
-    function setBalances(address[] memory _addressList, uint[] memory _amounts) public onlyOwner {
+    function setBalances(address[] memory _addressList, uint[] memory _amounts) public onlySnowflakeOwner {
         require(_addressList.length == _amounts.length);
         for (uint i = 0; i < _addressList.length; i++) {
           require(balances[_addressList[i]] == 0);
