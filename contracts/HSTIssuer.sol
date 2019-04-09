@@ -48,7 +48,7 @@ contract HSTIssuer is
 
 	// Main parameters
 	uint256 id;
-	bytes32 name;
+	string name;
 	string description;
 	string symbol;
     uint8 decimals;
@@ -137,7 +137,7 @@ contract HSTIssuer is
         string name,
         string symbol,
         uint8 decimals,
-        bytes32 einOwner
+        uint256 einOwner
         );
 
     event Sell(address indexed _owner, uint256 _amount);
@@ -179,7 +179,7 @@ contract HSTIssuer is
 
     constructor(
         uint256 _id,
-        bytes32 _name,
+        string _name,
         string memory _description,
         string memory _symbol,
         uint8 _decimals,
@@ -253,10 +253,10 @@ contract HSTIssuer is
         RegistryRules = address(0x0);
         InterestSolver = address(0x0);
 
-        hydroToken = HydroInterface(address(0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20));
-        identityRegistry = IdentityRegistryInterface(address(0xa7ba71305be9b2dfead947dc0e5730ba2abd28ea));
+        hydroToken = HydroInterface(0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20);
+        identityRegistry = IdentityRegistryInterface(0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA);
 
-        if (_owner == 0x0) _owner = msg.sender; else _owner = _owner;
+        if (_owner == address(0x0)) _owner = msg.sender; else _owner = _owner;
         einOwner = identityRegistry.getEIN(_owner);
 
         emit HydroSTCreated(id, name, symbol, decimals, einOwner);
@@ -308,13 +308,13 @@ contract HSTIssuer is
 
     function freeze(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          freeze[_einList[i]] == true;
+          freezed[_einList[i]] == true;
         }
     }
 
     function unFreeze(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          freeze[_einList[i]] == false;
+          freezed[_einList[i]] == false;
         }
     }
 
