@@ -41,6 +41,14 @@ contract HSTFactory is SnowflakeOwnable {
     constructor() public {
     }
 
+   /**
+    * @notice Get a Hydro Securities Token deployed address
+    * @dev    
+    * @param  _tokenName The name of the token contract set to be deployed
+    */
+    function getSecuritiesTokenAddress(bytes32 _tokenName) public returns(address) {
+    }
+
     /**
     * @notice Triggered when a whole set of contracts for a hydro securities token deploy is started
     */
