@@ -3,25 +3,11 @@
         {
             "constant": true,
             "inputs": [],
-            "name": "raindropAddress",
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "address"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [],
             "name": "name",
             "outputs": [
                 {
                     "name": "",
-                    "type": "string"
+                    "type": "bytes32"
                 }
             ],
             "payable": false,
@@ -225,7 +211,7 @@
             "outputs": [
                 {
                     "name": "",
-                    "type": "string"
+                    "type": "bytes32"
                 }
             ],
             "payable": false,
@@ -251,20 +237,6 @@
                     "type": "bool"
                 }
             ],
-            "payable": false,
-            "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "constant": false,
-            "inputs": [
-                {
-                    "name": "_raindrop",
-                    "type": "address"
-                }
-            ],
-            "name": "setRaindropAddress",
-            "outputs": [],
             "payable": false,
             "stateMutability": "nonpayable",
             "type": "function"
@@ -380,7 +352,24 @@
             "type": "function"
         },
         {
-            "inputs": [],
+            "inputs": [
+                {
+                    "name": "_name",
+                    "type": "bytes32"
+                },
+                {
+                    "name": "_decimals",
+                    "type": "uint8"
+                },
+                {
+                    "name": "_symbol",
+                    "type": "bytes32"
+                },
+                {
+                    "name": "_totalSupply",
+                    "type": "uint256"
+                }
+            ],
             "payable": false,
             "stateMutability": "nonpayable",
             "type": "constructor"
@@ -479,10 +468,8 @@
         "identityRegistry()": "134e18f4",
         "isOwner()": "8f32d59b",
         "name()": "06fdde03",
-        "raindropAddress()": "03960631",
         "renounceOwnership()": "715018a6",
         "setBalances(address[],uint256[])": "b7e39b4f",
-        "setRaindropAddress(address)": "b302ea1e",
         "symbol()": "95d89b41",
         "totalSupply()": "18160ddd",
         "transfer(address,uint256)": "a9059cbb",
