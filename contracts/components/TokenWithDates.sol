@@ -13,8 +13,8 @@ pragma solidity ^0.5.0;
 
 contract ERC20Basic {
     uint256 public totalSupply;
-    function balanceOf(address who) view returns (uint256);
-    function transfer(address to, uint256 value) returns (bool);
+    function balanceOf(address who) view public returns (uint256);
+    function transfer(address to, uint256 value) public returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -85,7 +85,7 @@ contract TokenWithDates {
     }
 
     // Token constructor
-    constructor() {        
+    constructor() public {        
         locked = false;
         name = 'TokenWithADate'; 
         symbol = 'TWD';
@@ -103,7 +103,7 @@ contract TokenWithDates {
     }
 
     // Only root function
-    function changeRoot(address _newRootAddress) onlyRoot returns(bool){
+    function changeRoot(address _newRootAddress) onlyRoot public returns(bool){
         rootAddress = _newRootAddress;
         return true;
     }
@@ -111,30 +111,30 @@ contract TokenWithDates {
     // Only owner functions
 
     // To send ERC20 tokens sent accidentally
-    function sendToken(address _token,address _to , uint _value) onlyOwner returns(bool) {
+    function sendToken(address _token,address _to , uint _value) onlyOwner public returns(bool) {
         ERC20Basic Token = ERC20Basic(_token);
         require(Token.transfer(_to, _value));
         return true;
     }
 
-    function changeOwner(address _newOwner) onlyOwner returns(bool) {
+    function changeOwner(address _newOwner) onlyOwner public returns(bool) {
         owner = _newOwner;
         return true;
     }
        
-    function unlock() onlyOwner returns(bool) {
+    function unlock() onlyOwner public returns(bool) {
         locked = false;
         return true;
     }
 
-    function lock() onlyOwner returns(bool) {
+    function lock() onlyOwner public returns(bool) {
         locked = true;
         return true;
     }
 
     // Public token functions
     // Standard function transfer
-    function transfer(address _to, uint _value) isUnlocked returns (bool success) {
+    function transfer(address _to, uint _value) isUnlocked public returns (bool success) {
         require(msg.sender != _to);
         if (balances[msg.sender] < _value) return false;
         balances[msg.sender] = safeSub(balances[msg.sender], _value);
@@ -162,7 +162,7 @@ contract TokenWithDates {
         return true;
     }
 
-    function approve(address _spender, uint _value) returns(bool) {
+    function approve(address _spender, uint _value) public returns(bool) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -171,17 +171,17 @@ contract TokenWithDates {
 
     // Public getters
 
-    function isLocked() view returns(bool) {
+    function isLocked() view public returns(bool) {
         return locked;
     }
 
     // ERC20 specific
 
-    function balanceOf(address _owner) view returns(uint256 balance) {
+    function balanceOf(address _owner) view public returns(uint256 balance) {
         return balances[_owner];
     }
 
-    function allowance(address _owner, address _spender) view returns(uint256) {
+    function allowance(address _owner, address _spender) view public returns(uint256) {
         return allowed[_owner][_spender];
     }
 
