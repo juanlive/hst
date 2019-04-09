@@ -179,7 +179,7 @@ contract HSTIssuer is
 
     constructor(
         uint256 _id,
-        string _name,
+        string memory _name,
         string memory _description,
         string memory _symbol,
         uint8 _decimals,
