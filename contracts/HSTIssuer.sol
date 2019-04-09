@@ -1,4 +1,4 @@
-pragma solidity ^0.5.4;
+pragma solidity ^0.5.0;
 
 import './components/SnowflakeOwnable.sol';
 import './components/HSTEscrow.sol';
@@ -32,7 +32,7 @@ import './zeppelin/ownership/Ownable.sol';
  */
 
 contract HSTIssuer is 
-    SnowflakeOwnable isOwner {
+    SnowflakeOwnable, Ownable {
 
     using SafeMath for uint256;
     
@@ -52,8 +52,9 @@ contract HSTIssuer is
 	bytes32 name;
 	string description;
 	string symbol;
+    uint8 decimals;
 	uint256 hydroPrice;
-    uint256 etherPrice;
+    uint256 ethPrice;
 	uint256 beginningDate;
     uint256 lockEnds; // Date of end of locking period
 	uint256 endDate;
@@ -130,6 +131,7 @@ contract HSTIssuer is
     IdentityRegistryInterface public identityRegistry;
     HydroInterface public hydroToken;
     SnowflakeViaInterface public snowflakeVia;
+    TokenWithDates private tokenWithDates;
 
     event HydroSTCreated(
         uint256 indexed id, 
@@ -148,7 +150,7 @@ contract HSTIssuer is
         _;
     }
 
-    modifier isUnfreezed(_from, _einId) {
+    modifier isUnfreezed(address _from, uint256 _einId) {
         require(!freezed[_einId] , "Target EIN is freezed");
         require(!freezed[identityRegistry.getEIN(_from)], "Source EIN is freezed");
         _;
@@ -179,10 +181,11 @@ contract HSTIssuer is
     constructor(
         uint256 _id,
         bytes32 _name,
-        string _description,
-        string _symbol,
+        string memory _description,
+        string memory _symbol,
+        uint8 _decimals,
         uint256 _hydroPrice,
-        uint256 _etherPrice,
+        uint256 _ethPrice,
         uint256 _beginningDate,
         uint256 _lockEnds, // Date of end of locking period
         uint256 _endDate,
@@ -214,8 +217,9 @@ contract HSTIssuer is
         name = _name;
         description = _description;
         symbol = _symbol;
+        decimals = _decimals;
         hydroPrice = _hydroPrice;
-        etherPrice = _etherPrice;
+        ethPrice = _ethPrice;
         beginningDate = _beginningDate;
         lockEnds = _lockEnds;
         endDate = _endDate;
@@ -256,13 +260,13 @@ contract HSTIssuer is
         if (_owner == 0x0) _owner = msg.sender; else _owner = _owner;
         einOwner = identityRegistry.getEIN(_owner);
 
-        emit HydroSTCreated(indexed id, name, symbol, decimals, einOwner);
+        emit HydroSTCreated(id, name, symbol, decimals, einOwner);
     }
 
     // Feature #10: ADMIN FUNCTIONS
 
     // Feature #9
-    function setLockupPeriod(uint256 _lockEnds) public onlyAdmin {
+    function setLockupPeriod(uint256 _lockEnds) onlyAdmin public {
         if (_lockEnds == 0) {
             PERIOD_LOCKED == false;
             }
@@ -270,46 +274,46 @@ contract HSTIssuer is
         lockEnds = _lockEnds;
     }
 
-    function lock() public onlyAdmin {
+    function lock() onlyAdmin public {
         IS_LOCKED = true;
     }
 
-    function unLock() public onlyAdmin {
+    function unLock() onlyAdmin public {
         IS_LOCKED = false;
     }
 
-    function addWhitelist(uint256[] _einList) public onlyAdmin {
+    function addWhitelist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
           whiteList[_einList[i]] == true;
         }
     }
 
-    function addBlackList(uint256[] _einList) public onlyAdmin {
+    function addBlackList(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
           blackList[_einList[i]] == true;
         }
     }
 
-    function removeWhitelist(uint256[] _einList) public onlyAdmin {
+    function removeWhitelist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
           whiteList[_einList[i]] == false;
         }
 
     }
 
-    function removeBlacklist(uint256[] _einList) public onlyAdmin {
+    function removeBlacklist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
           blackList[_einList[i]] == false;
         }
     }
 
-    function freeze(uint256[] _einList) public onlyAdmin {
+    function freeze(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
           freeze[_einList[i]] == true;
         }
     }
 
-    function unFreeze(uint256[] _einList) public onlyAdmin {
+    function unFreeze(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
           freeze[_einList[i]] == false;
         }
@@ -319,18 +323,18 @@ contract HSTIssuer is
     // Only at Prelaunch functions: adding and removing resolvers
 
     // Feature #3
-    function addKYCResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+    function addKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(KYCResolver[_address] == 0, "Resolver already exists");
         require(KYCResolverQ <= 5, "No more resolvers allowed");
         identityRegistry.addResolver(_address);
         KYCResolverQ ++;
         KYCResolver[_address] = KYCResolverQ;
-        KYCresolverArray[KYCResolverQ-1] = _address;
+        KYCResolverArray[KYCResolverQ-1] = _address;
     }
 
-    function removeKYCResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+    function removeKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(KYCResolver[_address] != 0, "Resolver does not exist");
-        uint8 memory _number = KYCResolver[_address];
+        uint8 _number = KYCResolver[_address];
         if (KYCResolverArray.length > _number) {
             for (uint8 i = _number; i < KYCResolverArray.length; i++) {
                 KYCResolverArray[i-1] = KYCResolverArray[i];
@@ -341,18 +345,18 @@ contract HSTIssuer is
         KYCResolver[_address] = 0;
         identityRegistry.removeResolver(_address); 
     }
-    function addAMLResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+    function addAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(AMLResolver[_address] == 0, "Resolver already exists");
         require(AMLResolverQ <= 5, "No more resolvers allowed");
         identityRegistry.addResolver(_address);
         AMLResolverQ ++;
         AMLResolver[_address] = AMLResolverQ;
-        AMLresolverArray[AMLResolverQ-1] = _address;
+        AMLResolverArray[AMLResolverQ-1] = _address;
     }
 
-    function removeAMLResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+    function removeAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(AMLResolver[_address] != 0, "Resolver does not exist");
-        uint8 memory _number = AMLResolver[_address];
+        uint8 _number = AMLResolver[_address];
         if (AMLResolverArray.length > _number) {
             for (uint8 i = _number; i < AMLResolverArray.length; i++) {
                 AMLResolverArray[i-1] = AMLResolverArray[i];
@@ -363,18 +367,18 @@ contract HSTIssuer is
         AMLResolver[_address] = 0;
         identityRegistry.removeResolver(_address); 
     }
-        function addLegalResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+        function addLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(LegalResolver[_address] == 0, "Resolver already exists");
         require(LegalResolverQ <= 5, "No more resolvers allowed");
         identityRegistry.addResolver(_address);
         LegalResolverQ ++;
         LegalResolver[_address] = LegalResolverQ;
-        LegalresolverArray[LegalResolverQ-1] = _address;
+        LegalResolverArray[LegalResolverQ-1] = _address;
     }
 
-    function removeLegalResolver(address _address) public onlyAdmin onlyAtPreLaunch {
+    function removeLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(LegalResolver[_address] != 0, "Resolver does not exist");
-        uint8 memory _number = LegalResolver[_address];
+        uint8 _number = LegalResolver[_address];
         if (LegalResolverArray.length > _number) {
             for (uint8 i = _number; i < LegalResolverArray.length; i++) {
                 LegalResolverArray[i-1] = LegalResolverArray[i];
@@ -385,26 +389,22 @@ contract HSTIssuer is
         LegalResolver[_address] = 0;
         identityRegistry.removeResolver(_address); 
     }
-    // Feature #4
-    function addAMLResolver(address _address) public onlyAdmin onlyAtPreLaunch {
-        identityRegistry.addResolver(_address);
-        AMLresolver.push(_address);
-    }
+
 
 
 
     // Release gains. Only after escrow is released
 
     // Retrieve tokens and ethers
-    function releaseHydroTokens() public onlyAdmin scrowReleased {
-        uint256 memory balance = hydroToken.balanceOf(address(this));
-        hydrosReleased = hydrosReleased + balance;
-        hydrotoken.transfer(_owner, balance);
+    function releaseHydroTokens() onlyAdmin escrowReleased public {
+        uint256 thisBalance = hydroToken.balanceOf(address(this));
+        hydrosReleased = hydrosReleased + thisBalance;
+        hydroToken.transfer(owner, thisBalance);
     }
 
-    function releaseEthers() public onlyAdmin scrowReleased {
-        ethersReleased = ethersRetrieved + this.balance;
-        _owner.send(this.balance);
+    function releaseEthers() onlyAdmin escrowReleased public {
+        ethersReleased = ethersReleased + this.balance;
+        owner.send(this.balance);
     }
 
 
@@ -413,10 +413,11 @@ contract HSTIssuer is
     // PUBLIC FUNCTIONS FOR INVESTORS -----------------------------------------------------------------
 
 
-    function buyTokens(string _coin, uint256 _amount) public payable return(bool) onlyActive {
+    function buyTokens(string memory _coin, uint256 _amount) onlyActive
+        public payable returns(bool) {
 
-        uint256 memory total;
-        uint256 memory _ein = identityRegistry.getEIN(msg.sender);
+        uint256 total;
+        uint256 _ein = identityRegistry.getEIN(msg.sender);
 
         require(stage == Stage.ACTIVE, "Current stage is not active");
 
@@ -456,14 +457,16 @@ contract HSTIssuer is
         }
 
         // Sell
-        _doSell(_to, total);
-        emit Sell(_to, total);
+        _doSell(msg.sender, total);
+        emit Sell(msg.sender, total);
         return true;
     }
 
 
-    function claimInterests() public returns(bool) {
-       return(interestSolver(msg.sender));
+    function claimInterests() 
+        public returns(bool) {
+        //return(interestSolver(msg.sender));
+        return true;
     }
 
 
@@ -471,27 +474,29 @@ contract HSTIssuer is
     // Token ERC-20 wrapper -----------------------------------------------------------
 
     // Feature #11
-    function transfer(address _to, uint256 _amount) public returns(bool) 
-        isUnlocked isUnfreezed(msg.sender, _to) {
+    function transfer(address _to, uint256 _amount) 
+        isUnlocked isUnfreezed(msg.sender, _to) 
+        public returns(bool) {
         
         if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
         if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
 
-        tokenWithADate.updateBatches(msg.sender, _to, _amount);
+        tokenWithDates.updateBatches(msg.sender, _to, _amount);
 
-        return(HydroToken.transfer(_to, _amount));
+        return(hydroToken.transfer(_to, _amount));
     }
 
     // Feature #11
-    function transferFrom(address _from, address _to, uint256 _amount) public returns(bool) 
-        isUnlocked isUnfreezed(_from, _to) {
+    function transferFrom(address _from, address _to, uint256 _amount) 
+        isUnlocked isUnfreezed(_from, _to) 
+        public returns(bool) {
         
         if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
         if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
 
-        tokenWithADate.updateBatches(_from, _to, _amount);
+        tokenWithDates.updateBatches(_from, _to, _amount);
 
-        return(HydroToken.transferFrom(_from, _to, _amount));
+        return(hydroToken.transferFrom(_from, _to, _amount));
     }
 
 
@@ -508,7 +513,7 @@ contract HSTIssuer is
 
     // INTERNAL FUNCTIONS ----------------------------------------------------------
 
-     function _doSell(_to, _amount) private {
+     function _doSell(address _to, uint256 _amount) private {
         issuedTokens = issuedTokens + _amount;
         ownedTokens = ownedTokens + _amount;
         balance[_to].add(_amount);
@@ -520,19 +525,19 @@ contract HSTIssuer is
     // Feature #8
     function _checkKYCWhitelist(uint256 _to, uint256 _amount) private {
         for (uint8 i = 1; i <= KYCResolverQ; i++) {
-            approver = new ApproverInterface(KYCResolver[i]);
+            ApproverInterface approver = new ApproverInterface(KYCResolver[i]);
             require(approver.isApproved(_to, _amount));
         }
     }
     function _checkAMLWhitelist(uint256 _to, uint256 _amount) private {
         for (uint8 i = 1; i <= AMLResolverQ; i++) {
-            approver = new ApproverInterface(AMLResolver[i]);
+            ApproverInterface approver = new ApproverInterface(AMLResolver[i]);
             require(approver.isApproved(_to, _amount));
         }
     }
     function _checkLegalWhitelist(uint256 _to, uint256 _amount) private {
         for (uint8 i = 1; i <= LegalResolverQ; i++) {
-            approver = new ApproverInterface(LegalResolver[i]);
+            ApproverInterface approver = new ApproverInterface(LegalResolver[i]);
             require(approver.isApproved(_to, _amount));
         }
     }

@@ -13,14 +13,14 @@ pragma solidity ^0.4.23;
 
 contract ERC20Basic {
     uint256 public totalSupply;
-    function balanceOf(address who) constant returns (uint256);
+    function balanceOf(address who) view returns (uint256);
     function transfer(address to, uint256 value) returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
 
 // The Token
-contract TokenWithADate {
+contract TokenWithDates {
 
     // Token public variables
     string public name;
@@ -171,24 +171,24 @@ contract TokenWithADate {
 
     // Public getters
 
-    function isLocked() constant returns(bool) {
+    function isLocked() view returns(bool) {
         return locked;
     }
 
     // ERC20 specific
 
-    function balanceOf(address _owner) constant returns(uint256 balance) {
+    function balanceOf(address _owner) view returns(uint256 balance) {
         return balances[_owner];
     }
 
-    function allowance(address _owner, address _spender) constant returns(uint256) {
+    function allowance(address _owner, address _spender) view returns(uint256) {
         return allowed[_owner][_spender];
     }
 
     // New Token With A Date getters
 
     // Address info
-    function addressInfo(address _address) public constant returns(
+    function addressInfo(address _address) public view returns(
         uint _balance,
         uint _older,
         uint _newer,
@@ -205,7 +205,7 @@ contract TokenWithADate {
             );
     }
 
-    function balanceBetween(address _address, uint _fromAge , uint _toAge) public constant returns(uint _balance) {
+    function balanceBetween(address _address, uint _fromAge , uint _toAge) public view returns(uint _balance) {
         if (_fromAge < _toAge) { // Swap values if necessary, so order is not a problem for users
             uint _swap = _fromAge;
             _fromAge = _toAge;
@@ -223,7 +223,7 @@ contract TokenWithADate {
         }
     }
 
-    function balanceOlders(address _address,uint _age) public constant returns(uint _balance) {
+    function balanceOlders(address _address,uint _age) public view returns(uint _balance) {
         _balance = 0;
         uint batchAmount;
         uint batchAge;
@@ -236,7 +236,7 @@ contract TokenWithADate {
         }
     }
 
-    function balanceNewers(address _address,uint _age) public constant returns(uint _balance) {
+    function balanceNewers(address _address,uint _age) public view returns(uint _balance) {
         _balance = 0;
         uint batchAmount;
         uint batchAge;
@@ -250,13 +250,13 @@ contract TokenWithADate {
 
     // Info about batches
 
-    function getBatch(address _address , uint _batch) public constant returns(uint _quant,uint _age) {
+    function getBatch(address _address , uint _batch) public view returns(uint _quant,uint _age) {
         // Retrieves info of a numered batch
         if ( batches[_address][_batch].age == 0 ) return (0,0);
         return (batches[_address][_batch].quant , secToDays(softSub(now,batches[_address][_batch].age)));
     }
 
-    function getFirstBatch(address _address) public constant returns(uint _quant,uint _age) {
+    function getFirstBatch(address _address) public view returns(uint _quant,uint _age) {
         // Returns the first batch with tokens of the address
         if ( batches[_address][minIndex[_address]].age == 0 ) return (0,0);
         return (batches[_address][minIndex[_address]].quant , secToDays(softSub(now,batches[_address][minIndex[_address]].age)));

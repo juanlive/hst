@@ -13,15 +13,15 @@ pragma solidity ^0.5.0;
 
 contract ERC20Basic {
     uint256 public totalSupply;
-    function balanceOf(address who) constant returns (uint256);
+    function balanceOf(address who) view returns (uint256);
     function transfer(address to, uint256 value) returns (bool);
     function transferFrom(address _from, address _to, uint256 _value) public returns(bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
 contract TokenWithDates {
-    function getBatch(address _address , uint _batch) public constant returns(uint _quant,uint _age);
-    function getFirstBatch(address _address) public constant returns(uint _quant,uint _age);
+    function getBatch(address _address , uint _batch) public view returns(uint _quant,uint _age);
+    function getFirstBatch(address _address) public view returns(uint _quant,uint _age);
     function resetBatches(address _address);
     function transferFrom(address _from, address _to, uint256 _value) public returns(bool);
     mapping(address => uint) public maxIndex; 
