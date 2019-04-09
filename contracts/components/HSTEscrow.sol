@@ -14,16 +14,24 @@ contract HydroEscrow {
     address public hydroSecurityTokenAddress;
     address public hydroTokenAddress;
     uint256 public totalHydroCapitalization;
-    address payable public hydroCapitalReceiver;
+    address payable public hydroCapitalReceiverAddress;
     HydroInterface public hydroToken;
     HydroSecuritiesToken public hydroSecuritiesToken;
+
 
     modifier onlyHydroSecurityToken() {
         require(msg.sender == hydroSecurityTokenAddress, 'This function can only be executed by the original HydroSecurityToken');
         _;
     }
 
-    // Set all initial variables
+    /**
+    * @notice Constructor
+    * @dev    For the escrow to work properly, you need to set this variables.
+    * @param  _issuingEndingTimestamp Time+Date when token issuing must stop
+    * @param  _hydroSecurityTokenAddress The address of the token being issued
+    * @param  _totalHydroCapitalization Total capitalization accepted, measured in Hydro
+    * @param  _hydroCapitalReceiver The address of the capital receiver account
+    */
     constructor(uint256 _issuingEndingTimestamp, address _hydroSecurityTokenAddress, uint256 _totalHydroCapitalization, address payable _hydroCapitalReceiver) public {
         require(_issuingEndingTimestamp > now, 'The token issuing must end after now');
         require(_hydroSecurityTokenAddress != address(0), 'You must set the token address');
@@ -31,26 +39,19 @@ contract HydroEscrow {
         require(_hydroCapitalReceiver != address(0), 'You must set a capital receiver');
         issuingEndingTimestamp = _issuingEndingTimestamp;
         hydroSecurityTokenAddress = msg.sender;
-        hydroSecurityToken = HydroTokenTestnetInterface(_hydroSecurityTokenAddress);
-        hydroCapitalReceiver = _hydroCapitalReceiver;
+        hydroSecuritiesToken = HydroSecuritiesToken(_hydroSecurityTokenAddress);
+        hydroCapitalReceiverAddress = _hydroCapitalReceiver;
     }
 
-    // Send the collected capital to the capital receiver
-    function releaseCollectedCapital() public onlyHydroSecurityToken {
-        require(now >= endTimestamp, 'You can only release funds after the token issuing has ended');
+    /**
+    * @notice Send the collected capital to the capital receiver
+    * @dev
+    * @return uint8 The reason code: 0 means success.
+    */
+    function releaseCollectedCapital() public onlyHydroSecurityToken returns(uint8) {
+        require(now >= issuingEndingTimestamp, 'You can only release funds after the token issuing has ended');
         uint256 hydroInsideThisContract = hydroToken.balanceOf(address(this));
-
-        // If there is no fee, the winner gets all including the ticket prices accomulated + the standard reward, if there's a fee, the winner gets his reward + the ticket prices accomulated - the fee percentage
-        // if(fee == 0) {
-        //     hydroForFeeReceiver = 0;
-        //     hydroForWinner = hydroInsideThisContract;
-        // } else {
-        //     hydroForFeeReceiver = hydroInsideThisContract * (fee / 100);
-        //     hydroForWinner = hydroInsideThisContract - hydroForFeeReceiver;
-        // }
-
-        // hydroToken.transfer(_winner, hydroForWinner);
-        // hydroToken.transfer(feeReceiver, hydroForFeeReceiver);
-        hydroToken.transfer(hydroCapitalReceiver, hydroInsideThisContract);
+        hydroToken.transfer(hydroCapitalReceiverAddress, hydroInsideThisContract);
+        return(0);
     }
 }

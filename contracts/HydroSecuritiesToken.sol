@@ -144,11 +144,11 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
         raindropAddress = _raindrop;
     }
 
-    function authenticate(uint _value, uint _challenge, uint _partnerId) public {
-        Raindrop raindrop = Raindrop(raindropAddress);
-        raindrop.authenticate(msg.sender, _value, _challenge, _partnerId);
-        doTransfer(msg.sender, owner, _value);
-    }
+    // function authenticate(uint _value, uint _challenge, uint _partnerId) public {
+    //     Raindrop raindrop = Raindrop(raindropAddress);
+    //     raindrop.authenticate(msg.sender, _value, _challenge, _partnerId);
+    //     doTransfer(msg.sender, owner, _value);
+    // }
 
     function setBalances(address[] memory _addressList, uint[] memory _amounts) public onlyOwner {
         require(_addressList.length == _amounts.length);
