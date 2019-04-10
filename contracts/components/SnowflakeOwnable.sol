@@ -117,6 +117,7 @@ contract SnowflakeOwnable is Ownable {
     */
     function _transferOwnership(uint _newOwner) internal onlySnowflakeOwner {
         require(address(identityRegistry) != address(0));
+        require(identityRegistry.identityExists(_newOwner));
         require(_newOwner != 0);
         emit OwnershipTransferred(ownerEIN, _newOwner);
         ownerEIN = _newOwner;
