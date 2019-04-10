@@ -54,13 +54,13 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
     /**
     * @notice Constructor to create a HydroSecuritiesToken
     * @dev    This data is provided in Constructor
-    * @param _name         Name of the token to be issued
+    * @param _tokenName         Name of the token to be issued
     * @param _decimals     Number of decimals of the smallest unit
     * @param _symbol       An identifier to designate the token to be issued
     * @param _totalSupply  Total number of tokens to mint in all stages
     */
-    constructor(bytes32 _name, uint8 _decimals, bytes32 _symbol, uint _totalSupply) public {
-        name        = _name;
+    constructor(bytes32 _tokenName, uint8 _decimals, bytes32 _symbol, uint _totalSupply) public payable {
+        name        = _tokenName;
         decimals    = _decimals;
         symbol      = _symbol;
         totalSupply = _totalSupply;
