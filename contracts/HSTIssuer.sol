@@ -31,7 +31,7 @@ import './zeppelin/ownership/Ownable.sol';
  */
 
 contract HSTIssuer is 
-    SnowflakeOwnable, Ownable {
+    SnowflakeOwnable {
 
     using SafeMath for uint256;
     
@@ -47,49 +47,49 @@ contract HSTIssuer is
     }
 
 	// Main parameters
-	uint256 id;
-	string name;
-	string description;
-	string symbol;
-    uint8 decimals;
-	uint256 hydroPrice;
-    uint256 ethPrice;
-	uint256 beginningDate;
-    uint256 lockEnds; // Date of end of locking period
-	uint256 endDate;
-    uint256 einOwner; // Instead of using the address we use EIN for the owner of the security
-    uint256 maxSupply;
-    uint256 escrowLimitPeriod;
-    address payable Owner;
+	uint256 public id;
+	string public name;
+	string public description;
+	string public symbol;
+    uint8 public decimals;
+	uint256 public hydroPrice;
+    uint256 public ethPrice;
+	uint256 public beginningDate;
+    uint256 public lockEnds; // Date of end of locking period
+	uint256 public endDate;
+    uint256 public einOwner; // Instead of using the address we use EIN for the owner of the security
+    uint256 public maxSupply;
+    uint256 public escrowLimitPeriod;
+    address payable public Owner;
 
 	// STO types / flags
-    bool LIMITED_OWNERSHIP;
-    bool IS_LOCKED; // Locked token transfers
-    bool PERIOD_LOCKED; // Locked period active or inactive
-	bool PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
-    bool HYDRO_AMOUNT_TYPE; // is Hydro amount limited
-    bool ETH_AMOUNT_TYPE; // is Ether amount limited
-    bool HYDRO_ALLOWED; // Is Hydro allowed to purchase
-    bool ETH_ALLOWED; // Is Ether allowed for purchase
-    bool KYC_WHITELIST_RESTRICTED;
-    bool AML_WHITELIST_RESTRICTED;
+    bool public LIMITED_OWNERSHIP;
+    bool public IS_LOCKED; // Locked token transfers
+    bool public PERIOD_LOCKED; // Locked period active or inactive
+	bool public PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
+    bool public HYDRO_AMOUNT_TYPE; // is Hydro amount limited
+    bool public ETH_AMOUNT_TYPE; // is Ether amount limited
+    bool public HYDRO_ALLOWED; // Is Hydro allowed to purchase
+    bool public ETH_ALLOWED; // Is Ether allowed for purchase
+    bool public KYC_WHITELIST_RESTRICTED;
+    bool public AML_WHITELIST_RESTRICTED;
 
     // STO parameters
-    uint256 percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
-    uint256 hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
-    uint256 ethAllowed; // considered if ETH_AMOUNT_TYPE
-    uint256 lockPeriod; // in days
-    uint256 minInvestors;
-    uint256 maxInvestors;
+    uint256 public percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
+    uint256 public hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
+    uint256 public ethAllowed; // considered if ETH_AMOUNT_TYPE
+    uint256 public lockPeriod; // in days
+    uint256 public minInvestors;
+    uint256 public maxInvestors;
 
     // State Memory
-    Stage stage; // SETUP, PRELAUNCH, ACTIVE, FINALIZED
+    Stage public stage; // SETUP, PRELAUNCH, ACTIVE, FINALIZED
     bool legalApproved;
     uint256 issuedTokens;
-    uint256 ownedTokens;
-    uint256 burnedTokens;
-    uint256 hydroReceived;
-    uint256 ethReceived;
+    uint256 public ownedTokens;
+    uint256 public burnedTokens;
+    uint256 public hydroReceived;
+    uint256 public ethReceived;
     uint256 hydrosReleased; // Quantity of Hydros released by owner
     uint256 ethersReleased; // idem form Ethers
 
@@ -98,12 +98,12 @@ contract HSTIssuer is
 	address RegistryRules;
 
 	// Links to Registries
-    address[5] KYCResolverArray;
-    address[5] AMLResolverArray;
-    address[5] LegalResolverArray;
-    mapping(address => uint8) KYCResolver;
-    mapping(address => uint8) AMLResolver;
-    mapping(address => uint8) LegalResolver;
+    address[5] public KYCResolverArray;
+    address[5] public AMLResolverArray;
+    address[5] public LegalResolverArray;
+    mapping(address => uint8) public KYCResolver;
+    mapping(address => uint8) public AMLResolver;
+    mapping(address => uint8) public LegalResolver;
     uint8 KYCResolverQ;
     uint8 AMLResolverQ;
     uint8 LegalResolverQ;
@@ -129,7 +129,7 @@ contract HSTIssuer is
     // Declaring interfaces
     IdentityRegistryInterface public identityRegistry;
     HydroInterface public hydroToken;
-    SnowflakeViaInterface public snowflakeVia;
+    // SnowflakeViaInterface public snowflakeVia;
     // TokenWithDates private tokenWithDates;
 
 
@@ -211,8 +211,7 @@ contract HSTIssuer is
         uint256 _ethAllowed, // considered if ETH_AMOUNT_TYPE
         uint256 _lockPeriod, // in days
         uint256 _minInvestors,
-        uint256 _maxInvestors,
-        address payable _owner) public {
+        uint256 _maxInvestors) public {
 
         id = _id; 
         name = _name;
@@ -251,14 +250,14 @@ contract HSTIssuer is
         stage = Stage.SETUP;
 
         // Links to Modules
-        HSToken = address(0x0);
-        RegistryRules = address(0x0);
+        HSToken = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
+        RegistryRules = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
         InterestSolver = address(0x0);
 
         hydroToken = HydroInterface(0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20);
         identityRegistry = IdentityRegistryInterface(0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA);
 
-        if (_owner == address(0x0)) Owner = msg.sender; else Owner = _owner;
+        Owner = msg.sender;
         einOwner = identityRegistry.getEIN(Owner);
 
         emit HydroSTCreated(id, name, symbol, decimals, einOwner);
@@ -269,7 +268,7 @@ contract HSTIssuer is
     // Feature #9
     function setLockupPeriod(uint256 _lockEnds) onlyAdmin public {
         if (_lockEnds == 0) {
-            PERIOD_LOCKED == false;
+            PERIOD_LOCKED = false;
             }
         PERIOD_LOCKED = true;
         lockEnds = _lockEnds;
@@ -285,38 +284,38 @@ contract HSTIssuer is
 
     function addWhitelist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          whiteList[_einList[i]] == true;
+          whiteList[_einList[i]] = true;
         }
     }
 
     function addBlackList(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          blackList[_einList[i]] == true;
+          blackList[_einList[i]] = true;
         }
     }
 
     function removeWhitelist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          whiteList[_einList[i]] == false;
+          whiteList[_einList[i]] = false;
         }
 
     }
 
     function removeBlacklist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          blackList[_einList[i]] == false;
+          blackList[_einList[i]] = false;
         }
     }
 
     function freeze(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          freezed[_einList[i]] == true;
+          freezed[_einList[i]] = true;
         }
     }
 
     function unFreeze(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          freezed[_einList[i]] == false;
+          freezed[_einList[i]] = false;
         }
     }
 
@@ -418,7 +417,7 @@ contract HSTIssuer is
         public payable returns(bool) {
 
         uint256 total;
-        uint256 _ein = identityRegistry.getEIN(msg.sender);
+        //uint256 _ein = identityRegistry.getEIN(msg.sender);
         bytes32 HYDRO = keccak256(abi.encode("HYDRO"));
         bytes32 ETH =  keccak256(abi.encode("ETH"));
         bytes32 coin = keccak256(abi.encode(_coin));
@@ -468,7 +467,7 @@ contract HSTIssuer is
 
 
     function claimInterests() 
-        public returns(bool) {
+        public pure returns(bool) {
         //return(interestSolver(msg.sender));
         return true;
     }
@@ -508,7 +507,7 @@ contract HSTIssuer is
 
     // PUBLIC GETTERS ----------------------------------------------------------------
 
-    function isLocked() public returns(bool) {
+    function isLocked() public view returns(bool) {
         return IS_LOCKED;
     }
 
@@ -527,7 +526,7 @@ contract HSTIssuer is
     // Permissions checking
 
     // Feature #8
-    function _checkKYCWhitelist(address _to, uint256 _amount) private {
+    function _checkKYCWhitelist(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= KYCResolverQ; i++) {
@@ -535,7 +534,7 @@ contract HSTIssuer is
             require(approver.isApproved(einTo, _amount));
         }
     }
-    function _checkAMLWhitelist(address _to, uint256 _amount) private {
+    function _checkAMLWhitelist(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= AMLResolverQ; i++) {
@@ -543,7 +542,7 @@ contract HSTIssuer is
             require(approver.isApproved(einTo, _amount));
         }
     }
-    function _checkLegalWhitelist(address _to, uint256 _amount) private {
+    function _checkLegalWhitelist(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= LegalResolverQ; i++) {
