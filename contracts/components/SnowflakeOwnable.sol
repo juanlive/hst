@@ -1,11 +1,16 @@
 pragma solidity ^0.5.0;
 
 import '../interfaces/IdentityRegistryInterface.sol';
+import '../zeppelin/ownership/Ownable.sol';
 
 // DONE
 // import relevant Snowflake contract
 // contructor
 // function isOwner()
+
+// TO DO
+// add getter and setter for Identity Registry address
+// check that Identity Registry address cannot be zero for any operation to work
 
 /**
  * @title SnowflakeOwnable
@@ -13,7 +18,7 @@ import '../interfaces/IdentityRegistryInterface.sol';
  * @dev The SnowflakeOwnable contract has an owner EIN, and provides basic authorization control functions, not based on an address as it is usual, but based on an EIN. This simplifies the implementation of "user permissions" when using Snowflakes.
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
-contract SnowflakeOwnable {
+contract SnowflakeOwnable is Ownable {
 
     //address private _owner;
     uint ownerEIN;
@@ -32,12 +37,17 @@ contract SnowflakeOwnable {
     * @notice Constructor
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account
+    */
+    constructor() public {
+    }
+
+    /**
+    * @notice Set the address for the Identity Registry
     * @param _identityRegistryAddress The address of the IdentityRegistry contract
     */
-    constructor(address _identityRegistryAddress) public {
+    function setIdentityRegistryAddress(address _identityRegistryAddress) public onlyOwner {
         require(_identityRegistryAddress != address(0), 'The identity registry address is required');
         identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
-        //_owner = msg.sender;
         ownerEIN = identityRegistry.getEIN(msg.sender);
         emit OwnershipTransferred(0, ownerEIN);
     }
