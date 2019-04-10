@@ -20,6 +20,7 @@ interface tokenRecipient {
 contract HydroSecuritiesToken is SnowflakeOwnable {
     using SafeMath for uint256;
 
+
     /**
     * @notice Configurable data for token
     * @dev    This data is provided in Constructor
@@ -30,10 +31,19 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
     uint    public totalSupply;    // Total number of tokens to mint in all stages
     //address public raindropAddress = address(0);
 
+
     mapping (address => uint256) public balances;
     
     // `allowed` tracks any extra transfer rights as in all ERC20 tokens
     mapping (address => mapping (address => uint256)) public allowed;
+
+
+    event Transfer(address indexed _from, address indexed _to, uint256 _amount);
+
+    event Approval(address indexed _owner, address indexed _spender, uint256 _amount);
+
+    event Burn(address indexed _burner, uint256 _amount);
+
 
     /**
     * @notice Constructor to create a HydroSecuritiesToken
@@ -57,21 +67,25 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
 // ERC20 Methods
 ///////////////////
 
-    /// @notice Send `_amount` tokens to `_to` from `msg.sender`
-    /// @param _to The address of the recipient
-    /// @param _amount The amount of tokens to be transferred
-    /// @return Whether the transfer was successful or not
+    /**
+    * @notice Send `_amount` tokens to `_to` from `msg.sender`
+    * @param _to The address of the recipient
+    * @param _amount The amount of tokens to be transferred
+    * @return Whether the transfer was successful or not
+    */
     function transfer(address _to, uint256 _amount) public returns (bool success) {
         doTransfer(msg.sender, _to, _amount);
         return true;
     }
 
-    /// @notice Send `_amount` tokens to `_to` from `_from` on the condition it
-    ///  is approved by `_from`
-    /// @param _from The address holding the tokens being transferred
-    /// @param _to The address of the recipient
-    /// @param _amount The amount of tokens to be transferred
-    /// @return True if the transfer was successful
+    /**
+    * @notice Send `_amount` tokens to `_to` from `_from` on the condition it
+    *  is approved by `_from`
+    * @param _from The address holding the tokens being transferred
+    * @param _to The address of the recipient
+    * @param _amount The amount of tokens to be transferred
+    * @return True if the transfer was successful
+    */
     function transferFrom(address _from, address _to, uint256 _amount
     ) public returns (bool success) {
         // The standard ERC 20 transferFrom functionality
@@ -81,12 +95,14 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
         return true;
     }
 
-    /// @dev This is the actual transfer function in the token contract, it can
-    ///  only be called by other functions in this contract.
-    /// @param _from The address holding the tokens being transferred
-    /// @param _to The address of the recipient
-    /// @param _amount The amount of tokens to be transferred
-    /// @return True if the transfer was successful
+    /**
+    * @dev This is the actual transfer function in the token contract, it can
+    *  only be called by other functions in this contract.
+    * @param _from The address holding the tokens being transferred
+    * @param _to The address of the recipient
+    * @param _amount The amount of tokens to be transferred
+    * @return True if the transfer was successful
+    */
     function doTransfer(address _from, address _to, uint _amount
     ) internal {
         // Do not allow transfer to 0x0 or the token contract itself
@@ -97,17 +113,21 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
         emit Transfer(_from, _to, _amount);
     }
 
-    /// @return The balance of `_owner`
+    /**
+    * @return The balance of `_owner`
+    */
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
 
-    /// @notice `msg.sender` approves `_spender` to spend `_amount` tokens on
-    ///  its behalf. This is a modified version of the ERC20 approve function
-    ///  to be a little bit safer
-    /// @param _spender The address of the account able to transfer the tokens
-    /// @param _amount The amount of tokens to be approved for transfer
-    /// @return True if the approval was successful
+    /**
+    * @notice `msg.sender` approves `_spender` to spend `_amount` tokens on
+    *  its behalf. This is a modified version of the ERC20 approve function
+    * to be a little bit safer
+    * @param _spender The address of the account able to transfer the tokens
+    * @param _amount The amount of tokens to be approved for transfer
+    * @return True if the approval was successful
+    */
     function approve(address _spender, uint256 _amount) public returns (bool success) {
         // To change the approve amount you first have to reduce the addresses`
         //  allowance to zero by calling `approve(_spender,0)` if it is not
@@ -135,18 +155,21 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
         emit Burn(msg.sender, _value);
     }
 
-    /// @dev This function makes it easy to read the `allowed[]` map
-    /// @param _owner The address of the account that owns the token
-    /// @param _spender The address of the account able to transfer the tokens
-    /// @return Amount of remaining tokens of _owner that _spender is allowed
-    ///  to spend
+    /**
+    * @dev This function makes it easy to read the `allowed[]` map
+    * @param _owner The address of the account that owns the token
+    * @param _spender The address of the account able to transfer the tokens
+    * @return Amount of remaining tokens of _owner that _spender is allowed to spend
+    */
     function allowance(address _owner, address _spender
     ) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
 
-    /// @dev This function makes it easy to get the total number of tokens
-    /// @return The total number of tokens
+    /**
+    * @dev This function makes it easy to get the total number of tokens
+    * @return The total number of tokens
+    */
     function getTotalSupply() public view returns (uint) {
         return totalSupply;
     }
@@ -168,22 +191,5 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
           transfer(_addressList[i], _amounts[i]);
         }
     }
-
-    event Transfer(
-        address indexed _from,
-        address indexed _to,
-        uint256 _amount
-        );
-
-    event Approval(
-        address indexed _owner,
-        address indexed _spender,
-        uint256 _amount
-        );
-
-    event Burn(
-        address indexed _burner,
-        uint256 _amount
-        );
 
 }
