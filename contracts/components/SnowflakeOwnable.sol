@@ -53,6 +53,14 @@ contract SnowflakeOwnable is Ownable {
     }
 
     /**
+    * @notice Get the address for the Identity Registry
+    * @return The address of the IdentityRegistry contract
+    */
+    function getIdentityRegistryAddress() public view returns(address) {
+        return(address(identityRegistry));
+    }
+
+    /**
     * @notice Get EIN of the current owner
     * @dev This contracts allows you to set ownership based on EIN instead of address
     * @return the address of the owner
@@ -66,6 +74,7 @@ contract SnowflakeOwnable is Ownable {
     * @dev This works on EINs, not on addresses
     */
     modifier onlySnowflakeOwner() {
+        require(address(identityRegistry) != address(0));
         require(isOwner());
         _;
     }
@@ -76,6 +85,7 @@ contract SnowflakeOwnable is Ownable {
     * @return true if `msg.sender` is the owner of the contract
     */
     function isOwner() public view returns(bool) {
+        require(address(identityRegistry) != address(0));
         uint caller = identityRegistry.getEIN(msg.sender);
         return (caller == ownerEIN);
     }
@@ -85,6 +95,7 @@ contract SnowflakeOwnable is Ownable {
     * @dev Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner modifier anymore.
     */
     function renounceOwnership() public onlySnowflakeOwner {
+        require(address(identityRegistry) != address(0));
         emit OwnershipTransferred(ownerEIN, 0);
         ownerEIN = 0;
     }
@@ -104,6 +115,7 @@ contract SnowflakeOwnable is Ownable {
     * @param _newOwner EIN to transfer ownership to
     */
     function _transferOwnership(uint _newOwner) internal onlySnowflakeOwner {
+        require(address(identityRegistry) != address(0));
         require(_newOwner != 0);
         emit OwnershipTransferred(ownerEIN, _newOwner);
         ownerEIN = _newOwner;
