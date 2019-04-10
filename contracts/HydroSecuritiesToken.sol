@@ -3,6 +3,12 @@ pragma solidity ^0.5.0;
 import "./components/SnowflakeOwnable.sol";
 import "./zeppelin/math/SafeMath.sol";
 
+// TO DO
+// review if interfaces down here are OK this way
+// review setBalances() function
+// review if token should keep balances by EIN instead of by address
+
+
 interface Raindrop {
     function authenticate(address _sender, uint _value, uint _challenge, uint _partnerId) external;
 }
@@ -96,8 +102,8 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
     }
 
     /**
-    * @dev This is the actual transfer function in the token contract, it can
-    *  only be called by other functions in this contract.
+    * @notice This is the actual transfer function in the token contract
+    * @dev it can only be called by other functions in this contract.
     * @param _from The address holding the tokens being transferred
     * @param _to The address of the recipient
     * @param _amount The amount of tokens to be transferred
@@ -114,6 +120,8 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
     }
 
     /**
+    * @notice Get token balance for an address
+    * @param _owner Address to check
     * @return The balance of `_owner`
     */
     function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -140,6 +148,16 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
         return true;
     }
 
+    /**
+    * @notice `msg.sender` approves `_spender` to spend `_amount` tokens on
+    *  its behalf. This is a modified version of the ERC20 approve function
+    * to be a little bit safer
+    * @dev This function calls the spender "receive approval" function
+    * @param _spender The address of the account able to transfer the tokens
+    * @param _value The amount of tokens to be approved for transfer
+    * @param _extraData To be passed to the spender
+    * @return True if the approval was successful
+    */
     function approveAndCall(address _spender, uint256 _value, bytes memory _extraData) public returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -148,6 +166,10 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
         }
     }
 
+    /**
+    * @notice Diminish total supply of tokens
+    * @param _value Quantity of tokens to burn
+    */
     function burn(uint256 _value) public onlySnowflakeOwner {
         require(balances[msg.sender] >= _value);
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -156,6 +178,7 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
     }
 
     /**
+    * @notice Get allowance for an addres
     * @dev This function makes it easy to read the `allowed[]` map
     * @param _owner The address of the account that owns the token
     * @param _spender The address of the account able to transfer the tokens
@@ -167,7 +190,7 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
     }
 
     /**
-    * @dev This function makes it easy to get the total number of tokens
+    * @notice Get the total number of tokens
     * @return The total number of tokens
     */
     function getTotalSupply() public view returns (uint) {
