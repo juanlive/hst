@@ -20,24 +20,34 @@ interface tokenRecipient {
 contract HydroSecuritiesToken is SnowflakeOwnable {
     using SafeMath for uint256;
 
-    string public name = "Hydro";          // The token's name
-    uint8 public decimals = 18;            // Number of decimals of the smallest unit
-    string public symbol = "HYDRO";        // An identifier
-    uint public totalSupply;
-    address public raindropAddress = address(0);
+    /**
+    * @notice Configurable data for token
+    * @dev    This data is provided in Constructor
+    */
+    bytes32  public name;          // The token's name
+    uint8   public decimals;       // Number of decimals of the smallest unit
+    bytes32  public symbol;         // An identifier
+    uint    public totalSupply;    // Total number of tokens to mint in all stages
+    //address public raindropAddress = address(0);
 
     mapping (address => uint256) public balances;
     
     // `allowed` tracks any extra transfer rights as in all ERC20 tokens
     mapping (address => mapping (address => uint256)) public allowed;
 
-////////////////
-// Constructor
-////////////////
-
-    /// @notice Constructor to create a HydroToken
-    constructor() public {
-        totalSupply = 11111111111 * 10**18;
+    /**
+    * @notice Constructor to create a HydroSecuritiesToken
+    * @dev    This data is provided in Constructor
+    * @param _name         Name of the token to be issued
+    * @param _decimals     Number of decimals of the smallest unit
+    * @param _symbol       An identifier to designate the token to be issued
+    * @param _totalSupply  Total number of tokens to mint in all stages
+    */
+    constructor(bytes32 _name, uint8 _decimals, bytes32 _symbol, uint _totalSupply) public {
+        name        = _name;
+        decimals    = _decimals;
+        symbol      = _symbol;
+        totalSupply = _totalSupply;
         // Give the creator all initial tokens
         balances[msg.sender] = totalSupply;
     }
@@ -141,9 +151,9 @@ contract HydroSecuritiesToken is SnowflakeOwnable {
         return totalSupply;
     }
 
-    function setRaindropAddress(address _raindrop) public onlySnowflakeOwner {
-        raindropAddress = _raindrop;
-    }
+    // function setRaindropAddress(address _raindrop) public onlySnowflakeOwner {
+    //     raindropAddress = _raindrop;
+    // }
 
     // function authenticate(uint _value, uint _challenge, uint _partnerId) public {
     //     Raindrop raindrop = Raindrop(raindropAddress);
