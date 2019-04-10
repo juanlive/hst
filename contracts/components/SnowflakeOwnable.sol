@@ -7,10 +7,11 @@ import '../zeppelin/ownership/Ownable.sol';
 // import relevant Snowflake contract
 // contructor
 // function isOwner()
-
-// TO DO
 // add getter and setter for Identity Registry address
 // check that Identity Registry address cannot be zero for any operation to work
+
+// TO DO
+// verify that new EIN for Snowflake owner has at least one associated address 
 
 /**
  * @title SnowflakeOwnable
