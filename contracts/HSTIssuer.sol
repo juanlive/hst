@@ -325,7 +325,7 @@ contract HSTIssuer is
     function addKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(KYCResolver[_address] == 0, "Resolver already exists");
         require(KYCResolverQ <= 5, "No more resolvers allowed");
-        identityRegistry.addResolver(_address);
+        identityRegistry.addResolvers(_address);
         KYCResolverQ ++;
         KYCResolver[_address] = KYCResolverQ;
         KYCResolverArray[KYCResolverQ-1] = _address;
@@ -342,12 +342,12 @@ contract HSTIssuer is
         KYCResolverArray[KYCResolverQ - 1] = address(0x0);
         KYCResolverQ --;
         KYCResolver[_address] = 0;
-        identityRegistry.removeResolver(_address); 
+        identityRegistry.removeResolvers(_address); 
     }
     function addAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(AMLResolver[_address] == 0, "Resolver already exists");
         require(AMLResolverQ <= 5, "No more resolvers allowed");
-        identityRegistry.addResolver(_address);
+        identityRegistry.addResolvers(_address);
         AMLResolverQ ++;
         AMLResolver[_address] = AMLResolverQ;
         AMLResolverArray[AMLResolverQ-1] = _address;
@@ -364,12 +364,12 @@ contract HSTIssuer is
         AMLResolverArray[AMLResolverQ - 1] = address(0x0);
         AMLResolverQ --;
         AMLResolver[_address] = 0;
-        identityRegistry.removeResolver(_address); 
+        identityRegistry.removeResolvers(_address); 
     }
         function addLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(LegalResolver[_address] == 0, "Resolver already exists");
         require(LegalResolverQ <= 5, "No more resolvers allowed");
-        identityRegistry.addResolver(_address);
+        identityRegistry.addResolvers(_address);
         LegalResolverQ ++;
         LegalResolver[_address] = LegalResolverQ;
         LegalResolverArray[LegalResolverQ-1] = _address;
@@ -386,7 +386,7 @@ contract HSTIssuer is
         LegalResolverArray[LegalResolverQ - 1] = address(0x0);
         LegalResolverQ --;
         LegalResolver[_address] = 0;
-        identityRegistry.removeResolver(_address); 
+        identityRegistry.removeResolvers(_address); 
     }
 
 
