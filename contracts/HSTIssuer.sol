@@ -60,6 +60,7 @@ contract HSTIssuer is
     uint256 einOwner; // Instead of using the address we use EIN for the owner of the security
     uint256 maxSupply;
     uint256 escrowLimitPeriod;
+    address payable Owner;
 
 	// STO types / flags
     bool LIMITED_OWNERSHIP;
@@ -125,12 +126,12 @@ contract HSTIssuer is
     mapping(address => uint256) public escrowContracts;
     address[] public escrowContractsArray;
 
-
     // Declaring interfaces
     IdentityRegistryInterface public identityRegistry;
     HydroInterface public hydroToken;
     SnowflakeViaInterface public snowflakeVia;
     TokenWithDates private tokenWithDates;
+
 
     event HydroSTCreated(
         uint256 indexed id, 
@@ -142,6 +143,7 @@ contract HSTIssuer is
 
     event Sell(address indexed _owner, uint256 _amount);
 
+
     // Feature #9 & #10
     modifier isUnlocked() {
         require(!IS_LOCKED, "Token locked");
@@ -149,8 +151,8 @@ contract HSTIssuer is
         _;
     }
 
-    modifier isUnfreezed(address _from, uint256 _einId) {
-        require(!freezed[_einId] , "Target EIN is freezed");
+    modifier isUnfreezed(address _from, address _to) {
+        require(!freezed[identityRegistry.getEIN(_to)] , "Target EIN is freezed");
         require(!freezed[identityRegistry.getEIN(_from)], "Source EIN is freezed");
         _;
     }
@@ -210,7 +212,7 @@ contract HSTIssuer is
         uint256 _lockPeriod, // in days
         uint256 _minInvestors,
         uint256 _maxInvestors,
-        address _owner) public {
+        address payable _owner) public {
 
         id = _id; 
         name = _name;
@@ -256,8 +258,8 @@ contract HSTIssuer is
         hydroToken = HydroInterface(0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20);
         identityRegistry = IdentityRegistryInterface(0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA);
 
-        if (_owner == address(0x0)) _owner = msg.sender; else _owner = _owner;
-        einOwner = identityRegistry.getEIN(_owner);
+        if (_owner == address(0x0)) Owner = msg.sender; else Owner = _owner;
+        einOwner = identityRegistry.getEIN(Owner);
 
         emit HydroSTCreated(id, name, symbol, decimals, einOwner);
     }
@@ -322,18 +324,18 @@ contract HSTIssuer is
     // Only at Prelaunch functions: adding and removing resolvers
 
     // Feature #3
-    function addKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
-        require(KYCResolver[_address] == 0, "Resolver already exists");
+    function addKYCResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
+        require(KYCResolver[_address[0]] == 0, "Resolver already exists");
         require(KYCResolverQ <= 5, "No more resolvers allowed");
         identityRegistry.addResolvers(_address);
         KYCResolverQ ++;
-        KYCResolver[_address] = KYCResolverQ;
-        KYCResolverArray[KYCResolverQ-1] = _address;
+        KYCResolver[_address[0]] = KYCResolverQ;
+        KYCResolverArray[KYCResolverQ-1] = _address[0];
     }
 
-    function removeKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
-        require(KYCResolver[_address] != 0, "Resolver does not exist");
-        uint8 _number = KYCResolver[_address];
+    function removeKYCResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
+        require(KYCResolver[_address[0]] != 0, "Resolver does not exist");
+        uint8 _number = KYCResolver[_address[0]];
         if (KYCResolverArray.length > _number) {
             for (uint8 i = _number; i < KYCResolverArray.length; i++) {
                 KYCResolverArray[i-1] = KYCResolverArray[i];
@@ -341,21 +343,21 @@ contract HSTIssuer is
         }
         KYCResolverArray[KYCResolverQ - 1] = address(0x0);
         KYCResolverQ --;
-        KYCResolver[_address] = 0;
+        KYCResolver[_address[0]] = 0;
         identityRegistry.removeResolvers(_address); 
     }
-    function addAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
-        require(AMLResolver[_address] == 0, "Resolver already exists");
+    function addAMLResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
+        require(AMLResolver[_address[0]] == 0, "Resolver already exists");
         require(AMLResolverQ <= 5, "No more resolvers allowed");
         identityRegistry.addResolvers(_address);
         AMLResolverQ ++;
-        AMLResolver[_address] = AMLResolverQ;
-        AMLResolverArray[AMLResolverQ-1] = _address;
+        AMLResolver[_address[0]] = AMLResolverQ;
+        AMLResolverArray[AMLResolverQ-1] = _address[0];
     }
 
-    function removeAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
-        require(AMLResolver[_address] != 0, "Resolver does not exist");
-        uint8 _number = AMLResolver[_address];
+    function removeAMLResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
+        require(AMLResolver[_address[0]] != 0, "Resolver does not exist");
+        uint8 _number = AMLResolver[_address[0]];
         if (AMLResolverArray.length > _number) {
             for (uint8 i = _number; i < AMLResolverArray.length; i++) {
                 AMLResolverArray[i-1] = AMLResolverArray[i];
@@ -363,21 +365,21 @@ contract HSTIssuer is
         }
         AMLResolverArray[AMLResolverQ - 1] = address(0x0);
         AMLResolverQ --;
-        AMLResolver[_address] = 0;
+        AMLResolver[_address[0]] = 0;
         identityRegistry.removeResolvers(_address); 
     }
-        function addLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
-        require(LegalResolver[_address] == 0, "Resolver already exists");
+    function addLegalResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
+        require(LegalResolver[_address[0]] == 0, "Resolver already exists");
         require(LegalResolverQ <= 5, "No more resolvers allowed");
         identityRegistry.addResolvers(_address);
         LegalResolverQ ++;
-        LegalResolver[_address] = LegalResolverQ;
-        LegalResolverArray[LegalResolverQ-1] = _address;
+        LegalResolver[_address[0]] = LegalResolverQ;
+        LegalResolverArray[LegalResolverQ-1] = _address[0];
     }
 
-    function removeLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
-        require(LegalResolver[_address] != 0, "Resolver does not exist");
-        uint8 _number = LegalResolver[_address];
+    function removeLegalResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
+        require(LegalResolver[_address[0]] != 0, "Resolver does not exist");
+        uint8 _number = LegalResolver[_address[0]];
         if (LegalResolverArray.length > _number) {
             for (uint8 i = _number; i < LegalResolverArray.length; i++) {
                 LegalResolverArray[i-1] = LegalResolverArray[i];
@@ -385,7 +387,7 @@ contract HSTIssuer is
         }
         LegalResolverArray[LegalResolverQ - 1] = address(0x0);
         LegalResolverQ --;
-        LegalResolver[_address] = 0;
+        LegalResolver[_address[0]] = 0;
         identityRegistry.removeResolvers(_address); 
     }
 
@@ -398,12 +400,12 @@ contract HSTIssuer is
     function releaseHydroTokens() onlyAdmin escrowReleased public {
         uint256 thisBalance = hydroToken.balanceOf(address(this));
         hydrosReleased = hydrosReleased + thisBalance;
-        hydroToken.transfer(owner, thisBalance);
+        require(hydroToken.transfer(Owner, thisBalance));
     }
 
     function releaseEthers() onlyAdmin escrowReleased public {
-        ethersReleased = ethersReleased + this.balance;
-        owner.send(this.balance);
+        ethersReleased = ethersReleased + address(this).balance;
+        require(Owner.send(address(this).balance));
     }
 
 
@@ -417,30 +419,33 @@ contract HSTIssuer is
 
         uint256 total;
         uint256 _ein = identityRegistry.getEIN(msg.sender);
+        bytes32 HYDRO = keccak256(abi.encode("HYDRO"));
+        bytes32 ETH =  keccak256(abi.encode("ETH"));
+        bytes32 coin = keccak256(abi.encode(_coin));
 
         require(stage == Stage.ACTIVE, "Current stage is not active");
 
         // CHECKINGS (to be exported as  a contract)
         // Coin allowance
-        if (_coin == "HYDRO") require (HYDRO_ALLOWED, "Hydro is not allowed");
-        if (_coin == "ETH") require (ETH_ALLOWED, "Ether is not allowed");
+        if (coin == HYDRO) require (HYDRO_ALLOWED, "Hydro is not allowed");
+        if (coin == ETH) require (ETH_ALLOWED, "Ether is not allowed");
         // Check for limits
-        if (HYDRO_AMOUNT_TYPE && _coin == "HYDRO") {
+        if (HYDRO_AMOUNT_TYPE && coin == HYDRO) {
             require(hydroReceived.add(_amount) <= hydroAllowed, "Hydro amount exceeded");
         }
-        if (ETH_AMOUNT_TYPE && _coin == "ETH") {
+        if (ETH_AMOUNT_TYPE && coin == ETH) {
             require((ethReceived + msg.value) <= ethAllowed, "Ether amount exceeded");
         }
         // Check for whitelists
-        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_ein, _amount);
-        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_ein, _amount);
+        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(msg.sender, _amount);
+        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(msg.sender, _amount);
         // Calculate total
-        if (_coin == "HYDRO") {
+        if (coin == HYDRO) {
             total = _amount.mul(hydroPrice);
             hydroReceived = hydroReceived.add(_amount);      
         }
 
-        if (_coin == "ETH") {
+        if (coin == ETH) {
             total = msg.value.mul(ethPrice);
             ethReceived = ethReceived + msg.value;
         }
@@ -450,7 +455,7 @@ contract HSTIssuer is
                 "Perc ownership exceeded");
         }
         // Transfer Hydrotokens
-        if (_coin == "HYDRO") {
+        if (coin == HYDRO) {
             require(hydroToken.transferFrom(msg.sender, address(this), _amount), 
                 "Hydro transfer was nos possible");
         }
@@ -480,7 +485,7 @@ contract HSTIssuer is
         if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
         if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
 
-        tokenWithDates.updateBatches(msg.sender, _to, _amount);
+        // _updateBatches(msg.sender, _to, _amount);
 
         return(hydroToken.transfer(_to, _amount));
     }
@@ -493,7 +498,7 @@ contract HSTIssuer is
         if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
         if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
 
-        tokenWithDates.updateBatches(_from, _to, _amount);
+        // _updateBatches(_from, _to, _amount);
 
         return(hydroToken.transferFrom(_from, _to, _amount));
     }
@@ -522,22 +527,28 @@ contract HSTIssuer is
     // Permissions checking
 
     // Feature #8
-    function _checkKYCWhitelist(uint256 _to, uint256 _amount) private {
+    function _checkKYCWhitelist(address _to, uint256 _amount) private {
+        uint256 einTo = identityRegistry.getEIN(_to);
+
         for (uint8 i = 1; i <= KYCResolverQ; i++) {
-            ApproverInterface approver = new ApproverInterface(KYCResolver[i]);
-            require(approver.isApproved(_to, _amount));
+            ApproverInterface approver = ApproverInterface(KYCResolverArray[i-1]);
+            require(approver.isApproved(einTo, _amount));
         }
     }
-    function _checkAMLWhitelist(uint256 _to, uint256 _amount) private {
+    function _checkAMLWhitelist(address _to, uint256 _amount) private {
+        uint256 einTo = identityRegistry.getEIN(_to);
+
         for (uint8 i = 1; i <= AMLResolverQ; i++) {
-            ApproverInterface approver = new ApproverInterface(AMLResolver[i]);
-            require(approver.isApproved(_to, _amount));
+            ApproverInterface approver = ApproverInterface(AMLResolverArray[i-1]);
+            require(approver.isApproved(einTo, _amount));
         }
     }
-    function _checkLegalWhitelist(uint256 _to, uint256 _amount) private {
+    function _checkLegalWhitelist(address _to, uint256 _amount) private {
+        uint256 einTo = identityRegistry.getEIN(_to);
+
         for (uint8 i = 1; i <= LegalResolverQ; i++) {
-            ApproverInterface approver = new ApproverInterface(LegalResolver[i]);
-            require(approver.isApproved(_to, _amount));
+            ApproverInterface approver = ApproverInterface(LegalResolverArray[i-1]);
+            require(approver.isApproved(einTo, _amount));
         }
     }
 
