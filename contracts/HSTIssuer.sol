@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import './components/SnowflakeOwnable.sol';
-import './components/TokenWithDates.sol';
+//import './components/TokenWithDates.sol';
 import './interfaces/HydroInterface.sol';
 import './interfaces/ApproverInterface.sol';
 import './interfaces/IdentityRegistryInterface.sol';
@@ -130,7 +130,7 @@ contract HSTIssuer is
     IdentityRegistryInterface public identityRegistry;
     HydroInterface public hydroToken;
     SnowflakeViaInterface public snowflakeVia;
-    TokenWithDates private tokenWithDates;
+    // TokenWithDates private tokenWithDates;
 
 
     event HydroSTCreated(
