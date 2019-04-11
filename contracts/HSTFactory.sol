@@ -109,7 +109,7 @@ contract HSTFactory is SnowflakeOwnable {
         HSTIssuer _issuer = HSTIssuer(tokens[_tokenName]);
       }
       //tokens[_tokenName]  = deployToken(_tokenName, _description, _symbol, _decimals);
-      issuers[_tokenName] = deployIssuer(_tokenName);
+      issuers[_tokenName] = deployIssuer(_tokenName, _description, _symbol, _decimals);
       escrows[_tokenName] = deployEscrow(_tokenName);
       emit SecuritiesDeployFinished(_tokenName);
     }
