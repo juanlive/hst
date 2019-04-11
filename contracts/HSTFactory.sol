@@ -106,7 +106,7 @@ contract HSTFactory is SnowflakeOwnable {
       // check if token to be deployed already exists
       if ( tokens[_tokenName] != address(0) ) {
         // token exists, check if is alive
-        HSTIssuer _issuer = HSTIssuer(address_del_contrato);
+        HSTIssuer _issuer = HSTIssuer(tokens[_tokenName]);
       }
       tokens[_tokenName]  = deployToken(_tokenName, _description, _symbol, _decimals);
       issuers[_tokenName] = deployIssuer(_tokenName);
@@ -132,14 +132,8 @@ contract HSTFactory is SnowflakeOwnable {
     * @notice Deploy a Hydro Securities Issuer contract   
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deployIssuer(bytes32 _tokenName) public onlySnowflakeOwner returns(address) {
-      HSTIssuer _issuer = new HSTIssuer(
-        1,
-        "NAME",
-        "Description",
-        "SYMB",
-        18
-        );
+    function deployIssuer(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public onlySnowflakeOwner returns(address) {
+      HSTIssuer _issuer = new HSTIssuer(1, _tokenName, _description, _symbol, _decimals);
       address _issuerAddress = address(_issuer);
       emit ContractDeployed(_tokenName, "ISSUER", _issuerAddress);
       return _issuerAddress;
