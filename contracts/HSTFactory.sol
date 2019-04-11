@@ -31,7 +31,6 @@ import './interfaces/IdentityRegistryInterface.sol';
 /**
  * @title HSTFactory
  * @notice Perform deployment of contracts for the issuance of Hydro Securities
- * @dev 
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
 contract HSTFactory is SnowflakeOwnable {
@@ -53,7 +52,6 @@ contract HSTFactory is SnowflakeOwnable {
 
    /**
     * @notice Get a Hydro Securities token contract deployed address
-    * @dev    
     * @param  _tokenName The name of the token contract set to be deployed
     * @return the address of the token contract corresponding to that name
     */
@@ -62,8 +60,7 @@ contract HSTFactory is SnowflakeOwnable {
     }
 
        /**
-    * @notice Get a Hydro Securities issuer contract deployed address
-    * @dev    
+    * @notice Get a Hydro Securities issuer contract deployed address   
     * @param  _tokenName The name of the token contract set to be deployed
     * @return the address of the issuer contract corresponding to that name
     */
@@ -73,7 +70,6 @@ contract HSTFactory is SnowflakeOwnable {
 
        /**
     * @notice Get a Hydro Securities escrow contract deployed address
-    * @dev    
     * @param  _tokenName The name of the token contract set to be deployed
     * @return the address of the escrow contract corresponding to that name
     */
@@ -86,7 +82,12 @@ contract HSTFactory is SnowflakeOwnable {
     */
     event SecuritiesDeployStarted(bytes32 _tokenName);
 
-   /**
+    /**
+    * @notice Triggered when a whole set of contracts for a hydro securities token deploy is cancelled
+    */
+    event SecuritiesDeployCancelled(bytes32 _tokenName, string _reason);
+
+    /**
     * @notice Triggered when a whole set of contracts for a hydro securities token deploy is finished
     */
     event SecuritiesDeployFinished(bytes32 _tokenName);
@@ -97,13 +98,17 @@ contract HSTFactory is SnowflakeOwnable {
     event ContractDeployed(bytes32 _name, bytes32 _type, address indexed _addr);
 
     /**
-    * @notice Deploy a Hydro Securities Token contract set
-    * @dev    
+    * @notice Deploy a Hydro Securities Token contract set 
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deploySecuritiesTokenContractSet(bytes32 _tokenName, uint8 _decimals, bytes32 _symbol, uint _totalSupply) public payable returns(bool) {
+    function deploySecuritiesTokenContractSet(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public payable returns(bool) {
       emit SecuritiesDeployStarted(_tokenName);
-      tokens[_tokenName]  = deployToken(_tokenName, _decimals, _symbol, _totalSupply);
+      // check if token to be deployed already exists
+      if ( tokens[_tokenName] != address(0) ) {
+        // token exists, check if is alive
+        HSTIssuer _issuer = HSTIssuer(address_del_contrato);
+      }
+      tokens[_tokenName]  = deployToken(_tokenName, _description, _symbol, _decimals);
       issuers[_tokenName] = deployIssuer(_tokenName);
       escrows[_tokenName] = deployEscrow(_tokenName);
       emit SecuritiesDeployFinished(_tokenName);
@@ -111,22 +116,20 @@ contract HSTFactory is SnowflakeOwnable {
 
     /**
     * @notice Deploy a Hydro Securities Token contract
-    * @dev    
     * @param _tokenName         Name of the token to be issued
     * @param _decimals     Number of decimals of the smallest unit
     * @param _symbol       An identifier to designate the token to be issued
     * @param _totalSupply  Total number of tokens to mint in all stages
     */
-    function deployToken(bytes32 _tokenName, uint8 _decimals, bytes32 _symbol, uint _totalSupply) public onlySnowflakeOwner returns(address) {
-      HydroSecuritiesToken _token = new HydroSecuritiesToken(_tokenName, _decimals, _symbol, _totalSupply);
+    function deployToken(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public onlySnowflakeOwner returns(address) {
+      HydroSecuritiesToken _token = new HydroSecuritiesToken(_tokenName, _description, _symbol, _decimals);
       address _tokenAddress = address(_token);
       emit ContractDeployed(_tokenName, "TOKEN", _tokenAddress);
       return _tokenAddress;
     }
 
     /**
-    * @notice Deploy a Hydro Securities Issuer contract
-    * @dev    
+    * @notice Deploy a Hydro Securities Issuer contract   
     * @param  _tokenName The name of the token contract set to be deployed
     */
     function deployIssuer(bytes32 _tokenName) public onlySnowflakeOwner returns(address) {
@@ -144,7 +147,6 @@ contract HSTFactory is SnowflakeOwnable {
 
     /**
     * @notice Deploy a Hydro Securities Escrow contract
-    * @dev    
     * @param  _tokenName The name of the token contract set to be deployed
     */
     function deployEscrow(bytes32 _tokenName) public onlySnowflakeOwner returns(address) {
