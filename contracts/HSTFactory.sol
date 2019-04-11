@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 //import './HydroSecuritiesToken.sol';
 //import './components/HSTEscrow.sol';
-import './HSTIssuer.sol';
+import './HSToken.sol';
 //import './components/HSTEscrow.sol';
 import './components/SnowflakeOwnable.sol';
 import './interfaces/IdentityRegistryInterface.sol';
@@ -38,9 +38,6 @@ contract HSTFactory is SnowflakeOwnable {
     // name of the token => address of the token
     mapping(bytes32 => address) tokens;
 
-    // name of the token => address of the issuer
-    mapping(bytes32 => address) issuers;
-
     // name of the token => address of the escrow
     mapping(bytes32 => address) escrows;
 
@@ -57,15 +54,6 @@ contract HSTFactory is SnowflakeOwnable {
     */
     function getSecuritiesTokenAddress(bytes32 _tokenName) public returns(address) {
       return tokens[_tokenName];
-    }
-
-       /**
-    * @notice Get a Hydro Securities issuer contract deployed address   
-    * @param  _tokenName The name of the token contract set to be deployed
-    * @return the address of the issuer contract corresponding to that name
-    */
-    function getSecuritiesIssuerAddress(bytes32 _tokenName) public returns(address) {
-      return issuers[_tokenName];
     }
 
        /**
@@ -106,11 +94,11 @@ contract HSTFactory is SnowflakeOwnable {
       // check if token to be deployed already exists
       if ( tokens[_tokenName] != address(0) ) {
         // token exists, check if is alive
-        HSTIssuer _issuer = HSTIssuer(tokens[_tokenName]);
+        HSToken _token = HSToken(tokens[_tokenName]);
       }
       //tokens[_tokenName]  = deployToken(_tokenName, _description, _symbol, _decimals);
-      issuers[_tokenName] = deployIssuer(_tokenName, _description, _symbol, _decimals);
-      escrows[_tokenName] = deployEscrow(_tokenName);
+      tokens[_tokenName] = deployToken(_tokenName, _description, _symbol, _decimals);
+      //escrows[_tokenName] = deployEscrow(_tokenName);
       emit SecuritiesDeployFinished(_tokenName);
     }
 
@@ -129,14 +117,14 @@ contract HSTFactory is SnowflakeOwnable {
     // }
 
     /**
-    * @notice Deploy a Hydro Securities Issuer contract   
+    * @notice Deploy a Hydro Securities Token contract   
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deployIssuer(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public onlySnowflakeOwner returns(address) {
-      HSTIssuer _issuer = new HSTIssuer(1, _tokenName, _description, _symbol, _decimals);
-      address _issuerAddress = address(_issuer);
-      emit ContractDeployed(_tokenName, "ISSUER", _issuerAddress);
-      return _issuerAddress;
+    function deployToken(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public onlySnowflakeOwner returns(address) {
+      HSToken _token = new HSToken(1, _tokenName, _description, _symbol, _decimals);
+      address _tokenAddress = address(_token);
+      emit ContractDeployed(_tokenName, "TOKEN", _tokenAddress);
+      return _tokenAddress;
     }
 
     /**

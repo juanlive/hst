@@ -25,42 +25,11 @@ module.exports = async function(deployer) {
   deployer.link(StringUtils, ClientRaindrop)
   deployer.link(StringUtils, OldClientRaindrop)
 console.log("OK");
-	await deployer.deploy(HSTIssuer,  {networks: {
-    development: {
-      host: 'localhost',
-      port: 8545,
-      network_id: '*',
-      websockets: true
-    }}},
+	await deployer.deploy(HSTIssuer,
 		1,
-		"Hydro Test ST",
+		'0x0123346',
 		"Hydro Security token for testing purposes",
 		"HTST",
-		18,
-		10000000000,
-		10000000000000000,
-		new Date(),
-		new Date() + 10 * 24 * 60 * 60 * 1000,
-		new Date() + 100 * 24 * 60 * 60 * 1000,
-		10000000 * 10**18,
-		new Date() + 5 * 24 * 60 * 60 * 1000,
-
-		true,
-		false,
-		false,
-		false,
-		true,
-		true,
-		true,
-		true,
-		false,
-		false,
-
-		0,
-		10000000000000,
-		10000000000,
-		14 * 24 * 60 * 60 * 1000,
-		5,
-		20)
+		18)
   	
 };

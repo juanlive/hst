@@ -24,7 +24,7 @@ import './zeppelin/ownership/Ownable.sol';
 
 
 /**
- * @title HSTIssuer
+ * @title HSToken
  * @notice The Hydro Security Token is a system to allow people to create their own Security Tokens, 
  *         related to their Snowflake identities and attached to external KYC, AML and other rules.
  * @author Juan Livingston <juanlivingston@gmail.com>
@@ -67,7 +67,7 @@ contract STO_PARAMS {
     uint256 maxInvestors;
 }
 
-contract HSTIssuer is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
+contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     using SafeMath for uint256;
     
