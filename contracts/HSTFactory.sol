@@ -36,7 +36,7 @@ import './interfaces/IdentityRegistryInterface.sol';
 contract HSTFactory is SnowflakeOwnable {
 
     // name of the token => address of the token
-    mapping(bytes32 => address) tokens;
+    //mapping(bytes32 => address) tokens;
 
     // name of the token => address of the issuer
     mapping(bytes32 => address) issuers;
@@ -108,7 +108,7 @@ contract HSTFactory is SnowflakeOwnable {
         // token exists, check if is alive
         HSTIssuer _issuer = HSTIssuer(tokens[_tokenName]);
       }
-      tokens[_tokenName]  = deployToken(_tokenName, _description, _symbol, _decimals);
+      //tokens[_tokenName]  = deployToken(_tokenName, _description, _symbol, _decimals);
       issuers[_tokenName] = deployIssuer(_tokenName);
       escrows[_tokenName] = deployEscrow(_tokenName);
       emit SecuritiesDeployFinished(_tokenName);
@@ -121,12 +121,12 @@ contract HSTFactory is SnowflakeOwnable {
     * @param _symbol       An identifier to designate the token to be issued
     * @param _totalSupply  Total number of tokens to mint in all stages
     */
-    function deployToken(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public onlySnowflakeOwner returns(address) {
-      HydroSecuritiesToken _token = new HydroSecuritiesToken(_tokenName, _description, _symbol, _decimals);
-      address _tokenAddress = address(_token);
-      emit ContractDeployed(_tokenName, "TOKEN", _tokenAddress);
-      return _tokenAddress;
-    }
+    // function deployToken(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public onlySnowflakeOwner returns(address) {
+    //   HydroSecuritiesToken _token = new HydroSecuritiesToken(_tokenName, _description, _symbol, _decimals);
+    //   address _tokenAddress = address(_token);
+    //   emit ContractDeployed(_tokenName, "TOKEN", _tokenAddress);
+    //   return _tokenAddress;
+    // }
 
     /**
     * @notice Deploy a Hydro Securities Issuer contract   
