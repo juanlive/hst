@@ -30,7 +30,44 @@ import './zeppelin/ownership/Ownable.sol';
  * @author Juan Livingston <juanlivingston@gmail.com>
  */
 
-contract HSTIssuer {
+
+  /**
+  * @notice We use contracts to store main variables, because Solidity can not habdle so many individual variables
+  */
+
+contract MAIN_PARAMS {
+    uint256 hydroPrice;
+    uint256 ethPrice;
+    uint256 beginningDate;
+    uint256 lockEnds; // Date of end of locking period
+    uint256 endDate;
+    uint256 maxSupply;
+    uint256 escrowLimitPeriod;
+}
+
+contract STO_FLAGS {
+    bool LIMITED_OWNERSHIP; 
+    bool IS_LOCKED; // Locked token transfers
+    bool PERIOD_LOCKED;  // Locked period active or inactive
+    bool PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
+    bool HYDRO_AMOUNT_TYPE; // is Hydro amount limited
+    bool ETH_AMOUNT_TYPE; // is Ether amount limited
+    bool HYDRO_ALLOWED; // Is Hydro allowed to purchase
+    bool ETH_ALLOWED; // Is Ether allowed for purchase
+    bool KYC_WHITELIST_RESTRICTED; 
+    bool AML_WHITELIST_RESTRICTED;
+}
+
+contract STO_PARAMS {
+    uint256 percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
+    uint256 hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
+    uint256 ethAllowed; // considered if ETH_AMOUNT_TYPE
+    uint256 lockPeriod; // in days
+    uint256 minInvestors;
+    uint256 maxInvestors;
+}
+
+contract HSTIssuer is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     using SafeMath for uint256;
     
@@ -45,55 +82,15 @@ contract HSTIssuer {
         uint age; // Birthday of the batch (timestamp)
     }
 
+    bool public exists;
 	// Main parameters
 	uint256 public id;
-	string public name;
+	bytes32 public name;
 	string public description;
 	string public symbol;
     uint8 public decimals;
     address payable public Owner;
     uint256 einOwner;
-
-  /**
-  * @notice Variables are grouped into arrays accesed by enums, because Solidity can not habdle so many individual variables
-  */
-
-    uint256[7] public MAIN_PARAMS;
-    enum MP {
-    	hydroPrice,
-        ethPrice,
-    	beginningDate,
-        lockEnds, // Date of end of locking period
-    	endDate,
-        maxSupply,
-        escrowLimitPeriod
-    }
-
-
-	// STO types / flags
-    bool[10] public STO_FLAGS;
-    enum SF {
-        LIMITED_OWNERSHIP, 
-        IS_LOCKED, // Locked token transfers
-        PERIOD_LOCKED,  // Locked period active or inactive
-        PERC_OWNERSHIP_TYPE, // is ownership percentage limited type
-        HYDRO_AMOUNT_TYPE, // is Hydro amount limited
-        ETH_AMOUNT_TYPE, // is Ether amount limited
-        HYDRO_ALLOWED, // Is Hydro allowed to purchase
-        ETH_ALLOWED, // Is Ether allowed for purchase
-        KYC_WHITELIST_RESTRICTED, 
-        AML_WHITELIST_RESTRICTED
-    }
-
-    uint256[6] public STO_PARAMS;
-    enum SP {
-        percAllowedTokens, // considered if PERC_OWNERSHIP_TYPE
-        hydroAllowed, // considered if HYDRO_AMOUNT_TYPE
-        ethAllowed, // considered if ETH_AMOUNT_TYPE
-        lockPeriod, // in days
-        minInvestors,
-        maxInvestors
-    }
 
     // State Memory
     Stage public stage; // SETUP, PRELAUNCH, ACTIVE, FINALIZED
@@ -148,7 +145,7 @@ contract HSTIssuer {
 
     event HydroSTCreated(
         uint256 indexed id, 
-        string name,
+        bytes32 name,
         string symbol,
         uint8 decimals,
         uint256 einOwner
@@ -159,8 +156,8 @@ contract HSTIssuer {
 
     // Feature #9 & #10
     modifier isUnlocked() {
-        require(!STO_FLAGS[uint(SF.IS_LOCKED)], "Token locked");
-        if (STO_FLAGS[uint(SF.PERIOD_LOCKED)]) require (now > MAIN_PARAMS[uint(MP.lockEnds)], "Locked period active");
+        require(!IS_LOCKED, "Token locked");
+        if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
         _;
     }
 
@@ -187,37 +184,26 @@ contract HSTIssuer {
     }
 
     modifier escrowReleased() {
-        require(MAIN_PARAMS[uint(MP.escrowLimitPeriod)] < now, "Escrow limit period is still active");
+        require(escrowLimitPeriod < now, "Escrow limit period is still active");
         require(legalApproved, "Legal conditions are not met");
         _;
     }
 
     constructor(
         uint256 _id,
-        string memory _name,
+        bytes32 _name,
         string memory _description,
         string memory _symbol,
-        uint8 _decimals,
-
-        uint256[7] memory _MAIN_PARAMS,
-        bool[10] memory _STO_FLAGS,
-        uint256[6] memory _STO_PARAMS
-
+        uint8 _decimals
         ) public {
+
+        exists = true;
 
         id = _id; 
         name = _name;
         description = _description;
         symbol = _symbol;
         decimals = _decimals;
-
-        MAIN_PARAMS = _MAIN_PARAMS;
-
-        // STO types / flags
-        STO_FLAGS = _STO_FLAGS; // _LIMITED_OWNERSHIP;
-
-        // STO parameters
-        STO_PARAMS = _STO_PARAMS;
 
         // State Memory
         stage = Stage.SETUP;
@@ -241,18 +227,18 @@ contract HSTIssuer {
     // Feature #9
     function setLockupPeriod(uint256 _lockEnds) onlyAdmin public {
         if (_lockEnds == 0) {
-            STO_FLAGS[uint(SF.PERIOD_LOCKED)] = false;
+            PERIOD_LOCKED = false;
             }
-        STO_FLAGS[uint(SF.PERIOD_LOCKED)] = true;
-        MAIN_PARAMS[uint(MP.lockEnds)] = _lockEnds;
+        PERIOD_LOCKED = true;
+        lockEnds = _lockEnds;
     }
 
     function lock() onlyAdmin public {
-        STO_FLAGS[uint(SF.IS_LOCKED)] = true;
+        IS_LOCKED = true;
     }
 
     function unLock() onlyAdmin public {
-        STO_FLAGS[uint(SF.IS_LOCKED)] = false;
+        IS_LOCKED = false;
     }
 
     function addWhitelist(uint256[] memory _einList) onlyAdmin public {
@@ -399,31 +385,31 @@ contract HSTIssuer {
 
         // CHECKINGS (to be exported as  a contract)
         // Coin allowance
-        if (coin == HYDRO) require (STO_FLAGS[uint(SF.HYDRO_ALLOWED)], "Hydro is not allowed");
-        if (coin == ETH) require (STO_FLAGS[uint(SF.ETH_ALLOWED)], "Ether is not allowed");
+        if (coin == HYDRO) require (HYDRO_ALLOWED, "Hydro is not allowed");
+        if (coin == ETH) require (ETH_ALLOWED, "Ether is not allowed");
         // Check for limits
-        if (STO_FLAGS[uint(SF.HYDRO_AMOUNT_TYPE)] && coin == HYDRO) {
-            require(hydroReceived.add(_amount) <= STO_PARAMS[uint(SP.hydroAllowed)], "Hydro amount exceeded");
+        if (HYDRO_AMOUNT_TYPE && coin == HYDRO) {
+            require(hydroReceived.add(_amount) <= hydroAllowed, "Hydro amount exceeded");
         }
-        if (STO_FLAGS[uint(SF.ETH_AMOUNT_TYPE)] && coin == ETH) {
-            require((ethReceived + msg.value) <= STO_PARAMS[uint(SP.ethAllowed)], "Ether amount exceeded");
+        if (ETH_AMOUNT_TYPE && coin == ETH) {
+            require((ethReceived + msg.value) <= ethAllowed, "Ether amount exceeded");
         }
         // Check for whitelists
-        if (STO_FLAGS[uint(SF.KYC_WHITELIST_RESTRICTED)]) _checkKYCWhitelist(msg.sender, _amount);
-        if (STO_FLAGS[uint(SF.AML_WHITELIST_RESTRICTED)]) _checkAMLWhitelist(msg.sender, _amount);
+        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(msg.sender, _amount);
+        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(msg.sender, _amount);
         // Calculate total
         if (coin == HYDRO) {
-            total = _amount.mul(MAIN_PARAMS[uint(MP.hydroPrice)]);
+            total = _amount.mul(hydroPrice);
             hydroReceived = hydroReceived.add(_amount);      
         }
 
         if (coin == ETH) {
-            total = msg.value.mul(MAIN_PARAMS[uint(MP.ethPrice)]);
+            total = msg.value.mul(ethPrice);
             ethReceived = ethReceived + msg.value;
         }
         // Check for ownership percentage 
-        if (STO_FLAGS[uint(SF.PERC_OWNERSHIP_TYPE)]) {
-            require ((issuedTokens.add(total) / ownedTokens) < STO_PARAMS[uint(SP.percAllowedTokens)], 
+        if (PERC_OWNERSHIP_TYPE) {
+            require ((issuedTokens.add(total) / ownedTokens) < percAllowedTokens, 
                 "Perc ownership exceeded");
         }
         // Transfer Hydrotokens
@@ -454,8 +440,8 @@ contract HSTIssuer {
         isUnlocked isUnfreezed(msg.sender, _to) 
         public returns(bool) {
         
-        if (STO_FLAGS[uint(SF.KYC_WHITELIST_RESTRICTED)]) _checkKYCWhitelist(_to, _amount);
-        if (STO_FLAGS[uint(SF.AML_WHITELIST_RESTRICTED)]) _checkAMLWhitelist(_to, _amount);
+        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
+        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
 
         // _updateBatches(msg.sender, _to, _amount);
 
@@ -467,8 +453,8 @@ contract HSTIssuer {
         isUnlocked isUnfreezed(_from, _to) 
         public returns(bool) {
         
-        if (STO_FLAGS[uint(SF.KYC_WHITELIST_RESTRICTED)]) _checkKYCWhitelist(_to, _amount);
-        if (STO_FLAGS[uint(SF.AML_WHITELIST_RESTRICTED)]) _checkAMLWhitelist(_to, _amount);
+        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
+        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
 
         // _updateBatches(_from, _to, _amount);
 
@@ -481,7 +467,7 @@ contract HSTIssuer {
     // PUBLIC GETTERS ----------------------------------------------------------------
 
     function isLocked() public view returns(bool) {
-        return STO_FLAGS[uint(SF.IS_LOCKED)];
+        return IS_LOCKED;
     }
 
 
