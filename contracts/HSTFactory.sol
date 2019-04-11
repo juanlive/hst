@@ -76,13 +76,21 @@ contract HSTFactory is SnowflakeOwnable {
     */
     function deploySecuritiesTokenContractSet(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public payable returns(bool) {
       emit SecuritiesDeployStarted(_tokenName);
-      // check if token to be deployed already exists
+      bool _deploymentAllowed = true;
+      // check if token to be deployed already exists in the list of tokens
       if ( tokens[_tokenName] != address(0) ) {
         // token exists, check if is alive
         HSToken _token = HSToken(tokens[_tokenName]);
+        if ( _token.isAlive() == true ) {
+          // token exists and it is alive, cancel deploy
+          _deploymentAllowed = false;
+          SecuritiesDeployCancelled(_tokenName, "Token exists and it is alive");
+        }
       }
-      tokens[_tokenName] = deployToken(_tokenName, _description, _symbol, _decimals);
-      emit SecuritiesDeployFinished(_tokenName);
+      if ( _deploymentAllowed == true ) {
+        tokens[_tokenName] = deployToken(_tokenName, _description, _symbol, _decimals);
+        emit SecuritiesDeployFinished(_tokenName);
+      }
     }
 
     /**
