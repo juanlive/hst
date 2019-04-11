@@ -20,7 +20,6 @@ interface tokenRecipient {
 /**
  * @title HydroSecuritiesToken
  * @notice Token for the issuance of Securities
- * @dev 
  * @author Juan Livingston <juanlivingston@gmail.com>
  */
 contract HydroSecuritiesToken is SnowflakeOwnable {

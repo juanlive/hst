@@ -6,7 +6,6 @@ import '../HydroSecuritiesToken.sol';
 /**
  * @title HydroEscrow
  * @notice Stores HYDRO inside as an escrow for HST issuing. This contracts stores any funds sent by the token creator and the funds that users pay to participate in the issuing. It distributes any refunds, and the corresponding dividends and interests to their receivers.
- * @dev
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
 contract HSTEscrow {
@@ -45,7 +44,6 @@ contract HSTEscrow {
 
     /**
     * @notice Send the collected capital to the capital receiver
-    * @dev
     * @return uint8 The reason code: 0 means success.
     */
     function releaseCollectedCapital() public onlyHydroSecurityToken returns(uint8) {
