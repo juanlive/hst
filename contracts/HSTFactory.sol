@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import './HydroSecuritiesToken.sol';
-import './components/HSTEscrow.sol';
+//import './HydroSecuritiesToken.sol';
+//import './components/HSTEscrow.sol';
 import './HSTIssuer.sol';
-import './components/HSTEscrow.sol';
+//import './components/HSTEscrow.sol';
 import './components/SnowflakeOwnable.sol';
 import './interfaces/IdentityRegistryInterface.sol';
 
