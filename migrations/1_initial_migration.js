@@ -33,6 +33,6 @@ console.log("OK");
 		"Hydro Security",
 		"HTST",
 		18,
-		{gas: 32000000})
+		{gas: 42000000})
   	
 };

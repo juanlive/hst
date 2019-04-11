@@ -1,13 +1,15 @@
 pragma solidity ^0.5.0;
 
-import './components/SnowflakeOwnable.sol';
+
+//import './components/SnowflakeOwnable.sol';
 //import './components/TokenWithDates.sol';
 import './interfaces/HydroInterface.sol';
 import './interfaces/ApproverInterface.sol';
 import './interfaces/IdentityRegistryInterface.sol';
-import './interfaces/SnowflakeViaInterface.sol';
+//import './interfaces/SnowflakeViaInterface.sol';
 import './zeppelin/math/SafeMath.sol';
 import './zeppelin/ownership/Ownable.sol';
+
 
 // Rinkeby testnet addresses
 // HydroToken: 0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20
@@ -107,9 +109,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 	address RegistryRules;
 
 	// Links to Registries
-    address[5] public KYCResolverArray;
-    address[5] public AMLResolverArray;
-    address[5] public LegalResolverArray;
+    //address[5] public KYCResolverArray;
+    //address[5] public AMLResolverArray;
+    //address[5] public LegalResolverArray;
     uint8 KYCResolverQ;
     uint8 AMLResolverQ;
     uint8 LegalResolverQ;
@@ -124,13 +126,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     mapping(address => uint256) public balance;
 
     // For date analysis and paying interests
-    mapping(address => uint) public maxIndex; // Index of last batch: points to the next one
-    mapping(address => uint) public minIndex; // Index of first batch
-    mapping(address => mapping(uint => Batch)) public batches; // Batches with quantities and ages
+    //mapping(address => uint) public maxIndex; // Index of last batch: points to the next one
+    //mapping(address => uint) public minIndex; // Index of first batch
+    //mapping(address => mapping(uint => Batch)) public batches; // Batches with quantities and ages
 
     // Escrow contract's address => security number
-    mapping(address => uint256) public escrowContracts;
-    address[] public escrowContractsArray;
+    //mapping(address => uint256) public escrowContracts;
+    // address[] public escrowContractsArray;
 
     // Declaring interfaces
     IdentityRegistryInterface public identityRegistry;
@@ -206,7 +208,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         // Links to Modules
         RegistryRules = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
-        InterestSolver = address(0x0);
+        //InterestSolver = address(0x0);
 
         hydroToken = HydroInterface(0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20);
         identityRegistry = IdentityRegistryInterface(0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA);
@@ -445,24 +447,24 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= KYCResolverQ; i++) {
-            ApproverInterface approver = ApproverInterface(KYCResolverArray[i-1]);
-            require(approver.isApproved(einTo, _amount));
+            //ApproverInterface approver = ApproverInterface(KYCResolverArray[i-1]);
+            //require(approver.isApproved(einTo, _amount));
         }
     }
     function _checkAMLWhitelist(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= AMLResolverQ; i++) {
-            ApproverInterface approver = ApproverInterface(AMLResolverArray[i-1]);
-            require(approver.isApproved(einTo, _amount));
+            //ApproverInterface approver = ApproverInterface(AMLResolverArray[i-1]);
+            //require(approver.isApproved(einTo, _amount));
         }
     }
     function _checkLegalWhitelist(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= LegalResolverQ; i++) {
-            ApproverInterface approver = ApproverInterface(LegalResolverArray[i-1]);
-            require(approver.isApproved(einTo, _amount));
+           // ApproverInterface approver = ApproverInterface(LegalResolverArray[i-1]);
+            //require(approver.isApproved(einTo, _amount));
         }
     }
 
