@@ -135,34 +135,7 @@ contract HSTFactory is SnowflakeOwnable {
         "NAME",
         "Description",
         "SYMB",
-        18,
-
-        [uint256(100000),
-        uint256(100000),
-        uint256(100000),
-        uint256(100000),
-        uint256(100000),
-        uint256(100000),
-        uint256(100000)],
-
-        [true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true],
-        [
-        uint256(100000),
-        uint256(100000),
-        uint256(100000),
-        uint256(100000),
-        uint256(100000),
-        uint256(100000)
-        ]
+        18
         );
       address _issuerAddress = address(_issuer);
       emit ContractDeployed(_tokenName, "ISSUER", _issuerAddress);
