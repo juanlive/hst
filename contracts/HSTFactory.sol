@@ -81,10 +81,10 @@ contract HSTFactory is SnowflakeOwnable {
       if ( tokens[_tokenName] != address(0) ) {
         // token exists, check if is alive
         HSToken _token = HSToken(tokens[_tokenName]);
-        if ( _token.isAlive() == true ) {
+        if ( _token.exists() == true ) {
           // token exists and it is alive, cancel deploy
           _deploymentAllowed = false;
-          SecuritiesDeployCancelled(_tokenName, "Token exists and it is alive");
+          emit SecuritiesDeployCancelled(_tokenName, "Token exists and it is alive");
         }
       }
       if ( _deploymentAllowed == true ) {
