@@ -15,7 +15,7 @@ contract HSTEscrow {
     uint256 public totalHydroCapitalization;
     address payable public hydroCapitalReceiverAddress;
     HydroInterface public hydroToken;
-    HydroSecuritiesToken public hydroSecuritiesToken;
+    // HydroSecuritiesToken public hydroSecuritiesToken;
 
 
     modifier onlyHydroSecurityToken() {
@@ -38,7 +38,7 @@ contract HSTEscrow {
         require(_hydroCapitalReceiver != address(0), 'You must set a capital receiver');
         issuingEndingTimestamp = _issuingEndingTimestamp;
         hydroSecurityTokenAddress = msg.sender;
-        hydroSecuritiesToken = HydroSecuritiesToken(_hydroSecurityTokenAddress);
+        // hydroSecuritiesToken = HydroSecuritiesToken(_hydroSecurityTokenAddress);
         hydroCapitalReceiverAddress = _hydroCapitalReceiver;
     }
 

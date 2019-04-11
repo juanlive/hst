@@ -36,7 +36,7 @@ import './interfaces/IdentityRegistryInterface.sol';
 contract HSTFactory is SnowflakeOwnable {
 
     // name of the token => address of the token
-    //mapping(bytes32 => address) tokens;
+    mapping(bytes32 => address) tokens;
 
     // name of the token => address of the issuer
     mapping(bytes32 => address) issuers;
