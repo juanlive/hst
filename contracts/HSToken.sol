@@ -104,16 +104,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     uint256 ethersReleased; // idem form Ethers
 
  	// Links to Modules
- 	address HSToken;
 	address RegistryRules;
 
 	// Links to Registries
     address[5] public KYCResolverArray;
     address[5] public AMLResolverArray;
     address[5] public LegalResolverArray;
-    mapping(address => uint8) public KYCResolver;
-    mapping(address => uint8) public AMLResolver;
-    mapping(address => uint8) public LegalResolver;
     uint8 KYCResolverQ;
     uint8 AMLResolverQ;
     uint8 LegalResolverQ;
@@ -137,7 +133,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     address[] public escrowContractsArray;
 
     // Declaring interfaces
-    // IdentityRegistryInterface public identityRegistry;
+    IdentityRegistryInterface public identityRegistry;
     HydroInterface public hydroToken;
     // SnowflakeViaInterface public snowflakeVia;
     // TokenWithDates private tokenWithDates;
@@ -162,8 +158,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     modifier isUnfreezed(address _from, address _to) {
-        //require(!freezed[identityRegistry.getEIN(_to)] , "Target EIN is freezed");
-        //require(!freezed[identityRegistry.getEIN(_from)], "Source EIN is freezed");
+        require(!freezed[identityRegistry.getEIN(_to)] , "Target EIN is freezed");
+        require(!freezed[identityRegistry.getEIN(_from)], "Source EIN is freezed");
         _;
     }
 
@@ -179,7 +175,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     modifier onlyAdmin() {
         // Check if EIN of sender is the same as einOwner
-        //require(identityRegistry.getEIN(msg.sender) == einOwner, "Only for admins");
+        require(identityRegistry.getEIN(msg.sender) == einOwner, "Only for admins");
         _;
     }
 
@@ -209,12 +205,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         stage = Stage.SETUP;
 
         // Links to Modules
-        HSToken = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
         RegistryRules = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
         InterestSolver = address(0x0);
 
         hydroToken = HydroInterface(0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20);
-        //identityRegistry = IdentityRegistryInterface(0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA);
+        identityRegistry = IdentityRegistryInterface(0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA);
 
         Owner = msg.sender;
         einOwner = 234; // identityRegistry.getEIN(Owner);
@@ -283,70 +278,31 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Feature #3
     function addKYCResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        require(KYCResolver[_address[0]] == 0, "Resolver already exists");
-        require(KYCResolverQ <= 5, "No more resolvers allowed");
-        //identityRegistry.addResolvers(_address);
-        KYCResolverQ ++;
-        KYCResolver[_address[0]] = KYCResolverQ;
-        KYCResolverArray[KYCResolverQ-1] = _address[0];
+        //require(KYCResolverQ < 4, "There are already 5 resolvers for KYC");
+        //require(_address.length == 1, "Only one address per time");
+        //KYCResolverArray[KYCResolverQ] = _address[0];
+        //KYCResolverQ ++;
+        identityRegistry.addResolvers(_address);
+
     }
 
     function removeKYCResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        require(KYCResolver[_address[0]] != 0, "Resolver does not exist");
-        uint8 _number = KYCResolver[_address[0]];
-        if (KYCResolverArray.length > _number) {
-            for (uint8 i = _number; i < KYCResolverArray.length; i++) {
-                KYCResolverArray[i-1] = KYCResolverArray[i];
-            }
-        }
-        KYCResolverArray[KYCResolverQ - 1] = address(0x0);
-        KYCResolverQ --;
-        KYCResolver[_address[0]] = 0;
-        //identityRegistry.removeResolvers(_address); 
+        identityRegistry.removeResolvers(_address); 
     }
     function addAMLResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        require(AMLResolver[_address[0]] == 0, "Resolver already exists");
-        require(AMLResolverQ <= 5, "No more resolvers allowed");
-        //identityRegistry.addResolvers(_address);
-        AMLResolverQ ++;
-        AMLResolver[_address[0]] = AMLResolverQ;
-        AMLResolverArray[AMLResolverQ-1] = _address[0];
+        identityRegistry.addResolvers(_address);
+
     }
 
     function removeAMLResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        require(AMLResolver[_address[0]] != 0, "Resolver does not exist");
-        uint8 _number = AMLResolver[_address[0]];
-        if (AMLResolverArray.length > _number) {
-            for (uint8 i = _number; i < AMLResolverArray.length; i++) {
-                AMLResolverArray[i-1] = AMLResolverArray[i];
-            }
-        }
-        AMLResolverArray[AMLResolverQ - 1] = address(0x0);
-        AMLResolverQ --;
-        AMLResolver[_address[0]] = 0;
-        //identityRegistry.removeResolvers(_address); 
+        identityRegistry.removeResolvers(_address); 
     }
     function addLegalResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        require(LegalResolver[_address[0]] == 0, "Resolver already exists");
-        require(LegalResolverQ <= 5, "No more resolvers allowed");
-        //identityRegistry.addResolvers(_address);
-        LegalResolverQ ++;
-        LegalResolver[_address[0]] = LegalResolverQ;
-        LegalResolverArray[LegalResolverQ-1] = _address[0];
+        identityRegistry.addResolvers(_address);
     }
 
     function removeLegalResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        require(LegalResolver[_address[0]] != 0, "Resolver does not exist");
-        uint8 _number = LegalResolver[_address[0]];
-        if (LegalResolverArray.length > _number) {
-            for (uint8 i = _number; i < LegalResolverArray.length; i++) {
-                LegalResolverArray[i-1] = LegalResolverArray[i];
-            }
-        }
-        LegalResolverArray[LegalResolverQ - 1] = address(0x0);
-        LegalResolverQ --;
-        LegalResolver[_address[0]] = 0;
-        //identityRegistry.removeResolvers(_address); 
+        identityRegistry.removeResolvers(_address);  
     }
 
 
@@ -376,7 +332,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         public payable returns(bool) {
 
         uint256 total;
-        //uint256 _ein = identityRegistry.getEIN(msg.sender);
+        uint256 _ein = identityRegistry.getEIN(msg.sender);
         bytes32 HYDRO = keccak256(abi.encode("HYDRO"));
         bytes32 ETH =  keccak256(abi.encode("ETH"));
         bytes32 coin = keccak256(abi.encode(_coin));
@@ -486,27 +442,27 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Feature #8
     function _checkKYCWhitelist(address _to, uint256 _amount) private view {
-        //uint256 einTo = identityRegistry.getEIN(_to);
+        uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= KYCResolverQ; i++) {
             ApproverInterface approver = ApproverInterface(KYCResolverArray[i-1]);
-            //require(approver.isApproved(einTo, _amount));
+            require(approver.isApproved(einTo, _amount));
         }
     }
     function _checkAMLWhitelist(address _to, uint256 _amount) private view {
-        //uint256 einTo = identityRegistry.getEIN(_to);
+        uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= AMLResolverQ; i++) {
             ApproverInterface approver = ApproverInterface(AMLResolverArray[i-1]);
-            //require(approver.isApproved(einTo, _amount));
+            require(approver.isApproved(einTo, _amount));
         }
     }
     function _checkLegalWhitelist(address _to, uint256 _amount) private view {
-        //uint256 einTo = identityRegistry.getEIN(_to);
+        uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= LegalResolverQ; i++) {
             ApproverInterface approver = ApproverInterface(LegalResolverArray[i-1]);
-            //require(approver.isApproved(einTo, _amount));
+            require(approver.isApproved(einTo, _amount));
         }
     }
 

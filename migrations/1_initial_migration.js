@@ -1,4 +1,4 @@
-const HSTIssuer = artifacts.require('./HSTIssuer.sol')
+const HSToken = artifacts.require('./HSToken.sol')
 const AddressSet = artifacts.require('./_testing/AddressSet/AddressSet.sol')
 const IdentityRegistry = artifacts.require('./_testing/IdentityRegistry.sol')
 
@@ -24,12 +24,15 @@ module.exports = async function(deployer) {
   await deployer.deploy(StringUtils)
   deployer.link(StringUtils, ClientRaindrop)
   deployer.link(StringUtils, OldClientRaindrop)
+
 console.log("OK");
-	await deployer.deploy(HSTIssuer,{gas: 14000000},
+
+	await deployer.deploy(HSToken,
 		1,
-		'0xa7f15e4e66334e8214dfd97d5214f1f8f11c90f25bbe44b344944ed9efed7e29',
-		"Hydro Security token",
+		"0xa7f15e4e66334e8214dfd97d5214f1f8f11c90f25bbe44b344944ed9efed7e29",
+		"Hydro Security",
 		"HTST",
-		18)
+		18,
+		{gas: 32000000})
   	
 };
