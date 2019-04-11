@@ -30,8 +30,7 @@ import './zeppelin/ownership/Ownable.sol';
  * @author Juan Livingston <juanlivingston@gmail.com>
  */
 
-contract HSTIssuer is 
-    SnowflakeOwnable {
+contract HSTIssuer {
 
     using SafeMath for uint256;
     
@@ -52,35 +51,49 @@ contract HSTIssuer is
 	string public description;
 	string public symbol;
     uint8 public decimals;
-	uint256 public hydroPrice;
-    uint256 public ethPrice;
-	uint256 public beginningDate;
-    uint256 public lockEnds; // Date of end of locking period
-	uint256 public endDate;
-    uint256 public einOwner; // Instead of using the address we use EIN for the owner of the security
-    uint256 public maxSupply;
-    uint256 public escrowLimitPeriod;
     address payable public Owner;
+    uint256 einOwner;
+
+  /**
+  * @notice Variables are grouped into arrays accesed by enums, because Solidity can not habdle so many individual variables
+  */
+
+    bool[7] public MAIN_PARAMS;
+    enum MP {
+    	hydroPrice,
+        ethPrice,
+    	beginningDate,
+        lockEnds, // Date of end of locking period
+    	endDate,
+        maxSupply,
+        escrowLimitPeriod
+    }
+
 
 	// STO types / flags
-    bool public LIMITED_OWNERSHIP;
-    bool public IS_LOCKED; // Locked token transfers
-    bool public PERIOD_LOCKED; // Locked period active or inactive
-	bool public PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
-    bool public HYDRO_AMOUNT_TYPE; // is Hydro amount limited
-    bool public ETH_AMOUNT_TYPE; // is Ether amount limited
-    bool public HYDRO_ALLOWED; // Is Hydro allowed to purchase
-    bool public ETH_ALLOWED; // Is Ether allowed for purchase
-    bool public KYC_WHITELIST_RESTRICTED;
-    bool public AML_WHITELIST_RESTRICTED;
+    bool[10] public STO_FLAGS;
+    enum SF {
+        LIMITED_OWNERSHIP, 
+        IS_LOCKED, // Locked token transfers
+        PERIOD_LOCKED,  // Locked period active or inactive
+        PERC_OWNERSHIP_TYPE, // is ownership percentage limited type
+        HYDRO_AMOUNT_TYPE, // is Hydro amount limited
+        ETH_AMOUNT_TYPE, // is Ether amount limited
+        HYDRO_ALLOWED, // Is Hydro allowed to purchase
+        ETH_ALLOWED, // Is Ether allowed for purchase
+        KYC_WHITELIST_RESTRICTED, 
+        AML_WHITELIST_RESTRICTED
+    }
 
-    // STO parameters
-    uint256 public percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
-    uint256 public hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
-    uint256 public ethAllowed; // considered if ETH_AMOUNT_TYPE
-    uint256 public lockPeriod; // in days
-    uint256 public minInvestors;
-    uint256 public maxInvestors;
+    uint256[6] public STO_PARAMS;
+    enum SP {
+        percAllowedTokens, // considered if PERC_OWNERSHIP_TYPE
+        hydroAllowed, // considered if HYDRO_AMOUNT_TYPE
+        ethAllowed, // considered if ETH_AMOUNT_TYPE
+        lockPeriod, // in days
+        minInvestors,
+        maxInvestors
+    }
 
     // State Memory
     Stage public stage; // SETUP, PRELAUNCH, ACTIVE, FINALIZED
@@ -146,8 +159,8 @@ contract HSTIssuer is
 
     // Feature #9 & #10
     modifier isUnlocked() {
-        require(!IS_LOCKED, "Token locked");
-        if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
+        require(!STO_FLAGS[SF.IS_LOCKED], "Token locked");
+        if (STO_FLAGS[SF.PERIOD_LOCKED]) require (now > MAIN_PARAMS[MP.lockEnds], "Locked period active");
         _;
     }
 
@@ -174,7 +187,7 @@ contract HSTIssuer is
     }
 
     modifier escrowReleased() {
-        require(escrowLimitPeriod < now, "Escrow limit period is still active");
+        require(MAIN_PARAMS[MP.escrowLimitPeriod] < now, "Escrow limit period is still active");
         require(legalApproved, "Legal conditions are not met");
         _;
     }
@@ -185,66 +198,26 @@ contract HSTIssuer is
         string memory _description,
         string memory _symbol,
         uint8 _decimals,
-        uint256 _hydroPrice,
-        uint256 _ethPrice,
-        uint256 _beginningDate,
-        uint256 _lockEnds, // Date of end of locking period
-        uint256 _endDate,
-        uint256 _maxSupply,
-        uint256 _escrowLimitPeriod,
 
-        // STO types / flags
-        bool _LIMITED_OWNERSHIP,
-        bool _IS_LOCKED,
-        bool _PERIOD_LOCKED, 
-        bool _PERC_OWNERSHIP_TYPE,
-        bool _HYDRO_AMOUNT_TYPE, 
-        bool _ETH_AMOUNT_TYPE, 
-        bool _HYDRO_ALLOWED, 
-        bool _ETH_ALLOWED,
-        bool _KYC_WHITELIST_RESTRICTED,
-        bool _AML_WHITELIST_RESTRICTED,
+        uint256[7] memory _MAIN_PARAMS,
+        bool[10] memory _STO_FLAGS,
+        uint256[6] memory _STO_PARAMS
 
-        // STO parameters
-        uint256 _percAllowedTokens, // considered if PERC_OWNERSHIP_TYPE
-        uint256 _hydroAllowed, // considered if HYDRO_AMOUNT_TYPE
-        uint256 _ethAllowed, // considered if ETH_AMOUNT_TYPE
-        uint256 _lockPeriod, // in days
-        uint256 _minInvestors,
-        uint256 _maxInvestors) public {
+        ) public {
 
         id = _id; 
         name = _name;
         description = _description;
         symbol = _symbol;
         decimals = _decimals;
-        hydroPrice = _hydroPrice;
-        ethPrice = _ethPrice;
-        beginningDate = _beginningDate;
-        lockEnds = _lockEnds;
-        endDate = _endDate;
-        maxSupply = _maxSupply;
-        escrowLimitPeriod = _escrowLimitPeriod;
+
+        MAIN_PARAMS[] = _MAIN_PARAMS;
 
         // STO types / flags
-        LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP;
-        IS_LOCKED = _IS_LOCKED;
-        PERIOD_LOCKED = _PERIOD_LOCKED;
-        PERC_OWNERSHIP_TYPE = _PERC_OWNERSHIP_TYPE;
-        HYDRO_AMOUNT_TYPE = _HYDRO_AMOUNT_TYPE;
-        ETH_AMOUNT_TYPE = _ETH_AMOUNT_TYPE; 
-        HYDRO_ALLOWED = _HYDRO_ALLOWED; 
-        ETH_ALLOWED = _ETH_ALLOWED; 
-        KYC_WHITELIST_RESTRICTED = _KYC_WHITELIST_RESTRICTED;
-        AML_WHITELIST_RESTRICTED = _AML_WHITELIST_RESTRICTED;
+        STO_FLAGS[] = _STO_FLAGS; // _LIMITED_OWNERSHIP;
 
         // STO parameters
-        percAllowedTokens = _percAllowedTokens; 
-        hydroAllowed = _hydroAllowed; 
-        ethAllowed = _ethAllowed; 
-        lockPeriod = _lockPeriod; 
-        minInvestors = _minInvestors;
-        maxInvestors = _maxInvestors;
+        STO_PARAMS[] = _STO_PARAMS;
 
         // State Memory
         stage = Stage.SETUP;
@@ -268,18 +241,18 @@ contract HSTIssuer is
     // Feature #9
     function setLockupPeriod(uint256 _lockEnds) onlyAdmin public {
         if (_lockEnds == 0) {
-            PERIOD_LOCKED = false;
+            STO_FLAGS[SF.PERIOD_LOCKED] = false;
             }
-        PERIOD_LOCKED = true;
-        lockEnds = _lockEnds;
+        STO_FLAGS[SF.PERIOD_LOCKED] = true;
+        MAIN_PARAMS[MP.lockEnds] = _lockEnds;
     }
 
     function lock() onlyAdmin public {
-        IS_LOCKED = true;
+        STO_FLAGS[SF.IS_LOCKED] = true;
     }
 
     function unLock() onlyAdmin public {
-        IS_LOCKED = false;
+        STO_FLAGS[SF.IS_LOCKED] = false;
     }
 
     function addWhitelist(uint256[] memory _einList) onlyAdmin public {
@@ -426,31 +399,31 @@ contract HSTIssuer is
 
         // CHECKINGS (to be exported as  a contract)
         // Coin allowance
-        if (coin == HYDRO) require (HYDRO_ALLOWED, "Hydro is not allowed");
-        if (coin == ETH) require (ETH_ALLOWED, "Ether is not allowed");
+        if (coin == HYDRO) require (STO_FLAGS[SF.HYDRO_ALLOWED], "Hydro is not allowed");
+        if (coin == ETH) require (STO_FLAGS[SF.ETH_ALLOWED], "Ether is not allowed");
         // Check for limits
-        if (HYDRO_AMOUNT_TYPE && coin == HYDRO) {
-            require(hydroReceived.add(_amount) <= hydroAllowed, "Hydro amount exceeded");
+        if (STO_FLAGS [SF.HYDRO_AMOUNT_TYPE] && coin == HYDRO) {
+            require(hydroReceived.add(_amount) <= STO_PARAMS[SP.hydroAllowed], "Hydro amount exceeded");
         }
-        if (ETH_AMOUNT_TYPE && coin == ETH) {
-            require((ethReceived + msg.value) <= ethAllowed, "Ether amount exceeded");
+        if (STO_FLAGS [SF.ETH_AMOUNT_TYPE] && coin == ETH) {
+            require((ethReceived + msg.value) <= STO_PARAMS[SP.ethAllowed], "Ether amount exceeded");
         }
         // Check for whitelists
-        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(msg.sender, _amount);
-        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(msg.sender, _amount);
+        if (STO_FLAGS [SF.KYC_WHITELIST_RESTRICTED]) _checkKYCWhitelist(msg.sender, _amount);
+        if (STO_FLAGS [SF.AML_WHITELIST_RESTRICTED]) _checkAMLWhitelist(msg.sender, _amount);
         // Calculate total
         if (coin == HYDRO) {
-            total = _amount.mul(hydroPrice);
+            total = _amount.mul(MAIN_PARAMS[MP.hydroPrice]);
             hydroReceived = hydroReceived.add(_amount);      
         }
 
         if (coin == ETH) {
-            total = msg.value.mul(ethPrice);
+            total = msg.value.mul(MAIN_PARAMS[MP.ethPrice]);
             ethReceived = ethReceived + msg.value;
         }
         // Check for ownership percentage 
-        if (PERC_OWNERSHIP_TYPE) {
-            require ((issuedTokens.add(total) / ownedTokens) < percAllowedTokens, 
+        if (STO_FLAGS [SF.PERC_OWNERSHIP_TYPE]) {
+            require ((issuedTokens.add(total) / ownedTokens) < STO_PARAMS[SP.percAllowedTokens], 
                 "Perc ownership exceeded");
         }
         // Transfer Hydrotokens
@@ -481,8 +454,8 @@ contract HSTIssuer is
         isUnlocked isUnfreezed(msg.sender, _to) 
         public returns(bool) {
         
-        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
-        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
+        if (STO_FLAGS [SF.KYC_WHITELIST_RESTRICTED]) _checkKYCWhitelist(_to, _amount);
+        if (STO_FLAGS [SF.AML_WHITELIST_RESTRICTED]) _checkAMLWhitelist(_to, _amount);
 
         // _updateBatches(msg.sender, _to, _amount);
 
@@ -494,8 +467,8 @@ contract HSTIssuer is
         isUnlocked isUnfreezed(_from, _to) 
         public returns(bool) {
         
-        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
-        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
+        if (STO_FLAGS [SF.KYC_WHITELIST_RESTRICTED]) _checkKYCWhitelist(_to, _amount);
+        if (STO_FLAGS [SF.AML_WHITELIST_RESTRICTED]) _checkAMLWhitelist(_to, _amount);
 
         // _updateBatches(_from, _to, _amount);
 
@@ -508,7 +481,7 @@ contract HSTIssuer is
     // PUBLIC GETTERS ----------------------------------------------------------------
 
     function isLocked() public view returns(bool) {
-        return IS_LOCKED;
+        return STO_FLAGS[SF.IS_LOCKED];
     }
 
 
