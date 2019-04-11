@@ -137,7 +137,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     address[] public escrowContractsArray;
 
     // Declaring interfaces
-    IdentityRegistryInterface public identityRegistry;
+    // IdentityRegistryInterface public identityRegistry;
     HydroInterface public hydroToken;
     // SnowflakeViaInterface public snowflakeVia;
     // TokenWithDates private tokenWithDates;
@@ -162,8 +162,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     modifier isUnfreezed(address _from, address _to) {
-        require(!freezed[identityRegistry.getEIN(_to)] , "Target EIN is freezed");
-        require(!freezed[identityRegistry.getEIN(_from)], "Source EIN is freezed");
+        //require(!freezed[identityRegistry.getEIN(_to)] , "Target EIN is freezed");
+        //require(!freezed[identityRegistry.getEIN(_from)], "Source EIN is freezed");
         _;
     }
 
@@ -179,7 +179,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     modifier onlyAdmin() {
         // Check if EIN of sender is the same as einOwner
-        require(identityRegistry.getEIN(msg.sender) == einOwner, "Only for admins");
+        //require(identityRegistry.getEIN(msg.sender) == einOwner, "Only for admins");
         _;
     }
 
@@ -214,10 +214,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         InterestSolver = address(0x0);
 
         hydroToken = HydroInterface(0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20);
-        identityRegistry = IdentityRegistryInterface(0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA);
+        //identityRegistry = IdentityRegistryInterface(0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA);
 
         Owner = msg.sender;
-        einOwner = identityRegistry.getEIN(Owner);
+        einOwner = 234; // identityRegistry.getEIN(Owner);
 
         emit HydroSTCreated(id, name, symbol, decimals, einOwner);
     }
@@ -285,7 +285,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     function addKYCResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
         require(KYCResolver[_address[0]] == 0, "Resolver already exists");
         require(KYCResolverQ <= 5, "No more resolvers allowed");
-        identityRegistry.addResolvers(_address);
+        //identityRegistry.addResolvers(_address);
         KYCResolverQ ++;
         KYCResolver[_address[0]] = KYCResolverQ;
         KYCResolverArray[KYCResolverQ-1] = _address[0];
@@ -302,12 +302,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         KYCResolverArray[KYCResolverQ - 1] = address(0x0);
         KYCResolverQ --;
         KYCResolver[_address[0]] = 0;
-        identityRegistry.removeResolvers(_address); 
+        //identityRegistry.removeResolvers(_address); 
     }
     function addAMLResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
         require(AMLResolver[_address[0]] == 0, "Resolver already exists");
         require(AMLResolverQ <= 5, "No more resolvers allowed");
-        identityRegistry.addResolvers(_address);
+        //identityRegistry.addResolvers(_address);
         AMLResolverQ ++;
         AMLResolver[_address[0]] = AMLResolverQ;
         AMLResolverArray[AMLResolverQ-1] = _address[0];
@@ -324,12 +324,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         AMLResolverArray[AMLResolverQ - 1] = address(0x0);
         AMLResolverQ --;
         AMLResolver[_address[0]] = 0;
-        identityRegistry.removeResolvers(_address); 
+        //identityRegistry.removeResolvers(_address); 
     }
     function addLegalResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
         require(LegalResolver[_address[0]] == 0, "Resolver already exists");
         require(LegalResolverQ <= 5, "No more resolvers allowed");
-        identityRegistry.addResolvers(_address);
+        //identityRegistry.addResolvers(_address);
         LegalResolverQ ++;
         LegalResolver[_address[0]] = LegalResolverQ;
         LegalResolverArray[LegalResolverQ-1] = _address[0];
@@ -346,7 +346,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         LegalResolverArray[LegalResolverQ - 1] = address(0x0);
         LegalResolverQ --;
         LegalResolver[_address[0]] = 0;
-        identityRegistry.removeResolvers(_address); 
+        //identityRegistry.removeResolvers(_address); 
     }
 
 
@@ -486,27 +486,27 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Feature #8
     function _checkKYCWhitelist(address _to, uint256 _amount) private view {
-        uint256 einTo = identityRegistry.getEIN(_to);
+        //uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= KYCResolverQ; i++) {
             ApproverInterface approver = ApproverInterface(KYCResolverArray[i-1]);
-            require(approver.isApproved(einTo, _amount));
+            //require(approver.isApproved(einTo, _amount));
         }
     }
     function _checkAMLWhitelist(address _to, uint256 _amount) private view {
-        uint256 einTo = identityRegistry.getEIN(_to);
+        //uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= AMLResolverQ; i++) {
             ApproverInterface approver = ApproverInterface(AMLResolverArray[i-1]);
-            require(approver.isApproved(einTo, _amount));
+            //require(approver.isApproved(einTo, _amount));
         }
     }
     function _checkLegalWhitelist(address _to, uint256 _amount) private view {
-        uint256 einTo = identityRegistry.getEIN(_to);
+        //uint256 einTo = identityRegistry.getEIN(_to);
 
         for (uint8 i = 1; i <= LegalResolverQ; i++) {
             ApproverInterface approver = ApproverInterface(LegalResolverArray[i-1]);
-            require(approver.isApproved(einTo, _amount));
+            //require(approver.isApproved(einTo, _amount));
         }
     }
 
