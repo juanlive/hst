@@ -521,8 +521,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
 
         // _updateBatches(msg.sender, _to, _amount);
-
-        return true;
+        balance[_to].add(_amount);
+        balance[msg.sender].sub(_amount);
     }
 
     // Feature #11
@@ -534,8 +534,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
 
         // _updateBatches(_from, _to, _amount);
-
-        return true;;
+        balance[_to].add(_amount);
+        balance[_from].sub(_amount);
     }
 
 
