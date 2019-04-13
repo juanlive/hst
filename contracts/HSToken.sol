@@ -38,6 +38,8 @@ import './zeppelin/ownership/Ownable.sol';
   */
 
 contract MAIN_PARAMS {
+    bool MAIN_PARAMS;
+
     uint256 hydroPrice;
     uint256 ethPrice;
     uint256 beginningDate;
@@ -48,6 +50,8 @@ contract MAIN_PARAMS {
 }
 
 contract STO_FLAGS {
+    bool STO_FLAGS;
+
     bool LIMITED_OWNERSHIP; 
     bool IS_LOCKED; // Locked token transfers
     bool PERIOD_LOCKED;  // Locked period active or inactive
@@ -61,6 +65,8 @@ contract STO_FLAGS {
 }
 
 contract STO_PARAMS {
+    bool STO_PARAMS;
+
     uint256 percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
     uint256 hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
     uint256 ethAllowed; // considered if ETH_AMOUNT_TYPE
@@ -84,9 +90,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint age; // Birthday of the batch (timestamp)
     }
 
-    bool public exists;
+    bool public exists; // Flag to deactivate it
+    uint256 public registerDate; // Date of creation of token
 	// Main parameters
-	uint256 public id;
+	uint256 public id; // Unique HSToken id
 	bytes32 public name;
 	string public description;
 	string public symbol;
@@ -109,9 +116,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 	address RegistryRules;
 
 	// Links to Registries
-    //address[5] public KYCResolverArray;
-    //address[5] public AMLResolverArray;
-    //address[5] public LegalResolverArray;
+    address[5] public KYCResolverArray;
+    address[5] public AMLResolverArray;
+    address[5] public LegalResolverArray;
     uint8 KYCResolverQ;
     uint8 AMLResolverQ;
     uint8 LegalResolverQ;
@@ -126,9 +133,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     mapping(address => uint256) public balance;
 
     // For date analysis and paying interests
-    //mapping(address => uint) public maxIndex; // Index of last batch: points to the next one
-    //mapping(address => uint) public minIndex; // Index of first batch
-    //mapping(address => mapping(uint => Batch)) public batches; // Batches with quantities and ages
+    mapping(address => uint) public maxIndex; // Index of last batch: points to the next one
+    mapping(address => uint) public minIndex; // Index of first batch
+    mapping(address => mapping(uint => Batch)) public batches; // Batches with quantities and ages
 
     // Escrow contract's address => security number
     //mapping(address => uint256) public escrowContracts;
@@ -187,6 +194,17 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         _;
     }
 
+    modifier requireSetup() {
+        require(stage == Stage.SETUP, "Stage is not setup");
+        require(isSetupTime(), "Setup time has expired");
+        _;
+    }
+
+    modifier requirePrelaunch() {
+        require(stage == Stage.PRELAUNCH, "Stage is not prelaunch");
+        _;
+    }
+
     constructor(
         uint256 _id,
         bytes32 _name,
@@ -195,13 +213,14 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint8 _decimals
         ) public {
 
-        exists = true;
-
         id = _id; 
         name = _name;
         description = _description;
         symbol = _symbol;
         decimals = _decimals;
+
+        exists = true;
+        registerDate = now;
 
         // State Memory
         stage = Stage.SETUP;
@@ -219,7 +238,105 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         emit HydroSTCreated(id, name, symbol, decimals, einOwner);
     }
 
+
+    // ADMIN SETUP FUNCTIONS
+
+
+    function set_MAIN_PARAMS(
+        uint256 _hydroPrice,
+        uint256 _ethPrice,
+        uint256 _beginningDate,
+        uint256 _lockEnds,
+        uint256 _endDate,
+        uint256 _maxSupply,
+        uint256 _escrowLimitPeriod
+    ) onlyAdmin requireSetup public  {
+        // Validations
+        require(
+            (_hydroPrice > 0 || _ethPrice > 0) &&
+            (_beginningDate == 0 || _beginningDate > now) &&
+            (_lockEnds > _beginningDate && _lockEnds > now) &&
+            _endDate > _lockEnds &&
+            _maxSupply > 10000 &&
+            _escrowLimitPeriod > (10 * 24 * 60 * 60),
+            "Incorrect input data"
+            );
+        // Load values
+        hydroPrice = _hydroPrice;
+        ethPrice = _ethPrice;
+        beginningDate = _beginningDate;
+        lockEnds = _lockEnds; // Date of end of locking period
+        endDate = _endDate;
+        maxSupply = _maxSupply;
+        escrowLimitPeriod = _escrowLimitPeriod;
+        // Set flag
+        MAIN_PARAMS = true;
+    }
+
+
+    function set_STO_FLAGS(
+        bool _LIMITED_OWNERSHIP, 
+        bool _IS_LOCKED,
+        bool _PERIOD_LOCKED,
+        bool _PERC_OWNERSHIP_TYPE,
+        bool _HYDRO_AMOUNT_TYPE,
+        bool _ETH_AMOUNT_TYPE,
+        bool _HYDRO_ALLOWED,
+        bool _ETH_ALLOWED,
+        bool _KYC_WHITELIST_RESTRICTED, 
+        bool _AML_WHITELIST_RESTRICTED
+    ) onlyAdmin requireSetup public {
+        // Load values
+        LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP; 
+        IS_LOCKED = _IS_LOCKED;
+        PERIOD_LOCKED = _PERIOD_LOCKED;
+        PERC_OWNERSHIP_TYPE = _PERC_OWNERSHIP_TYPE;
+        HYDRO_AMOUNT_TYPE = _HYDRO_AMOUNT_TYPE;
+        ETH_AMOUNT_TYPE = _ETH_AMOUNT_TYPE;
+        HYDRO_ALLOWED = _HYDRO_ALLOWED;
+        ETH_ALLOWED = _ETH_ALLOWED;
+        KYC_WHITELIST_RESTRICTED = _KYC_WHITELIST_RESTRICTED; 
+        AML_WHITELIST_RESTRICTED = _AML_WHITELIST_RESTRICTED;
+        // Set flag
+        STO_FLAGS = true;
+    }
+
+    function set_STO_PARAMS(
+        uint256 _percAllowedTokens, 
+        uint256 _hydroAllowed,
+        uint256 _ethAllowed,
+        uint256 _lockPeriod,
+        uint256 _minInvestors,
+        uint256 _maxInvestors
+    ) onlyAdmin requireSetup public {
+        require(STO_FLAGS, "STO_FLAGS has not been sat");
+
+        percAllowedTokens = _percAllowedTokens; 
+        hydroAllowed = _hydroAllowed;
+        ethAllowed = _ethAllowed;
+        lockPeriod = _lockPeriod;
+        minInvestors = _minInvestors;
+        maxInvestors = _maxInvestors;
+        // Set flag
+        STO_PARAMS = true;
+    }
+
+
+    function activatePrelaunch() onlyAdmin requireSetup public {
+        require(MAIN_PARAMS, "MAIN_PARAMS not setted");
+        require(STO_FLAGS, "STO_FLAGS not setted");
+        require(STO_PARAMS, "STO_PARAMS not setted");
+
+        if (beginningDate == 0) beginningDate = now;
+
+        stage = Stage.PRELAUNCH;
+    }
+
+
+
+
     // Feature #10: ADMIN FUNCTIONS
+
 
     // Feature #9
     function setLockupPeriod(uint256 _lockEnds) onlyAdmin public {
@@ -229,6 +346,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         PERIOD_LOCKED = true;
         lockEnds = _lockEnds;
     }
+
+
 
     function lock() onlyAdmin public {
         IS_LOCKED = true;
@@ -403,7 +522,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         // _updateBatches(msg.sender, _to, _amount);
 
-        return(hydroToken.transfer(_to, _amount));
+        return true;
     }
 
     // Feature #11
@@ -416,7 +535,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         // _updateBatches(_from, _to, _amount);
 
-        return(hydroToken.transferFrom(_from, _to, _amount));
+        return true;;
     }
 
 
@@ -428,7 +547,17 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         return IS_LOCKED;
     }
 
+    function isAlive() public view returns(bool) {
+        if (!exists) return false;
+        if (stage != Stage.SETUP) return true;
+        // If it is in the Stup stage, check that date has not been surpassed
+        return isSetupTime();
+    }
 
+    function isSetupTime() internal view returns(bool) {
+        // 15 days to complete setup
+        return((now - registerDate) < (15 * 24 * 60 * 60));
+    }
 
 
     // INTERNAL FUNCTIONS ----------------------------------------------------------
