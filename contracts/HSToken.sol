@@ -11,6 +11,9 @@ import './zeppelin/math/SafeMath.sol';
 import './zeppelin/ownership/Ownable.sol';
 
 
+// For testing
+
+import './_testing/IdentityRegistry.sol';
 // Rinkeby testnet addresses
 // HydroToken: 0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20
 // IdentityRegistry: 0xa7ba71305be9b2dfead947dc0e5730ba2abd28ea
@@ -38,7 +41,7 @@ import './zeppelin/ownership/Ownable.sol';
   */
 
 contract MAIN_PARAMS {
-    bool MAIN_PARAMS;
+    bool MAIN_PARAMS_ready;
 
     uint256 hydroPrice;
     uint256 ethPrice;
@@ -50,7 +53,7 @@ contract MAIN_PARAMS {
 }
 
 contract STO_FLAGS {
-    bool STO_FLAGS;
+    bool STO_FLAGS_ready;
 
     bool LIMITED_OWNERSHIP; 
     bool IS_LOCKED; // Locked token transfers
@@ -65,7 +68,7 @@ contract STO_FLAGS {
 }
 
 contract STO_PARAMS {
-    bool STO_PARAMS;
+    bool STO_PARAMS_ready;
 
     uint256 percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
     uint256 hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
@@ -230,7 +233,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         //InterestSolver = address(0x0);
 
         hydroToken = HydroInterface(0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20);
-        identityRegistry = IdentityRegistryInterface(0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA);
+        identityRegistry = new IdentityRegistry();
 
         Owner = msg.sender;
         einOwner = 234; // identityRegistry.getEIN(Owner);
@@ -270,7 +273,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         maxSupply = _maxSupply;
         escrowLimitPeriod = _escrowLimitPeriod;
         // Set flag
-        MAIN_PARAMS = true;
+        MAIN_PARAMS_readyF = true;
     }
 
 
@@ -298,7 +301,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         KYC_WHITELIST_RESTRICTED = _KYC_WHITELIST_RESTRICTED; 
         AML_WHITELIST_RESTRICTED = _AML_WHITELIST_RESTRICTED;
         // Set flag
-        STO_FLAGS = true;
+        STO_FLAGS_ready = true;
     }
 
     function set_STO_PARAMS(
@@ -309,7 +312,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 _minInvestors,
         uint256 _maxInvestors
     ) onlyAdmin requireSetup public {
-        require(STO_FLAGS, "STO_FLAGS has not been sat");
+        require(STO_FLAGS_ready, "STO_FLAGS has not been sat");
 
         percAllowedTokens = _percAllowedTokens; 
         hydroAllowed = _hydroAllowed;
@@ -318,14 +321,14 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         minInvestors = _minInvestors;
         maxInvestors = _maxInvestors;
         // Set flag
-        STO_PARAMS = true;
+        STO_PARAMS_ready = true;
     }
 
 
     function activatePrelaunch() onlyAdmin requireSetup public {
-        require(MAIN_PARAMS, "MAIN_PARAMS not setted");
-        require(STO_FLAGS, "STO_FLAGS not setted");
-        require(STO_PARAMS, "STO_PARAMS not setted");
+        require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
+        require(STO_FLAGS_ready, "STO_FLAGS not setted");
+        require(STO_PARAMS_ready, "STO_PARAMS not setted");
 
         if (beginningDate == 0) beginningDate = now;
 
