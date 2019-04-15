@@ -81,8 +81,8 @@ it('HSToken can be created', async () => {
 
   it('HSToken set MAIN_PARAMS', async () => {
     await newToken.set_MAIN_PARAMS(
-      "1", // hydroPrice
-      "1", // ethPrice
+      web3.utils.toWei("0.1"), // hydroPrice: 1 ether = same price
+      web3.utils.toWei("0.001"), // ethPrice
       daysOn(15), // beginningDate
       daysOn(20), // lockEnds
       daysOn(24), // endDate
@@ -114,7 +114,7 @@ it('HSToken can be created', async () => {
 
   it('HSToken set STO_PARAMS', async () => {
     await newToken.set_STO_PARAMS(
-        web3.utils.toWei("0.2"), // _percAllowedTokens, expressed as 1 ether = 100%, 0.2 ether = 20%
+        web3.utils.toWei("0.2"), // _percAllowedTokens: 1 ether = 100%, 0.2 ether = 20%
         web3.utils.toWei("1000"), // _hydroAllowed,
         web3.utils.toWei("1000"), // _ethAllowed,
         daysToSeconds(12).toString(), // _lockPeriod,

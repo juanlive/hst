@@ -97,6 +97,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint age; // Creation of the batch (timestamp)
     }
 
+    struct Investor {
+        bool exist;
+        uint256 etherSent;
+        uint256 hydroSent;
+    }
+
     bool public exists; // Flag to deactivate it
     uint256 public registerDate; // Date of creation of token
 	// Main parameters
@@ -115,6 +121,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     uint256 public burnedTokens;
     uint256 public hydroReceived;
     uint256 public ethReceived;
+    uint256 public investorsQuantity;
     uint256 hydrosReleased; // Quantity of Hydros released by owner
     uint256 ethersReleased; // idem form Ethers
 
@@ -137,6 +144,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     mapping(uint256 => bool) public freezed;
 
     mapping(address => uint256) public balance;
+    mapping(uint256 => Investor) public investors;
 
     // For date analysis and paying interests
     mapping(address => uint) public maxIndex; // Index of last batch: points to the next one
@@ -480,12 +488,18 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         bytes32 ETH =  keccak256(abi.encode("ETH"));
         bytes32 coin = keccak256(abi.encode(_coin));
 
+        if (!investors[_ein].exist) {
+            investorsQuantity++;
+            investors[_ein].exist = true;
+            require(investorsQuantity <= maxInvestors || maxInvestors == 0, "Maximum investors reached");
+        }
+ 
         require(stage == Stage.ACTIVE, "Current stage is not active");
 
         // CHECKINGS (to be exported as  a contract)
         // Coin allowance
-        if (coin == HYDRO) require (HYDRO_ALLOWED, "Hydro is not allowed");
-        if (coin == ETH) require (ETH_ALLOWED, "Ether is not allowed");
+        if (coin == HYDRO) require(HYDRO_ALLOWED, "Hydro is not allowed");
+        if (coin == ETH) require(ETH_ALLOWED, "Ether is not allowed");
         // Check for limits
         if (HYDRO_AMOUNT_TYPE && coin == HYDRO) {
             require(hydroReceived.add(_amount) <= hydroAllowed, "Hydro amount exceeded");
@@ -503,12 +517,14 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         // Calculate total
         if (coin == HYDRO) {
-            total = _amount.mul(hydroPrice);
+            total = _amount.mul(hydroPrice) / 1 ether;
+            investors[_ein].hydroSent = investors[_ein].hydroSent.add(_amount);
             hydroReceived = hydroReceived.add(_amount);      
         }
 
         if (coin == ETH) {
-            total = msg.value.mul(ethPrice);
+            total = msg.value.mul(ethPrice) / 1 ether;
+            investors[_ein].etherSent += msg.value;
             ethReceived = ethReceived + msg.value;
         }
 
@@ -552,8 +568,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         if (AML_RESTRICTED) _checkAML(_to, _amount);
 
         // _updateBatches(msg.sender, _to, _amount);
-        balance[_to].add(_amount);
-        balance[msg.sender].sub(_amount);
+        balance[_to] = balance[_to].add(_amount);
+        balance[msg.sender] = balance[msg.sender].sub(_amount);
     }
 
     // Feature #11
@@ -565,8 +581,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         if (AML_RESTRICTED) _checkAML(_to, _amount);
 
         // _updateBatches(_from, _to, _amount);
-        balance[_to].add(_amount);
-        balance[_from].sub(_amount);
+        balance[_to] = balance[_to].add(_amount);
+        balance[_from] = balance[_from].sub(_amount);
     }
 
 
@@ -600,7 +616,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
      function _doSell(address _to, uint256 _amount) private {
         issuedTokens = issuedTokens.add(_amount);
-        balance[_to].add(_amount);
+        balance[_to] = balance[_to].add(_amount);
     }
 
 
