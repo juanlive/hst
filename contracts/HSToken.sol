@@ -41,7 +41,7 @@ import './zeppelin/ownership/Ownable.sol';
   */
 
 contract MAIN_PARAMS {
-    bool MAIN_PARAMS_ready;
+    bool public MAIN_PARAMS_ready;
 
     uint256 public hydroPrice;
     uint256 public ethPrice;
@@ -53,7 +53,7 @@ contract MAIN_PARAMS {
 }
 
 contract STO_FLAGS {
-    bool STO_FLAGS_ready;
+    bool public STO_FLAGS_ready;
 
     bool public LIMITED_OWNERSHIP; 
     bool public IS_LOCKED; // Locked token transfers
@@ -70,7 +70,7 @@ contract STO_FLAGS {
 }
 
 contract STO_PARAMS {
-    bool STO_PARAMS_ready;
+    bool public STO_PARAMS_ready;
     // @param percAllowedTokens Where 100% = 1 ether, 50% = 0.5 ether
     uint256 public percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
     uint256 public hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
@@ -104,7 +104,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 	string public symbol;
     uint8 public decimals;
     address payable public Owner;
-    uint256 einOwner;
+    uint256 public einOwner;
 
     // State Memory
     Stage public stage; // SETUP, PRELAUNCH, ACTIVE, FINALIZED
@@ -239,7 +239,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         hydroToken = HydroInterface(_HydroToken); // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
         identityRegistry = IdentityRegistryInterface(_IdentityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
-        serviceRegistry = new HSTServiceRegistry();
+        // serviceRegistry = new HSTServiceRegistry();
 
         Owner = msg.sender;
         einOwner = identityRegistry.getEIN(Owner);
@@ -345,7 +345,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         stage = Stage.PRELAUNCH;
     }
 
-    function stageActivate() onlyAdmin onlyAtPrelaunch public {
+    function stageActivate() onlyAdmin onlyAtPreLaunch public {
         stage = Stage.ACTIVE;
     }
 
@@ -458,9 +458,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     function releaseEthers() onlyAdmin escrowReleased public {
-        require(this.balance > 0, "There are not ethers in this account");
+        require(address(this).balance > 0, "There are not ethers in this account");
         ethersReleased = ethersReleased + address(this).balance;
-        require(Owner.send(this.balance));
+        require(Owner.send(address(this).balance));
     }
 
 
@@ -493,7 +493,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         }
         // Check with KYC and AML providers
         if (KYC_RESTRICTED && KYCResolverQ > 0) _checkKYC(msg.sender, _amount);
-        if (AML_RESTRICTED && ALMResolverQ > 0) _checkAML(msg.sender, _amount);
+        if (AML_RESTRICTED && AMLResolverQ > 0) _checkAML(msg.sender, _amount);
 
         // Check with whitelist and blacklist
         if (WHITELIST_RESTRICTED) _checkWhitelist(msg.sender);
@@ -610,7 +610,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         for (uint8 i = 0; i < KYCResolverQ; i++) {
             ResolverInterface resolver = ResolverInterface(KYCResolverArray[i]);
-            require(resolver.isApproved(einTo, _amount));
+            require(resolver.isApproved(einTo, _amount), "KYC not approved");
         }
     }
     function _checkAML(address _to, uint256 _amount) private view {
@@ -622,12 +622,14 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         }
     }
 
-    function _checkWhitelist(address _EINuser) private view {
-        require(whitelist[_EINuser], "EIN address not in whitelist");
+    function _checkWhitelist(address _user) private view {
+        uint256 einUser = identityRegistry.getEIN(_user);
+        require(whiteList[einUser], "EIN address not in whitelist");
     }
 
-    function _checkBlacklist(address _EINuser) private view {
-        require(!blacklist[_EINuser], "EIN address is blacklisted");
+    function _checkBlacklist(address _user) private view {
+        uint256 einUser = identityRegistry.getEIN(_user);
+        require(!blackList[einUser], "EIN address is blacklisted");
     }
     
 

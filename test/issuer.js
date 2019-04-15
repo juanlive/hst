@@ -1,3 +1,4 @@
+const truffleAssert = require('truffle-assertions');
 const HSToken = artifacts.require('./HSToken.sol')
 
 const common = require('./common.js')
@@ -54,7 +55,6 @@ contract('Testing HSToken', function (accounts) {
   })
 
 
-
 describe('Checking HSToken functionality', async() =>{
 
 it('HSToken can be created', async () => {
@@ -68,7 +68,8 @@ it('HSToken can be created', async () => {
       instances.IdentityRegistry.address, // IdentityRegistry Rinkeby
       {from: user.address}
     )
-    console.log("HSTokenAddress", newToken.address)
+    console.log("HSToken Address", newToken.address)
+    console.log("User", user.address)
 
 })
 
@@ -76,6 +77,7 @@ it('HSToken can be created', async () => {
   it('HSToken exists', async () => {
     userId = await newToken.Owner();
   })
+
 
   it('HSToken set MAIN_PARAMS', async () => {
     await newToken.set_MAIN_PARAMS(
@@ -88,19 +90,100 @@ it('HSToken can be created', async () => {
       daysOn(18), // _escrowLimitPeriod
       { from: user.address }
       )
-
-    console.log("User",user.address)
   })
+
+
+  it('HSToken set STO_FLAGS', async () => {
+    await newToken.set_STO_FLAGS(
+        true, // _LIMITED_OWNERSHIP, 
+        false, // _IS_LOCKED,
+        false, // _PERIOD_LOCKED,
+        true, // _PERC_OWNERSHIP_TYPE,
+        true, // _HYDRO_AMOUNT_TYPE,
+        true, // _ETH_AMOUNT_TYPE,
+        true, // _HYDRO_ALLOWED,
+        true, // _ETH_ALLOWED,
+        true, // _KYC_WHITELIST_RESTRICTED, 
+        true, // _AML_WHITELIST_RESTRICTED
+        true, // WHITELIST_RESTRICTED
+        true, // BLACKLIST_RESTRICTED
+      { from: user.address }
+      )
+  })
+
+
+  it('HSToken set STO_PARAMS', async () => {
+    await newToken.set_STO_PARAMS(
+        web3.utils.toWei("0.2"), // _percAllowedTokens, expressed as 1 ether = 100%, 0.2 ether = 20%
+        web3.utils.toWei("1000"), // _hydroAllowed,
+        web3.utils.toWei("1000"), // _ethAllowed,
+        daysToSeconds(12).toString(), // _lockPeriod,
+        "1", // _minInvestors,
+        "4", // _maxInvestors
+      { from: user.address }
+      )
+  })
+
+  it('HSToken activate Prelaunch', async () => {
+    await newToken.stagePrelaunch({ from: user.address });
+  })
+
+  it('HSToken add KYC Resolver', async () => {
+    await newToken.addKYCResolver(
+      instances.KYCResolver.address,
+      { from: user.address })
+  })
+
+
+  it('HSToken activate Launch', async () => {
+    await newToken.stageActivate({ from: user.address });
+  })
+
+
+  it('Adds User 1 to the Whitelist', async() => {
+    await newToken.addWhitelist(["1"],
+      { from: user.address })
+  })
+
+
+ // it('buyTokens from EIN user 1', async () => {
+ //   await newToken.buyTokens(
+ //       "HYDRO",
+ //       "10",
+ //       { from: user.address })
+ // })
+
+
+  it('Reject EIN identity 1', async () => {
+    await instances.KYCResolver.rejectEin(
+      "1",
+      { from: user.address });
+  })
+
+  it('Reverts buy for EIN user 1', async () => {
+      await truffleAssert.reverts(
+        newToken.buyTokens(
+        "HYDRO",
+        "10",
+        { from: user.address }),
+        "KYC not approved"
+      )
+  })
+
 
 })
 
 
+})
 
 
-function daysOn(days) {
-  return parseInt(new Date() / 1000 + days * 24 * 60 * 60).toString();
+function daysOn(_days) {
+  return parseInt(new Date() / 1000 + daysToSeconds(_days)).toString();
+}
+
+function daysToSeconds(_days) {
+  return _days * 24 * 60 * 60;
 }
 
 
 
-})
