@@ -145,14 +145,23 @@ it('HSToken can be created', async () => {
       { from: user.address })
   })
 
+  it('User 1 approves 1M HydroTokens for HSToken', async() => {
+    await instances.HydroToken.approve(
+      newToken.address,
+      web3.utils.toWei("1000000"),
+      { from: user.address })
+  })
 
- // it('buyTokens from EIN user 1', async () => {
- //   await newToken.buyTokens(
- //       "HYDRO",
- //       "10",
- //       { from: user.address })
- // })
+  it('buyTokens from EIN user 1', async () => {
+    await newToken.buyTokens(
+        "HYDRO",
+        web3.utils.toWei("10"),
+        { from: user.address })
+  })
 
+
+/*
+// Reject Identity 1 and try to buy
 
   it('Reject EIN identity 1', async () => {
     await instances.KYCResolver.rejectEin(
@@ -169,6 +178,7 @@ it('HSToken can be created', async () => {
         "KYC not approved"
       )
   })
+*/
 
 
 })
