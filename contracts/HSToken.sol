@@ -3,8 +3,9 @@ pragma solidity ^0.5.0;
 
 //import './components/SnowflakeOwnable.sol';
 //import './components/TokenWithDates.sol';
+import './components/HSTServiceRegistry.sol';
 import './interfaces/HydroInterface.sol';
-import './interfaces/ApproverInterface.sol';
+import './interfaces/ResolverInterface.sol';
 import './interfaces/IdentityRegistryInterface.sol';
 //import './interfaces/SnowflakeViaInterface.sol';
 import './zeppelin/math/SafeMath.sol';
@@ -62,8 +63,10 @@ contract STO_FLAGS {
     bool public ETH_AMOUNT_TYPE; // is Ether amount limited
     bool public HYDRO_ALLOWED; // Is Hydro allowed to purchase
     bool public ETH_ALLOWED; // Is Ether allowed for purchase
-    bool public KYC_WHITELIST_RESTRICTED; 
-    bool public AML_WHITELIST_RESTRICTED;
+    bool public KYC_RESTRICTED; 
+    bool public AML_RESTRICTED;
+    bool public WHITELIST_RESTRICTED;
+    bool public BLACKLIST_RESTRICTED;
 }
 
 contract STO_PARAMS {
@@ -89,7 +92,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     struct Batch {
         uint initial; // Initial quantity received in a batch. Not modified in the future
         uint quantity; // Current quantity of tokens in a batch.
-        uint age; // Birthday of the batch (timestamp)
+        uint age; // Creation of the batch (timestamp)
     }
 
     bool public exists; // Flag to deactivate it
@@ -114,7 +117,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     uint256 ethersReleased; // idem form Ethers
 
  	// Links to Modules
-	address public RegistryRules;
+	// address public RegistryRules;
 
 	// Links to Registries
     address[5] public KYCResolverArray;
@@ -124,7 +127,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     uint8 AMLResolverQ;
     uint8 LegalResolverQ;
 
-    address InterestSolver;
+    // address InterestSolver;
 
     // Mappings
     mapping(uint256 => bool) public whiteList;
@@ -145,6 +148,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // Declaring interfaces
     IdentityRegistryInterface public identityRegistry;
     HydroInterface public hydroToken;
+    // HSTServiceRegistry public serviceRegistry;
     // SnowflakeViaInterface public snowflakeVia;
     // TokenWithDates private tokenWithDates;
 
@@ -230,11 +234,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         stage = Stage.SETUP;
 
         // Links to Modules
-        RegistryRules = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
+        // RegistryRules = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
         // InterestSolver = address(0x0);
 
         hydroToken = HydroInterface(_HydroToken); // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
         identityRegistry = IdentityRegistryInterface(_IdentityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
+        serviceRegistry = new HSTServiceRegistry();
 
         Owner = msg.sender;
         einOwner = identityRegistry.getEIN(Owner);
@@ -288,8 +293,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         bool _ETH_AMOUNT_TYPE,
         bool _HYDRO_ALLOWED,
         bool _ETH_ALLOWED,
-        bool _KYC_WHITELIST_RESTRICTED, 
-        bool _AML_WHITELIST_RESTRICTED
+        bool _KYC_RESTRICTED, 
+        bool _AML_RESTRICTED,
+        bool _WHITELIST_RESTRICTED,
+        bool _BLACKLIST_RESTRICTED
     ) onlyAdmin onlyAtSetup public {
         // Load values
         LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP; 
@@ -300,8 +307,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         ETH_AMOUNT_TYPE = _ETH_AMOUNT_TYPE;
         HYDRO_ALLOWED = _HYDRO_ALLOWED;
         ETH_ALLOWED = _ETH_ALLOWED;
-        KYC_WHITELIST_RESTRICTED = _KYC_WHITELIST_RESTRICTED; 
-        AML_WHITELIST_RESTRICTED = _AML_WHITELIST_RESTRICTED;
+        KYC_RESTRICTED = _KYC_RESTRICTED; 
+        AML_RESTRICTED = _AML_RESTRICTED;
+        WHITELIST_RESTRICTED = _WHITELIST_RESTRICTED;
+        BLACKLIST_RESTRICTED = _BLACKLIST_RESTRICTED;
         // Set flag
         STO_FLAGS_ready = true;
     }
@@ -327,18 +336,18 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
-    function activatePrelaunch() onlyAdmin onlyAtSetup public {
+    function stagePrelaunch() onlyAdmin onlyAtSetup public {
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
         require(STO_PARAMS_ready, "STO_PARAMS not setted");
 
         if (beginningDate == 0) beginningDate = now;
-
         stage = Stage.PRELAUNCH;
     }
 
-
-
+    function stageActivate() onlyAdmin onlyAtPrelaunch public {
+        stage = Stage.ACTIVE;
+    }
 
     // Feature #10: ADMIN FUNCTIONS
 
@@ -403,32 +412,36 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // Only at Prelaunch functions: adding and removing resolvers
 
     // Feature #3
-    function addKYCResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        //require(KYCResolverQ < 4, "There are already 5 resolvers for KYC");
-        //require(_address.length == 1, "Only one address per time");
-        //KYCResolverArray[KYCResolverQ] = _address[0];
-        //KYCResolverQ ++;
-        identityRegistry.addResolvers(_address);
-
+    function addKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+        require(KYCResolverQ < 4, "There are already 5 resolvers for KYC");
+        KYCResolverArray[KYCResolverQ] = _address;
+        KYCResolverQ ++;
+        //serviceRegistry.addService(address(this), bytes32("KYC"), _address);
+    }
+    function removeKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+        //serviceRegistry.replaceService(address(this), bytes32("KYC"), _address,address(0)); 
     }
 
-    function removeKYCResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        identityRegistry.removeResolvers(_address); 
-    }
-    function addAMLResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        identityRegistry.addResolvers(_address);
+    function addAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+        require(AMLResolverQ < 4, "There are already 5 resolvers for AML");
+        AMLResolverArray[AMLResolverQ] = _address;
+        AMLResolverQ ++;
+        //serviceRegistry.addService(address(this), bytes32("AML"), _address);
 
     }
-
-    function removeAMLResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        identityRegistry.removeResolvers(_address); 
-    }
-    function addLegalResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        identityRegistry.addResolvers(_address);
+    function removeAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+        //serviceRegistry.replaceService(address(this), bytes32("AML"), _address,address(0)); 
     }
 
-    function removeLegalResolver(address[] memory _address) onlyAdmin onlyAtPreLaunch public {
-        identityRegistry.removeResolvers(_address);  
+    function addLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+        require(LegalResolverQ < 4, "There are already 5 legal resolvers");
+        LegalResolverArray[LegalResolverQ] = _address;
+        LegalResolverQ ++;
+        //serviceRegistry.addService(address(this), bytes32("LEGAL"), _address);
+    }
+
+    function removeLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+        //serviceRegistry.replaceService(address(this), bytes32("LEGAL"), _address,address(0));
     }
 
 
@@ -439,13 +452,15 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // Retrieve tokens and ethers
     function releaseHydroTokens() onlyAdmin escrowReleased public {
         uint256 thisBalance = hydroToken.balanceOf(address(this));
+        require(thisBalance > 0, "There are not HydroTokens in this account");
         hydrosReleased = hydrosReleased + thisBalance;
         require(hydroToken.transfer(Owner, thisBalance));
     }
 
     function releaseEthers() onlyAdmin escrowReleased public {
+        require(this.balance > 0, "There are not ethers in this account");
         ethersReleased = ethersReleased + address(this).balance;
-        require(Owner.send(address(this).balance));
+        require(Owner.send(this.balance));
     }
 
 
@@ -476,9 +491,14 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         if (ETH_AMOUNT_TYPE && coin == ETH) {
             require((ethReceived + msg.value) <= ethAllowed, "Ether amount exceeded");
         }
-        // Check for whitelists
-        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(msg.sender, _amount);
-        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(msg.sender, _amount);
+        // Check with KYC and AML providers
+        if (KYC_RESTRICTED && KYCResolverQ > 0) _checkKYC(msg.sender, _amount);
+        if (AML_RESTRICTED && ALMResolverQ > 0) _checkAML(msg.sender, _amount);
+
+        // Check with whitelist and blacklist
+        if (WHITELIST_RESTRICTED) _checkWhitelist(msg.sender);
+        if (BLACKLIST_RESTRICTED) _checkBlacklist(msg.sender);
+
         // Calculate total
         if (coin == HYDRO) {
             total = _amount.mul(hydroPrice);
@@ -490,6 +510,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
             ethReceived = ethReceived + msg.value;
         }
 
+        // Check with maxSupply
         require(issuedTokens.add(total) <= maxSupply, "Max supply of Tokens is exceeded");
 
         // Check for ownership percentage 
@@ -525,8 +546,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         isUnlocked isUnfreezed(msg.sender, _to) 
         public returns(bool) {
         
-        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
-        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
+        if (KYC_RESTRICTED) _checkKYC(_to, _amount);
+        if (AML_RESTRICTED) _checkAML(_to, _amount);
 
         // _updateBatches(msg.sender, _to, _amount);
         balance[_to].add(_amount);
@@ -538,8 +559,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         isUnlocked isUnfreezed(_from, _to) 
         public returns(bool) {
         
-        if (KYC_WHITELIST_RESTRICTED) _checkKYCWhitelist(_to, _amount);
-        if (AML_WHITELIST_RESTRICTED) _checkAMLWhitelist(_to, _amount);
+        if (KYC_RESTRICTED) _checkKYC(_to, _amount);
+        if (AML_RESTRICTED) _checkAML(_to, _amount);
 
         // _updateBatches(_from, _to, _amount);
         balance[_to].add(_amount);
@@ -584,28 +605,38 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // Permissions checking
 
     // Feature #8
-    function _checkKYCWhitelist(address _to, uint256 _amount) private view {
+    function _checkKYC(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
 
-        for (uint8 i = 1; i <= KYCResolverQ; i++) {
-            //ApproverInterface approver = ApproverInterface(KYCResolverArray[i-1]);
-            //require(approver.isApproved(einTo, _amount));
+        for (uint8 i = 0; i < KYCResolverQ; i++) {
+            ResolverInterface resolver = ResolverInterface(KYCResolverArray[i]);
+            require(resolver.isApproved(einTo, _amount));
         }
     }
-    function _checkAMLWhitelist(address _to, uint256 _amount) private view {
+    function _checkAML(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
 
-        for (uint8 i = 1; i <= AMLResolverQ; i++) {
-            //ApproverInterface approver = ApproverInterface(AMLResolverArray[i-1]);
-            //require(approver.isApproved(einTo, _amount));
+        for (uint8 i = 0; i < AMLResolverQ; i++) {
+            ResolverInterface resolver = ResolverInterface(AMLResolverArray[i]);
+            require(resolver.isApproved(einTo, _amount));
         }
     }
-    function _checkLegalWhitelist(address _to, uint256 _amount) private view {
+
+    function _checkWhitelist(address _EINuser) private view {
+        require(whitelist[_EINuser], "EIN address not in whitelist");
+    }
+
+    function _checkBlacklist(address _EINuser) private view {
+        require(!blacklist[_EINuser], "EIN address is blacklisted");
+    }
+    
+
+    function _checkLegaL(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
 
-        for (uint8 i = 1; i <= LegalResolverQ; i++) {
-           // ApproverInterface approver = ApproverInterface(LegalResolverArray[i-1]);
-            //require(approver.isApproved(einTo, _amount));
+        for (uint8 i = 0; i < LegalResolverQ; i++) {
+            ResolverInterface resolver = ResolverInterface(LegalResolverArray[i]);
+            require(resolver.isApproved(einTo, _amount));
         }
     }
 

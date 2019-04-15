@@ -1,14 +1,13 @@
 pragma solidity ^0.5.0;
 
 
-contract KMLApprover {
+contract KYCResolver {
 
 
 	mapping(uint256 => bool) public rejectedEin;
 
 
-    constructor(uint256 _rejected) public {
-        rejectedEin[_rejected] = true;
+    constructor() public {
     }
 
 

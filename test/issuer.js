@@ -78,18 +78,6 @@ it('HSToken can be created', async () => {
   })
 
   it('HSToken set MAIN_PARAMS', async () => {
-    console.log("Dayson",daysOn(8))
-    const params = [
-      web3.utils.toWei("10"), // hydroPrice
-      web3.utils.toWei("0.2"), // ethPrice
-      daysOn(15), // beginningDate
-      daysOn(20), // lockEnds
-      daysOn(24), // endDate
-      web3.utils.toWei("20000000"), // _maxSupply
-      daysOn(18) ]
-
-    console.log("Params",params);
-
     await newToken.set_MAIN_PARAMS(
       web3.utils.toWei("10"), // hydroPrice
       web3.utils.toWei("0.2"), // ethPrice
@@ -100,6 +88,8 @@ it('HSToken can be created', async () => {
       daysOn(18), // _escrowLimitPeriod
       { from: user.address }
       )
+
+    console.log("User",user.address)
   })
 
 })

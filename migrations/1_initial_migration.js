@@ -46,7 +46,7 @@ const deployToken = async () => {
 		18,
 		HydroToken.address, // HydroToken Rinkeby
 		IdentityRegistry.address, // IdentityRegistry Rinkeby
-		{gas: 12000000})
+		{gas: 6000000})
 
 	console.log("HSToken",HSToken.address);
   	}

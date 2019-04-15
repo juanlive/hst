@@ -3,6 +3,7 @@ const HydroToken = artifacts.require('./_testing/HydroToken.sol')
 const Snowflake = artifacts.require('./Snowflake.sol')
 const ClientRaindrop = artifacts.require('./resolvers/ClientRaindrop/ClientRaindrop.sol')
 const OldClientRaindrop = artifacts.require('./_testing/OldClientRaindrop.sol')
+const KYCResolver = artifacts.require('./samples/KYCResolver.sol')
 
 
 async function initialize (owner, users) {
@@ -31,6 +32,10 @@ async function initialize (owner, users) {
     instances.Snowflake.address, instances.OldClientRaindrop.address, 0, 0, { from: owner }
   )
   await instances.Snowflake.setClientRaindropAddress(instances.ClientRaindrop.address, { from: owner })
+
+  instances.KYCResolver = await KYCResolver.new( {from: owner })
+  
+  console.log("KYC Resolver", instances.KYCResolver.address)
 
   return instances
 }
