@@ -42,39 +42,39 @@ import './zeppelin/ownership/Ownable.sol';
 contract MAIN_PARAMS {
     bool MAIN_PARAMS_ready;
 
-    uint256 hydroPrice;
-    uint256 ethPrice;
-    uint256 beginningDate;
-    uint256 lockEnds; // Date of end of locking period
-    uint256 endDate;
-    uint256 maxSupply;
-    uint256 escrowLimitPeriod;
+    uint256 public hydroPrice;
+    uint256 public ethPrice;
+    uint256 public beginningDate;
+    uint256 public lockEnds; // Date of end of locking period
+    uint256 public endDate;
+    uint256 public maxSupply;
+    uint256 public escrowLimitPeriod;
 }
 
 contract STO_FLAGS {
     bool STO_FLAGS_ready;
 
-    bool LIMITED_OWNERSHIP; 
-    bool IS_LOCKED; // Locked token transfers
-    bool PERIOD_LOCKED;  // Locked period active or inactive
-    bool PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
-    bool HYDRO_AMOUNT_TYPE; // is Hydro amount limited
-    bool ETH_AMOUNT_TYPE; // is Ether amount limited
-    bool HYDRO_ALLOWED; // Is Hydro allowed to purchase
-    bool ETH_ALLOWED; // Is Ether allowed for purchase
-    bool KYC_WHITELIST_RESTRICTED; 
-    bool AML_WHITELIST_RESTRICTED;
+    bool public LIMITED_OWNERSHIP; 
+    bool public IS_LOCKED; // Locked token transfers
+    bool public PERIOD_LOCKED;  // Locked period active or inactive
+    bool public PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
+    bool public HYDRO_AMOUNT_TYPE; // is Hydro amount limited
+    bool public ETH_AMOUNT_TYPE; // is Ether amount limited
+    bool public HYDRO_ALLOWED; // Is Hydro allowed to purchase
+    bool public ETH_ALLOWED; // Is Ether allowed for purchase
+    bool public KYC_WHITELIST_RESTRICTED; 
+    bool public AML_WHITELIST_RESTRICTED;
 }
 
 contract STO_PARAMS {
     bool STO_PARAMS_ready;
     // @param percAllowedTokens Where 100% = 1 ether, 50% = 0.5 ether
-    uint256 percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
-    uint256 hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
-    uint256 ethAllowed; // considered if ETH_AMOUNT_TYPE
-    uint256 lockPeriod; // in days
-    uint256 minInvestors;
-    uint256 maxInvestors;
+    uint256 public percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
+    uint256 public hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
+    uint256 public ethAllowed; // considered if ETH_AMOUNT_TYPE
+    uint256 public lockPeriod; // in days
+    uint256 public minInvestors;
+    uint256 public maxInvestors;
 }
 
 contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
@@ -237,7 +237,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         identityRegistry = IdentityRegistryInterface(_IdentityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
 
         Owner = msg.sender;
-        einOwner = 234; // identityRegistry.getEIN(Owner);
+        einOwner = identityRegistry.getEIN(Owner);
 
         emit HydroSTCreated(id, name, symbol, decimals, einOwner);
     }
@@ -275,6 +275,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         escrowLimitPeriod = _escrowLimitPeriod;
         // Set flag
         MAIN_PARAMS_ready = true;
+
     }
 
 

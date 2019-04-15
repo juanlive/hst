@@ -28,7 +28,28 @@ module.exports = async function(deployer) {
   deployer.link(StringUtils, OldClientRaindrop)
 
   await deployer.deploy(Ownable)
-  	
+
+
+await deployer.deploy(HydroToken)
+await deployer.deploy(IdentityRegistry)
+
+console.log("SafeMath", SafeMath.address);
+console.log("HydroToken",HydroToken.address);
+
+
+const deployToken = async () => {
+	await deployer.deploy(HSToken,
+		1,
+		"0xa7f15e4e66334e8214dfd97d5214f1f8f11c90f25bbe44b344944ed9efed7e29",
+		"Hydro Security",
+		"HTST",
+		18,
+		HydroToken.address, // HydroToken Rinkeby
+		IdentityRegistry.address, // IdentityRegistry Rinkeby
+		{gas: 12000000})
+
+	console.log("HSToken",HSToken.address);
+  	}
 
   	  deployer.link(SafeMath, HSToken)
   	  deployer.link(Ownable, HSToken)

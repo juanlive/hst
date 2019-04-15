@@ -1,9 +1,11 @@
+const HSToken = artifacts.require('./HSToken.sol')
+
 const common = require('./common.js')
 const { sign, verifyIdentity } = require('./utilities')
 
 let instances
 let user
-contract('Testing KYC', function (accounts) {
+contract('Testing HSToken', function (accounts) {
   const owner = {
     public: accounts[0]
   }
@@ -18,17 +20,8 @@ contract('Testing KYC', function (accounts) {
   ]
 
   it('common contracts deployed', async () => {
-    instances = await common.initialize(owner.public, [])
+    instances = await common.initialize(owner.public, users)
   })
-
-
-
-
-  it('HSToken exists', async function() {
-    userId = instances.HSToken.Owner
-        console.log("Userid", userId)
-  })
-
 
 
   it('Identity can be created', async function () {
@@ -60,30 +53,64 @@ contract('Testing KYC', function (accounts) {
     })
   })
 
-  describe('Checking Resolver Functionality', async () => {
-    it('deploy KYC', async () => {
-      instances.KYC = await KYC.new(instances.Snowflake.address)
-    })
 
-    let identityNode
-    it('create and update identity node', async () => {
-      const result = await instances.KYC.newIdentityNode('test', '0x00')
-      identityNode = result.logs[0].args.identityNode
 
-      await instances.KYC.updateIdentityNode('test', '0x01')
-    })
+describe('Checking HSToken functionality', async() =>{
 
-    it('user can add identity node', async () => {
-      await instances.Snowflake.addResolver(
-        instances.KYC.address, true, web3.utils.toBN(0), identityNode, { from: user.address }
-      )
+it('HSToken can be created', async () => {
+  newToken = await HSToken.new(
+      1,
+      "0xa7f15e4e66334e8214dfd97d5214f1f8f11c90f25bbe44b344944ed9efed7e29",
+      "Hydro Security",
+      "HTST",
+      18,
+      instances.HydroToken.address, // HydroToken Rinkeby
+      instances.IdentityRegistry.address, // IdentityRegistry Rinkeby
+      {from: user.address}
+    )
+    console.log("HSTokenAddress", newToken.address)
 
-      await instances.KYC.addIdentityNode(web3.utils.soliditySha3('test'), { from: user.address })
-      await instances.KYC.revokeIdentityNode(web3.utils.soliditySha3('test'), { from: user.address })
+})
 
-      await instances.Snowflake.removeResolver(
-        instances.KYC.address, true, '0x00', { from: user.address }
-      )
-    })
+
+  it('HSToken exists', async () => {
+    userId = await newToken.Owner();
   })
+
+  it('HSToken set MAIN_PARAMS', async () => {
+    console.log("Dayson",daysOn(8))
+    const params = [
+      web3.utils.toWei("10"), // hydroPrice
+      web3.utils.toWei("0.2"), // ethPrice
+      daysOn(15), // beginningDate
+      daysOn(20), // lockEnds
+      daysOn(24), // endDate
+      web3.utils.toWei("20000000"), // _maxSupply
+      daysOn(18) ]
+
+    console.log("Params",params);
+
+    await newToken.set_MAIN_PARAMS(
+      web3.utils.toWei("10"), // hydroPrice
+      web3.utils.toWei("0.2"), // ethPrice
+      daysOn(15), // beginningDate
+      daysOn(20), // lockEnds
+      daysOn(24), // endDate
+      web3.utils.toWei("20000000"), // _maxSupply
+      daysOn(18), // _escrowLimitPeriod
+      { from: user.address }
+      )
+  })
+
+})
+
+
+
+
+function daysOn(days) {
+  return parseInt(new Date() / 1000 + days * 24 * 60 * 60).toString();
+}
+
+
+
 })

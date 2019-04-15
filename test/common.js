@@ -3,7 +3,6 @@ const HydroToken = artifacts.require('./_testing/HydroToken.sol')
 const Snowflake = artifacts.require('./Snowflake.sol')
 const ClientRaindrop = artifacts.require('./resolvers/ClientRaindrop/ClientRaindrop.sol')
 const OldClientRaindrop = artifacts.require('./_testing/OldClientRaindrop.sol')
-const HSToken = artifacts.require('./HSToken.sol')
 
 
 async function initialize (owner, users) {
@@ -23,18 +22,6 @@ async function initialize (owner, users) {
 
   instances.Snowflake = await Snowflake.new(
     instances.IdentityRegistry.address, instances.HydroToken.address, { from: owner }
-  )
-
-
-instances.HSToken = await HSToken.new(
-    1,
-    "0xa7f15e4e66334e8214dfd97d5214f1f8f11c90f25bbe44b344944ed9efed7e29",
-    "Hydro Security",
-    "HTST",
-    18,
-    instances.HydroToken.address, // HydroToken Rinkeby
-    instances.IdentityRegistry.address, // IdentityRegistry Rinkeby
-    {from: owner}
   )
 
 
