@@ -81,8 +81,8 @@ it('HSToken can be created', async () => {
 
   it('HSToken set MAIN_PARAMS', async () => {
     await newToken.set_MAIN_PARAMS(
-      web3.utils.toWei("10"), // hydroPrice
-      web3.utils.toWei("0.2"), // ethPrice
+      "1", // hydroPrice
+      "1", // ethPrice
       daysOn(15), // beginningDate
       daysOn(20), // lockEnds
       daysOn(24), // endDate
@@ -155,12 +155,10 @@ it('HSToken can be created', async () => {
   it('buyTokens from EIN user 1', async () => {
     await newToken.buyTokens(
         "HYDRO",
-        web3.utils.toWei("10"),
+        web3.utils.toWei("0.1"),
         { from: user.address })
   })
 
-
-/*
 // Reject Identity 1 and try to buy
 
   it('Reject EIN identity 1', async () => {
@@ -178,7 +176,19 @@ it('HSToken can be created', async () => {
         "KYC not approved"
       )
   })
-*/
+
+  it('Approve again EIN identity 1', async () => {
+    await instances.KYCResolver.approveEin(
+      "1",
+      { from: user.address });
+  })
+
+  it('buyTokens again from EIN user 1', async () => {
+    await newToken.buyTokens(
+        "HYDRO",
+        web3.utils.toWei("0.1"),
+        { from: user.address })
+  })
 
 
 })

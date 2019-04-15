@@ -21,5 +21,8 @@ contract KYCResolver {
     	rejectedEin[_ein] = true;
     }
 
+    function approveEin(uint256 _ein) public {
+        rejectedEin[_ein] = false;
+    }
 
 }

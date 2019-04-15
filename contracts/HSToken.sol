@@ -20,6 +20,8 @@ import './zeppelin/ownership/Ownable.sol';
 
 // TODO
 //
+// Make price ether/percentage (1 ether = 100%)
+//
 // A global Registry with data of all Securities issued, to check for repeated ids or symbols
 //
 // Feature #11: Participant functions -> send and receive token
