@@ -1,11 +1,9 @@
 const common = require('./common.js')
 const { sign, verifyIdentity } = require('./utilities')
 
-const HSTIssuer = artifacts.require('./resolvers/HSTIssuer.sol')
-
 let instances
 let user
-contract('Testing HSTIssuer', function (accounts) {
+contract('Testing KYC', function (accounts) {
   const owner = {
     public: accounts[0]
   }
@@ -22,6 +20,16 @@ contract('Testing HSTIssuer', function (accounts) {
   it('common contracts deployed', async () => {
     instances = await common.initialize(owner.public, [])
   })
+
+
+
+
+  it('HSToken exists', async function() {
+    userId = instances.HSToken.Owner
+        console.log("Userid", userId)
+  })
+
+
 
   it('Identity can be created', async function () {
     user = users[0]
@@ -53,28 +61,28 @@ contract('Testing HSTIssuer', function (accounts) {
   })
 
   describe('Checking Resolver Functionality', async () => {
-    it('deploy HSTIssuer', async () => {
-      instances.HSTIssuer = await HSTIssuer.new(instances.Snowflake.address)
+    it('deploy KYC', async () => {
+      instances.KYC = await KYC.new(instances.Snowflake.address)
     })
 
     let identityNode
     it('create and update identity node', async () => {
-      const result = await instances.HSTIssuer.newIdentityNode('test', '0x00')
+      const result = await instances.KYC.newIdentityNode('test', '0x00')
       identityNode = result.logs[0].args.identityNode
 
-      await instances.HSTIssuer.updateIdentityNode('test', '0x01')
+      await instances.KYC.updateIdentityNode('test', '0x01')
     })
 
     it('user can add identity node', async () => {
       await instances.Snowflake.addResolver(
-        instances.HSTIssuer.address, true, web3.utils.toBN(0), identityNode, { from: user.address }
+        instances.KYC.address, true, web3.utils.toBN(0), identityNode, { from: user.address }
       )
 
-      await instances.HSTIssuer.addIdentityNode(web3.utils.soliditySha3('test'), { from: user.address })
-      await instances.HSTIssuer.revokeIdentityNode(web3.utils.soliditySha3('test'), { from: user.address })
+      await instances.KYC.addIdentityNode(web3.utils.soliditySha3('test'), { from: user.address })
+      await instances.KYC.revokeIdentityNode(web3.utils.soliditySha3('test'), { from: user.address })
 
       await instances.Snowflake.removeResolver(
-        instances.HSTIssuer.address, true, '0x00', { from: user.address }
+        instances.KYC.address, true, '0x00', { from: user.address }
       )
     })
   })

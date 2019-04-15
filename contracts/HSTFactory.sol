@@ -32,13 +32,18 @@ import './interfaces/IdentityRegistryInterface.sol';
  */
 contract HSTFactory is SnowflakeOwnable {
 
+    address public HydroToken;
+    address public IdentityRegistry;
+
     // name of the token => address of the token
     mapping(bytes32 => address) tokens;
 
    /**
    * @notice Constructor
    */
-    constructor() public {
+    constructor(address _HydroToken, address _IdentityRegistry) public {
+      HydroToken = _HydroToken;
+      IdentityRegistry = _IdentityRegistry;
     }
 
    /**
@@ -98,7 +103,7 @@ contract HSTFactory is SnowflakeOwnable {
     * @param  _tokenName The name of the token contract set to be deployed
     */
     function deployToken(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public onlySnowflakeOwner returns(address) {
-      HSToken _token = new HSToken(1, _tokenName, _description, _symbol, _decimals);
+      HSToken _token = new HSToken(1, _tokenName, _description, _symbol, _decimals, HydroToken, IdentityRegistry);
       address _tokenAddress = address(_token);
       tokens[_tokenName] = _tokenAddress;
       emit ContractDeployed(_tokenName, "TOKEN", _tokenAddress);

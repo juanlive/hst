@@ -13,7 +13,6 @@ import './zeppelin/ownership/Ownable.sol';
 
 // For testing
 
-import './_testing/IdentityRegistry.sol';
 // Rinkeby testnet addresses
 // HydroToken: 0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20
 // IdentityRegistry: 0xa7ba71305be9b2dfead947dc0e5730ba2abd28ea
@@ -37,7 +36,7 @@ import './_testing/IdentityRegistry.sol';
 
 
   /**
-  * @notice We use contracts to store main variables, because Solidity can not habdle so many individual variables
+  * @dev We use contracts to store main variables, because Solidity can not habdle so many individual variables
   */
 
 contract MAIN_PARAMS {
@@ -69,7 +68,7 @@ contract STO_FLAGS {
 
 contract STO_PARAMS {
     bool STO_PARAMS_ready;
-
+    // @param percAllowedTokens Where 100% = 1 ether, 50% = 0.5 ether
     uint256 percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
     uint256 hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
     uint256 ethAllowed; // considered if ETH_AMOUNT_TYPE
@@ -107,8 +106,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // State Memory
     Stage public stage; // SETUP, PRELAUNCH, ACTIVE, FINALIZED
     bool legalApproved;
-    uint256 issuedTokens;
-    uint256 public ownedTokens;
+    uint256 public issuedTokens;
     uint256 public burnedTokens;
     uint256 public hydroReceived;
     uint256 public ethReceived;
@@ -116,7 +114,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     uint256 ethersReleased; // idem form Ethers
 
  	// Links to Modules
-	address RegistryRules;
+	address public RegistryRules;
 
 	// Links to Registries
     address[5] public KYCResolverArray;
@@ -141,7 +139,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     mapping(address => mapping(uint => Batch)) public batches; // Batches with quantities and ages
 
     // Escrow contract's address => security number
-    //mapping(address => uint256) public escrowContracts;
+    // mapping(address => uint256) public escrowContracts;
     // address[] public escrowContractsArray;
 
     // Declaring interfaces
@@ -197,7 +195,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         _;
     }
 
-    modifier requireSetup() {
+    modifier onlyAtSetup() {
         require(stage == Stage.SETUP, "Stage is not setup");
         require(isSetupTime(), "Setup time has expired");
         _;
@@ -205,6 +203,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     modifier requirePrelaunch() {
         require(stage == Stage.PRELAUNCH, "Stage is not prelaunch");
+        require(beginningDate == 0 || beginningDate > now, "Prelaunch time has passed");
         _;
     }
 
@@ -213,7 +212,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         bytes32 _name,
         string memory _description,
         string memory _symbol,
-        uint8 _decimals
+        uint8 _decimals,
+        address _HydroToken,
+        address _IdentityRegistry
         ) public {
 
         id = _id; 
@@ -230,10 +231,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         // Links to Modules
         RegistryRules = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
-        //InterestSolver = address(0x0);
+        // InterestSolver = address(0x0);
 
-        hydroToken = HydroInterface(0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20);
-        identityRegistry = new IdentityRegistry();
+        hydroToken = HydroInterface(_HydroToken); // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
+        identityRegistry = IdentityRegistryInterface(_IdentityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
 
         Owner = msg.sender;
         einOwner = 234; // identityRegistry.getEIN(Owner);
@@ -253,7 +254,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 _endDate,
         uint256 _maxSupply,
         uint256 _escrowLimitPeriod
-    ) onlyAdmin requireSetup public  {
+    ) onlyAdmin onlyAtSetup public  {
         // Validations
         require(
             (_hydroPrice > 0 || _ethPrice > 0) &&
@@ -273,7 +274,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         maxSupply = _maxSupply;
         escrowLimitPeriod = _escrowLimitPeriod;
         // Set flag
-        MAIN_PARAMS_readyF = true;
+        MAIN_PARAMS_ready = true;
     }
 
 
@@ -288,7 +289,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         bool _ETH_ALLOWED,
         bool _KYC_WHITELIST_RESTRICTED, 
         bool _AML_WHITELIST_RESTRICTED
-    ) onlyAdmin requireSetup public {
+    ) onlyAdmin onlyAtSetup public {
         // Load values
         LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP; 
         IS_LOCKED = _IS_LOCKED;
@@ -311,7 +312,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 _lockPeriod,
         uint256 _minInvestors,
         uint256 _maxInvestors
-    ) onlyAdmin requireSetup public {
+    ) onlyAdmin onlyAtSetup public {
         require(STO_FLAGS_ready, "STO_FLAGS has not been sat");
 
         percAllowedTokens = _percAllowedTokens; 
@@ -325,7 +326,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
-    function activatePrelaunch() onlyAdmin requireSetup public {
+    function activatePrelaunch() onlyAdmin onlyAtSetup public {
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
         require(STO_PARAMS_ready, "STO_PARAMS not setted");
@@ -487,12 +488,15 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
             total = msg.value.mul(ethPrice);
             ethReceived = ethReceived + msg.value;
         }
+
+        require(issuedTokens.add(total) <= maxSupply, "Max supply of Tokens is exceeded");
+
         // Check for ownership percentage 
         if (PERC_OWNERSHIP_TYPE) {
-            require ((issuedTokens.add(total) / ownedTokens) < percAllowedTokens, 
+            require ((issuedTokens.add(total) * 1 ether / maxSupply) < percAllowedTokens, 
                 "Perc ownership exceeded");
         }
-        // Transfer Hydrotokens
+        // Transfer Hydrotokens from buyer to this contract
         if (coin == HYDRO) {
             require(hydroToken.transferFrom(msg.sender, address(this), _amount), 
                 "Hydro transfer was nos possible");
@@ -552,9 +556,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     function isAlive() public view returns(bool) {
         if (!exists) return false;
-        if (stage != Stage.SETUP) return true;
-        // If it is in the Stup stage, check that date has not been surpassed
-        return isSetupTime();
+        if (stage == Stage.SETUP && !isSetupTime()) return false;
+        return true;
     }
 
     function isSetupTime() internal view returns(bool) {
@@ -562,12 +565,17 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         return((now - registerDate) < (15 * 24 * 60 * 60));
     }
 
+    function isPrelaunchTime() internal view returns(bool) {
+        // 15 days to complete setup
+        return((now - registerDate) < (15 * 24 * 60 * 60));
+    }
+
+
 
     // INTERNAL FUNCTIONS ----------------------------------------------------------
 
      function _doSell(address _to, uint256 _amount) private {
-        issuedTokens = issuedTokens + _amount;
-        ownedTokens = ownedTokens + _amount;
+        issuedTokens = issuedTokens.add(_amount);
         balance[_to].add(_amount);
     }
 
