@@ -39,7 +39,8 @@ contract SnowflakeOwnable is Ownable {
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account
     */
-    constructor() public {
+    constructor(address _identityRegistryAddress) public {
+        setIdentityRegistryAddress(_identityRegistryAddress);
     }
 
     /**
