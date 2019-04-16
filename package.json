@@ -1,7 +1,7 @@
 {
-  "name": "snowflake",
-  "version": "1.0.0",
-  "description": "Hydro Snowflake identity protocol",
+  "name": "hstoken",
+  "version": "0.1.0",
+  "description": "Hydro Security Token System",
   "scripts": {
     "build": "npm run buidl",
     "buidl": "rm -rf build/ && npx truffle compile",
