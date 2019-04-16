@@ -14,7 +14,7 @@ const ClientRaindrop = artifacts.require('./resolvers/ClientRaindrop/ClientRaind
 const OldClientRaindrop = artifacts.require('./_testing/OldClientRaindrop.sol')
 
 
-module.exports = async function(deployer) {
+module.exports = async function(deployer, network) {
 	await deployer.deploy(AddressSet)
   deployer.link(AddressSet, IdentityRegistry)
 
@@ -29,27 +29,41 @@ module.exports = async function(deployer) {
 
   await deployer.deploy(Ownable)
 
+console.log("SafeMath:", SafeMath.address);
+console.log("HydroToken:",HydroToken.address);
 
-await deployer.deploy(HydroToken)
-await deployer.deploy(IdentityRegistry)
+console.log("Network:",network);
 
-console.log("SafeMath", SafeMath.address);
-console.log("HydroToken",HydroToken.address);
 
+var HydroTokenAdd
+var IdentityRegistryAdd
+
+if (network == "development") {
+	await deployer.deploy(HydroToken)
+	await deployer.deploy(IdentityRegistry)
+	HydroTokenAdd = HydroToken.address
+	IdentityRegistryAdd = IdentityRegistry.address
+
+} else {
+	HydroTokenAdd = "";
+	IdentityRegistryAdd = "";
+}
 
 const deployToken = async () => {
 	await deployer.deploy(HSToken,
 		1,
-		"0xa7f15e4e66334e8214dfd97d5214f1f8f11c90f25bbe44b344944ed9efed7e29",
+		web3.utils.stringToHex("HydroSecurityToken"),
 		"Hydro Security",
 		"HTST",
 		18,
-		HydroToken.address, // HydroToken Rinkeby
-		IdentityRegistry.address, // IdentityRegistry Rinkeby
+		HydroTokenAdd, // HydroToken Rinkeby
+		IdentityRegistryAdd, // IdentityRegistry Rinkeby
 		{gas: 6000000})
 
 	console.log("HSToken",HSToken.address);
   	}
+
+
 
   	  deployer.link(SafeMath, HSToken)
   	  deployer.link(Ownable, HSToken)
