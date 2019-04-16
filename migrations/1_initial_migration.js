@@ -29,6 +29,9 @@ module.exports = async function(deployer, network) {
 
   await deployer.deploy(Ownable)
 
+await deployer.deploy(HydroToken)
+await deployer.deploy(IdentityRegistry)
+
 console.log("SafeMath:", SafeMath.address);
 console.log("HydroToken:",HydroToken.address);
 
@@ -39,8 +42,6 @@ var HydroTokenAdd
 var IdentityRegistryAdd
 
 if (network == "development") {
-	await deployer.deploy(HydroToken)
-	await deployer.deploy(IdentityRegistry)
 	HydroTokenAdd = HydroToken.address
 	IdentityRegistryAdd = IdentityRegistry.address
 

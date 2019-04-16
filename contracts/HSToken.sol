@@ -137,12 +137,15 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     address public raindropAddress;
 
 	// Links to Registries
-    address[5] public KYCResolverArray;
-    address[5] public AMLResolverArray;
-    address[5] public LegalResolverArray;
+    address[3] public KYCResolverArray;
+    address[3] public AMLResolverArray;
+    address[3] public LegalResolverArray;
     uint8 KYCResolverQ;
     uint8 AMLResolverQ;
     uint8 LegalResolverQ;
+    mapping(address => uint8) KYCResolver;
+    mapping(address => uint8) AMLResolver;
+    mapping(address => uint8) LegalResolver;
 
     // address InterestSolver;
 
@@ -459,34 +462,64 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Feature #3
     function addKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
-        require(KYCResolverQ < 4, "There are already 5 resolvers for KYC");
+        require(KYCResolverQ < 2, "There are already 3 resolvers for KYC");
         KYCResolverArray[KYCResolverQ] = _address;
         KYCResolverQ ++;
         //serviceRegistry.addService(address(this), bytes32("KYC"), _address);
     }
     function removeKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+        require(KYCResolver[_address] != 0, "Resolver does not exist");
+        uint8 _number = KYCResolver[_address];
+        if (_number < 3) {
+            for (uint8 i = _number; i < 4; i++) {
+                KYCResolverArray[i-1] = KYCResolverArray[i];
+            }
+        }
+        KYCResolverArray[KYCResolverQ - 1] = address(0);
+        KYCResolverQ --;
+        KYCResolver[_address] = 0;
         //serviceRegistry.replaceService(address(this), bytes32("KYC"), _address,address(0)); 
     }
 
     function addAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
-        require(AMLResolverQ < 4, "There are already 5 resolvers for AML");
+        require(AMLResolverQ < 2, "There are already 3 resolvers for AML");
         AMLResolverArray[AMLResolverQ] = _address;
         AMLResolverQ ++;
         //serviceRegistry.addService(address(this), bytes32("AML"), _address);
 
     }
     function removeAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+        require(AMLResolver[_address] != 0, "Resolver does not exist");
+        uint8 _number = AMLResolver[_address];
+        if (_number < 3) {
+            for (uint8 i = _number; i < 4; i++) {
+                AMLResolverArray[i-1] = AMLResolverArray[i];
+            }
+        }
+        AMLResolverArray[AMLResolverQ - 1] = address(0);
+        AMLResolverQ --;
+        AMLResolver[_address] = 0;
         //serviceRegistry.replaceService(address(this), bytes32("AML"), _address,address(0)); 
     }
 
     function addLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
-        require(LegalResolverQ < 4, "There are already 5 legal resolvers");
+        require(LegalResolverQ < 2, "There are already 3 legal resolvers");
         LegalResolverArray[LegalResolverQ] = _address;
         LegalResolverQ ++;
         //serviceRegistry.addService(address(this), bytes32("LEGAL"), _address);
     }
 
     function removeLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+        require(LegalResolver[_address] != 0, "Resolver does not exist");
+        uint8 _number = LegalResolver[_address];
+        if (_number < 3) {
+            for (uint8 i = _number; i < 4; i++) {
+                LegalResolverArray[i-1] = LegalResolverArray[i];
+            }
+        }
+        LegalResolverArray[LegalResolverQ - 1] = address(0);
+        LegalResolverQ --;
+        LegalResolver[_address] = 0;
         //serviceRegistry.replaceService(address(this), bytes32("LEGAL"), _address,address(0));
     }
 

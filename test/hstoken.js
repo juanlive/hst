@@ -190,6 +190,13 @@ it('HSToken can be created', async () => {
         { from: user.address })
   })
 
+/*  it('HSToken transfer 2.345 HSTokens to Account 3', async () => {
+    await newToken.transfer(
+        accounts[3],
+        web3.utils.toWei("2.345"),
+        { from: user.address })
+  })*/
+
 
 })
 
