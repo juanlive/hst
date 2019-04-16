@@ -51,7 +51,7 @@ contract HSTFactory is SnowflakeOwnable {
     * @param  _tokenName The name of the token contract set to be deployed
     * @return the address of the token contract corresponding to that name
     */
-    function getSecuritiesTokenAddress(bytes32 _tokenName) public returns(address) {
+    function getSecuritiesTokenAddress(bytes32 _tokenName) public view returns(address) {
       return tokens[_tokenName];
     }
 
@@ -86,11 +86,13 @@ contract HSTFactory is SnowflakeOwnable {
       if ( tokens[_tokenName] != address(0) ) {
         // token exists, check if is alive
         HSToken _token = HSToken(tokens[_tokenName]);
-        if ( _token.exists() == true ) {
+        if ( _token.isAlive() ) {
           // token exists and it is alive, cancel deploy
           _deploymentAllowed = false;
           emit SecuritiesDeployCancelled(_tokenName, "Token exists and it is alive");
-        }
+        }  
+      } else {
+          _deploymentAllowed = false;
       }
       if ( _deploymentAllowed == true ) {
         tokens[_tokenName] = deployToken(_tokenName, _description, _symbol, _decimals);
