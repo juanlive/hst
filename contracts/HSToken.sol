@@ -20,11 +20,10 @@ import './zeppelin/ownership/Ownable.sol';
 
 // TODO
 //
-// Make price ether/percentage (1 ether = 100%)
+// External pricer
 //
 // A global Registry with data of all Securities issued, to check for repeated ids or symbols
 //
-// Feature #11: Participant functions -> send and receive token
 // Feature #15: Carried interest ?
 // Feature #16: Interest payout ?
 // Feature #17: Dividend payout ?
@@ -37,10 +36,17 @@ import './zeppelin/ownership/Ownable.sol';
  * @author Juan Livingston <juanlivingston@gmail.com>
  */
 
+interface Raindrop {
+    function authenticate(address _sender, uint _value, uint _challenge, uint _partnerId) external;
+}
 
-  /**
-  * @dev We use contracts to store main variables, because Solidity can not habdle so many individual variables
-  */
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external;
+}
+
+/**
+* @dev We use contracts to store main variables, because Solidity can not handle so many individual variables
+*/
 
 contract MAIN_PARAMS {
     bool public MAIN_PARAMS_ready;
@@ -81,6 +87,7 @@ contract STO_PARAMS {
     uint256 public minInvestors;
     uint256 public maxInvestors;
 }
+
 
 contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
@@ -127,6 +134,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
  	// Links to Modules
 	// address public RegistryRules;
+    address public raindropAddress;
 
 	// Links to Registries
     address[5] public KYCResolverArray;
@@ -144,6 +152,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     mapping(uint256 => bool) public freezed;
 
     mapping(address => uint256) public balance;
+    mapping (address => mapping (address => uint256)) public allowed;
+
     mapping(uint256 => Investor) public investors;
 
     // For date analysis and paying interests
@@ -162,7 +172,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // SnowflakeViaInterface public snowflakeVia;
     // TokenWithDates private tokenWithDates;
 
-
     event HydroSTCreated(
         uint256 indexed id, 
         bytes32 name,
@@ -173,6 +182,17 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     event Sell(address indexed _owner, uint256 _amount);
 
+    event Transfer(
+        address indexed _from,
+        address indexed _to,
+        uint256 _amount
+    );
+
+    event Approval(
+        address indexed _owner,
+        address indexed _spender,
+        uint256 _amount
+    );
 
     // Feature #9 & #10
     modifier isUnlocked() {
@@ -182,7 +202,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     modifier isUnfreezed(address _from, address _to) {
-        require(!freezed[identityRegistry.getEIN(_to)] , "Target EIN is freezed");
+        require(!freezed[identityRegistry.getEIN(_to)], "Target EIN is freezed");
         require(!freezed[identityRegistry.getEIN(_from)], "Source EIN is freezed");
         _;
     }
@@ -229,7 +249,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint8 _decimals,
         address _HydroToken,
         address _IdentityRegistry
-        ) public {
+        // address _RaindropAddress
+    ) 
+        public 
+    {
 
         id = _id; 
         name = _name;
@@ -250,6 +273,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         hydroToken = HydroInterface(_HydroToken); // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
         identityRegistry = IdentityRegistryInterface(_IdentityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
         // serviceRegistry = new HSTServiceRegistry();
+        // raindropAddress = _RaindropAddress;
 
         Owner = msg.sender;
         einOwner = identityRegistry.getEIN(Owner);
@@ -269,7 +293,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 _endDate,
         uint256 _maxSupply,
         uint256 _escrowLimitPeriod
-    ) onlyAdmin onlyAtSetup public  {
+    ) 
+        onlyAdmin onlyAtSetup public  
+    {
         // Validations
         require(
             (_hydroPrice > 0 || _ethPrice > 0) &&
@@ -279,7 +305,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
             _maxSupply > 10000 &&
             _escrowLimitPeriod > (10 * 24 * 60 * 60),
             "Incorrect input data"
-            );
+        );
         // Load values
         hydroPrice = _hydroPrice;
         ethPrice = _ethPrice;
@@ -307,7 +333,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         bool _AML_RESTRICTED,
         bool _WHITELIST_RESTRICTED,
         bool _BLACKLIST_RESTRICTED
-    ) onlyAdmin onlyAtSetup public {
+    ) 
+        onlyAdmin onlyAtSetup public 
+    {
         // Load values
         LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP; 
         IS_LOCKED = _IS_LOCKED;
@@ -332,7 +360,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 _lockPeriod,
         uint256 _minInvestors,
         uint256 _maxInvestors
-    ) onlyAdmin onlyAtSetup public {
+    ) 
+        onlyAdmin onlyAtSetup public 
+    {
         require(STO_FLAGS_ready, "STO_FLAGS has not been sat");
 
         percAllowedTokens = _percAllowedTokens; 
@@ -346,7 +376,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
-    function stagePrelaunch() onlyAdmin onlyAtSetup public {
+    function stagePrelaunch() 
+        onlyAdmin onlyAtSetup public 
+    {
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
         require(STO_PARAMS_ready, "STO_PARAMS not setted");
@@ -355,7 +387,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         stage = Stage.PRELAUNCH;
     }
 
-    function stageActivate() onlyAdmin onlyAtPreLaunch public {
+    function stageActivate() 
+        onlyAdmin onlyAtPreLaunch public 
+    {
         stage = Stage.ACTIVE;
     }
 
@@ -363,7 +397,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
 
     // Feature #9
-    function setLockupPeriod(uint256 _lockEnds) onlyAdmin public {
+    function setLockupPeriod(uint256 _lockEnds)
+        onlyAdmin public 
+    {
         if (_lockEnds == 0) {
             PERIOD_LOCKED = false;
             }
@@ -479,9 +515,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // PUBLIC FUNCTIONS FOR INVESTORS -----------------------------------------------------------------
 
 
-    function buyTokens(string memory _coin, uint256 _amount) onlyActive
-        public payable returns(bool) {
-
+    function buyTokens(string memory _coin, uint256 _amount) 
+        onlyActive public payable 
+        returns(bool) 
+    {
         uint256 total;
         uint256 _ein = identityRegistry.getEIN(msg.sender);
         bytes32 HYDRO = keccak256(abi.encode("HYDRO"));
@@ -533,7 +570,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         // Check for ownership percentage 
         if (PERC_OWNERSHIP_TYPE) {
-            require ((issuedTokens.add(total) * 1 ether / maxSupply) < percAllowedTokens, 
+            require ((issuedTokens.add(total).mul(1 ether) / maxSupply) < percAllowedTokens, 
                 "Perc ownership exceeded");
         }
         // Transfer Hydrotokens from buyer to this contract
@@ -550,7 +587,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
 
     function claimInterests() 
-        public pure returns(bool) {
+        public pure 
+        returns(bool) 
+    {
         //return(interestSolver(msg.sender));
         return true;
     }
@@ -562,30 +601,58 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // Feature #11
     function transfer(address _to, uint256 _amount) 
         isUnlocked isUnfreezed(msg.sender, _to) 
-        public returns(bool) {
-        
+        public 
+        returns(bool success) 
+    {    
         if (KYC_RESTRICTED) _checkKYC(_to, _amount);
         if (AML_RESTRICTED) _checkAML(_to, _amount);
-
         // _updateBatches(msg.sender, _to, _amount);
-        balance[_to] = balance[_to].add(_amount);
-        balance[msg.sender] = balance[msg.sender].sub(_amount);
+        _doTransfer(msg.sender, _to, _amount);
+        return true;
     }
 
     // Feature #11
     function transferFrom(address _from, address _to, uint256 _amount) 
         isUnlocked isUnfreezed(_from, _to) 
-        public returns(bool) {
-        
+        public 
+        returns(bool success) 
+    { 
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         if (KYC_RESTRICTED) _checkKYC(_to, _amount);
         if (AML_RESTRICTED) _checkAML(_to, _amount);
-
         // _updateBatches(_from, _to, _amount);
-        balance[_to] = balance[_to].add(_amount);
-        balance[_from] = balance[_from].sub(_amount);
+        _doTransfer(_from, _to, _amount);
+        return true;
     }
 
+    function balanceOf(address _from) public view returns(uint256) {
+        return balance[_from];
+    }
 
+    function approve(address _spender, uint256 _amount) public returns(bool success) {
+        // To change the approve amount you first have to reduce the addresses`
+        //  allowance to zero by calling `approve(_spender,0)` if it is not
+        //  already 0 to mitigate the race condition described here:
+        //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+        require((_amount == 0) || (allowed[msg.sender][_spender] == 0), "Approved amount should be zero before changing it");
+        allowed[msg.sender][_spender] = _amount;
+        emit Approval(msg.sender, _spender, _amount);
+        return true;
+    }
+
+    function approveAndCall(address _spender, uint256 _value, bytes memory _extraData) public returns (bool success) {
+        tokenRecipient spender = tokenRecipient(_spender);
+        if (approve(_spender, _value)) {
+            spender.receiveApproval(msg.sender, _value, address(this), _extraData);
+            return true;
+        }
+    }
+
+    function authenticate(uint _value, uint _challenge, uint _partnerId) public {
+        Raindrop raindrop = Raindrop(raindropAddress);
+        raindrop.authenticate(msg.sender, _value, _challenge, _partnerId);
+        _doTransfer(msg.sender, Owner, _value);
+    }
 
 
     // PUBLIC GETTERS ----------------------------------------------------------------
@@ -619,13 +686,17 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         balance[_to] = balance[_to].add(_amount);
     }
 
+    function _doTransfer(address _from, address _to, uint256 _amount) internal {
+        balance[_to] = balance[_to].add(_amount);
+        balance[_from] = balance[_from].sub(_amount);
+        emit Transfer(_from, _to, _amount);
+    } 
 
     // Permissions checking
 
     // Feature #8
     function _checkKYC(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
-
         for (uint8 i = 0; i < KYCResolverQ; i++) {
             ResolverInterface resolver = ResolverInterface(KYCResolverArray[i]);
             require(resolver.isApproved(einTo, _amount), "KYC not approved");
@@ -633,9 +704,16 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
     function _checkAML(address _to, uint256 _amount) private view {
         uint256 einTo = identityRegistry.getEIN(_to);
-
         for (uint8 i = 0; i < AMLResolverQ; i++) {
             ResolverInterface resolver = ResolverInterface(AMLResolverArray[i]);
+            require(resolver.isApproved(einTo, _amount));
+        }
+    }
+
+    function _checkLegaL(address _to, uint256 _amount) private view {
+        uint256 einTo = identityRegistry.getEIN(_to);
+        for (uint8 i = 0; i < LegalResolverQ; i++) {
+            ResolverInterface resolver = ResolverInterface(LegalResolverArray[i]);
             require(resolver.isApproved(einTo, _amount));
         }
     }
@@ -648,16 +726,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     function _checkBlacklist(address _user) private view {
         uint256 einUser = identityRegistry.getEIN(_user);
         require(!blackList[einUser], "EIN address is blacklisted");
-    }
-    
-
-    function _checkLegaL(address _to, uint256 _amount) private view {
-        uint256 einTo = identityRegistry.getEIN(_to);
-
-        for (uint8 i = 0; i < LegalResolverQ; i++) {
-            ResolverInterface resolver = ResolverInterface(LegalResolverArray[i]);
-            require(resolver.isApproved(einTo, _amount));
-        }
     }
 
 }

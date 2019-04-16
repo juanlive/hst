@@ -140,19 +140,19 @@ it('HSToken can be created', async () => {
   })
 
 
-  it('Adds User 1 to the Whitelist', async() => {
+  it('KYCResolver approves EIN 1', async() => {
     await newToken.addWhitelist(["1"],
       { from: user.address })
   })
 
-  it('User 1 approves 1M HydroTokens for HSToken', async() => {
+  it('HydroToken user 1 approves 1M HydroTokens for HSToken', async() => {
     await instances.HydroToken.approve(
       newToken.address,
       web3.utils.toWei("1000000"),
       { from: user.address })
   })
 
-  it('buyTokens from EIN user 1', async () => {
+  it('HSToken buyTokens from EIN user 1', async () => {
     await newToken.buyTokens(
         "HYDRO",
         web3.utils.toWei("0.1"),
@@ -161,13 +161,13 @@ it('HSToken can be created', async () => {
 
 // Reject Identity 1 and try to buy
 
-  it('Reject EIN identity 1', async () => {
+  it('KYCResolver disapprove EIN identity 1', async () => {
     await instances.KYCResolver.rejectEin(
       "1",
       { from: user.address });
   })
 
-  it('Reverts buy for EIN user 1', async () => {
+  it('HSToken Reverts buy for EIN user 1', async () => {
       await truffleAssert.reverts(
         newToken.buyTokens(
         "HYDRO",
@@ -177,13 +177,13 @@ it('HSToken can be created', async () => {
       )
   })
 
-  it('Approve again EIN identity 1', async () => {
+  it('KYCResolver approve again EIN identity 1', async () => {
     await instances.KYCResolver.approveEin(
       "1",
       { from: user.address });
   })
 
-  it('buyTokens again from EIN user 1', async () => {
+  it('HSToken buyTokens again from EIN user 1', async () => {
     await newToken.buyTokens(
         "HYDRO",
         web3.utils.toWei("0.1"),
