@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
 //import '../interfaces/HSTControlService.sol';
-//import './SnowflakeOwnable.sol';
-import '../zeppelin/ownership/Ownable.sol';
+import './SnowflakeOwnable.sol';
+//import '../zeppelin/ownership/Ownable.sol';
 
 // DONE
 // create default categories
@@ -31,7 +31,7 @@ import '../zeppelin/ownership/Ownable.sol';
  * @dev The Service Registry contract has an array of token address, and provides of service providers for tokens, this simplifies the creation of an ecosystems of service providers.
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
-contract HSTServiceRegistry is Ownable {
+contract HSTServiceRegistry is SnowflakeOwnable {
 
   // service category symbol => category description
   mapping(bytes32 => string) serviceCategories;
@@ -83,27 +83,29 @@ contract HSTServiceRegistry is Ownable {
   }
 
   /**
-   * @notice Add a new service
+   * @notice Add a new service category
    * @dev    This method is only callable by the contract's owner
    * @param _name Name of the new service category
    * @param _description Description of the new service category
    */
-  function addCategory(bytes32 _name, string memory _description) onlyOwner public {
+  function addCategory(bytes32 _name, string memory _description) onlySnowflakeOwner public {
     serviceCategories[_name] = _description;
     emit AddCategory(_name, _description);
   }
 
   /**
    * @notice Add a new service
-   * @dev This method is only callable by the contract's owner
    *
    * @param _token Address of the token that will use the service
    * @param _category Name of the category the service belongs to
    * @param _service Address of the service to use
    */
-  function addService(address _token, bytes32 _category, address _service) onlyOwner withContract(_token) withContract(_service) public {
-    serviceRegistry[_token][_category] = _service;
-    emit AddService(_token, _category, _service);
+  function addService(bytes32 _categoryName, address _service) withContract(_tokenAddress) withContract(_service) public {
+    bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
+    require (_emptyStringTest.length != 0);
+    address _tokenAddress = msg.sender;
+    serviceRegistry[_tokenAddress][_categoryName] = _service;
+    emit AddService(_tokenAddress, _categoryName, _service);
   }
 
     /**
@@ -116,9 +118,12 @@ contract HSTServiceRegistry is Ownable {
    * @param _oldService Old address for the service
    * @param _newService New address for the service to use
    */
-  function replaceService(address _token, bytes32 _category, address _oldService, address _newService) onlyOwner withContract(_token) withContract(_newService) public {
-    serviceRegistry[_token][_category] = _newService;
-    emit ReplaceService(_token, _category, _oldService, _newService);
+  function replaceService(bytes32 _categoryName, address _oldService, address _newService) onlyOwner withContract(_token) withContract(_newService) public {
+    bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
+    require (_emptyStringTest.length != 0);
+    address _tokenAddress = msg.sender;
+    serviceRegistry[_tokenAddress][_categoryName] = _newService;
+    emit ReplaceService(_tokenAddress, _categoryName, _oldService, _newService);
   }
 
 }
