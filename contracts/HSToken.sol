@@ -64,7 +64,6 @@ contract STO_FLAGS {
     bool public STO_FLAGS_ready;
 
     bool public LIMITED_OWNERSHIP; 
-    bool public IS_LOCKED; // Locked token transfers
     bool public PERIOD_LOCKED;  // Locked period active or inactive
     bool public PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
     bool public HYDRO_AMOUNT_TYPE; // is Hydro amount limited
@@ -111,6 +110,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     bool public exists; // Flag to deactivate it
+    bool locked; // Locked token transfers
     uint256 public registerDate; // Date of creation of token
 	// Main parameters
 	uint256 public id; // Unique HSToken id
@@ -150,8 +150,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // address InterestSolver;
 
     // Mappings
-    mapping(uint256 => bool) public whiteList;
-    mapping(uint256 => bool) public blackList;
+    mapping(uint256 => bool) public whitelist;
+    mapping(uint256 => bool) public blacklist;
     mapping(uint256 => bool) public freezed;
 
     mapping(address => uint256) public balance;
@@ -199,7 +199,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Feature #9 & #10
     modifier isUnlocked() {
-        require(!IS_LOCKED, "Token locked");
+        require(!locked, "Token locked");
         if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
         _;
     }
@@ -212,11 +212,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     modifier onlyAtPreLaunch() {
         require(stage == Stage.PRELAUNCH, "Not in Prelaunch stage");
+        require(beginningDate == 0 || beginningDate > now, "Prelaunch time has passed");
     	_;
     }
 
     modifier onlyActive() {
-        require(stage == Stage.ACTIVE, "Not active");
+        require(stage == Stage.ACTIVE, "Not in active stage");
+        require(endDate > now, "Issuing stage finalized");
         _;
     }
 
@@ -235,12 +237,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     modifier onlyAtSetup() {
         require(stage == Stage.SETUP, "Stage is not setup");
         require(isSetupTime(), "Setup time has expired");
-        _;
-    }
-
-    modifier requirePrelaunch() {
-        require(stage == Stage.PRELAUNCH, "Stage is not prelaunch");
-        require(beginningDate == 0 || beginningDate > now, "Prelaunch time has passed");
         _;
     }
 
@@ -265,6 +261,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         exists = true;
         registerDate = now;
+        // locked = true;
 
         // State Memory
         stage = Stage.SETUP;
@@ -325,7 +322,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     function set_STO_FLAGS(
         bool _LIMITED_OWNERSHIP, 
-        bool _IS_LOCKED,
         bool _PERIOD_LOCKED,
         bool _PERC_OWNERSHIP_TYPE,
         bool _HYDRO_AMOUNT_TYPE,
@@ -341,7 +337,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     {
         // Load values
         LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP; 
-        IS_LOCKED = _IS_LOCKED;
         PERIOD_LOCKED = _PERIOD_LOCKED;
         PERC_OWNERSHIP_TYPE = _PERC_OWNERSHIP_TYPE;
         HYDRO_AMOUNT_TYPE = _HYDRO_AMOUNT_TYPE;
@@ -411,37 +406,36 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
-
     function lock() onlyAdmin public {
-        IS_LOCKED = true;
+        locked = true;
     }
 
     function unLock() onlyAdmin public {
-        IS_LOCKED = false;
+        locked = false;
     }
 
     function addWhitelist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          whiteList[_einList[i]] = true;
+          whitelist[_einList[i]] = true;
         }
     }
 
-    function addBlackList(uint256[] memory _einList) onlyAdmin public {
+    function addBlacklist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          blackList[_einList[i]] = true;
+          blacklist[_einList[i]] = true;
         }
     }
 
     function removeWhitelist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          whiteList[_einList[i]] = false;
+          whitelist[_einList[i]] = false;
         }
 
     }
 
     function removeBlacklist(uint256[] memory _einList) onlyAdmin public {
         for (uint i = 0; i < _einList.length; i++) {
-          blackList[_einList[i]] = false;
+          blacklist[_einList[i]] = false;
         }
     }
 
@@ -590,13 +584,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
             total = _amount.mul(hydroPrice) / 1 ether;
             investors[_ein].hydroSent = investors[_ein].hydroSent.add(_amount);
             hydroReceived = hydroReceived.add(_amount);      
-        }
-
+        } else
         if (coin == ETH) {
             total = msg.value.mul(ethPrice) / 1 ether;
             investors[_ein].etherSent += msg.value;
             ethReceived = ethReceived + msg.value;
-        }
+        } else 
+        revert("_coin should be ETH or HYDRO");
 
         // Check with maxSupply
         require(issuedTokens.add(total) <= maxSupply, "Max supply of Tokens is exceeded");
@@ -609,7 +603,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         // Transfer Hydrotokens from buyer to this contract
         if (coin == HYDRO) {
             require(hydroToken.transferFrom(msg.sender, address(this), _amount), 
-                "Hydro transfer was nos possible");
+                "Hydro transfer was not possible");
         }
 
         // Sell
@@ -691,7 +685,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // PUBLIC GETTERS ----------------------------------------------------------------
 
     function isLocked() public view returns(bool) {
-        return IS_LOCKED;
+        if (locked) return true;
+        if (PERIOD_LOCKED && now < lockEnds) return true;
+        return false;
     }
 
     function isAlive() public view returns(bool) {
@@ -700,26 +696,36 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         return true;
     }
 
-    function isSetupTime() internal view returns(bool) {
+    function getStage() public view returns(string memory _stage) {
+        if (stage == Stage.FINALIZED || stage == Stage.ACTIVE && endDate < now) return "FINALIZED";
+        if (stage == Stage.ACTIVE || stage == Stage.PRELAUNCH && beginningDate > 0 && beginningDate > now) return "ACTIVE";
+        if (stage == Stage.PRELAUNCH) return "PRELAUNCH";
+        if (stage == Stage.SETUP && isSetupTime()) return "SETUP";
+        return "TOKEN IS INACTIVE";
+    }
+
+    // PRIVATE GETTERS
+
+    function isSetupTime() private view returns(bool) {
         // 15 days to complete setup
         return((now - registerDate) < (15 * 24 * 60 * 60));
     }
 
-    function isPrelaunchTime() internal view returns(bool) {
+    function isPrelaunchTime() private view returns(bool) {
         // 15 days to complete setup
         return((now - registerDate) < (15 * 24 * 60 * 60));
     }
 
 
 
-    // INTERNAL FUNCTIONS ----------------------------------------------------------
+    // PRIVATE FUNCTIONS ----------------------------------------------------------
 
      function _doSell(address _to, uint256 _amount) private {
         issuedTokens = issuedTokens.add(_amount);
         balance[_to] = balance[_to].add(_amount);
     }
 
-    function _doTransfer(address _from, address _to, uint256 _amount) internal {
+    function _doTransfer(address _from, address _to, uint256 _amount) private {
         balance[_to] = balance[_to].add(_amount);
         balance[_from] = balance[_from].sub(_amount);
         emit Transfer(_from, _to, _amount);
@@ -753,12 +759,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     function _checkWhitelist(address _user) private view {
         uint256 einUser = identityRegistry.getEIN(_user);
-        require(whiteList[einUser], "EIN address not in whitelist");
+        require(whitelist[einUser], "EIN address not in whitelist");
     }
 
     function _checkBlacklist(address _user) private view {
         uint256 einUser = identityRegistry.getEIN(_user);
-        require(!blackList[einUser], "EIN address is blacklisted");
+        require(!blacklist[einUser], "EIN address is blacklisted");
     }
 
 }
