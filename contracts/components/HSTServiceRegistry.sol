@@ -6,7 +6,7 @@ import './SnowflakeOwnable.sol';
 
 // DONE
 // create default categories
-// add categories
+// add categories - onlySnowflakeOwnable
 // add services for a token
 // replace services for a token
 // create contract SnowflakeOwnable and modifier onlySnowflakeOwner
@@ -14,10 +14,10 @@ import './SnowflakeOwnable.sol';
 // TODO
 // create modifier afterEndOfIssuance
 
-// add services for a token - onlySnowflakeOwner and afterEndOfIssuance
+// add services for a token - afterEndOfIssuance
 // record authorizations in IdentityRegistryInterface.sol
 
-// replace services for a token - onlySnowflakeOwner and afterEndOfIssuance
+// replace services for a token - afterEndOfIssuance
 // record authorizations in IdentityRegistryInterface.sol
 
 // retrieve all services by category name (example: "KYC")
