@@ -1,0 +1,3473 @@
+{
+  "contractName": "HSTEscrow",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "hydroTokenAddress",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "hydroCapitalReceiverAddress",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "issuingEndingTimestamp",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "hydroToken",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "hydroSecurityTokenAddress",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "totalHydroCapitalization",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_issuingEndingTimestamp",
+          "type": "uint256"
+        },
+        {
+          "name": "_hydroSecurityTokenAddress",
+          "type": "address"
+        },
+        {
+          "name": "_totalHydroCapitalization",
+          "type": "uint256"
+        },
+        {
+          "name": "_hydroCapitalReceiver",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "releaseCollectedCapital",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.4+commit.9549d8ff\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"hydroTokenAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"hydroCapitalReceiverAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"issuingEndingTimestamp\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"hydroToken\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"hydroSecurityTokenAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"releaseCollectedCapital\",\"outputs\":[{\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalHydroCapitalization\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_issuingEndingTimestamp\",\"type\":\"uint256\"},{\"name\":\"_hydroSecurityTokenAddress\",\"type\":\"address\"},{\"name\":\"_totalHydroCapitalization\",\"type\":\"uint256\"},{\"name\":\"_hydroCapitalReceiver\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"author\":\"Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>\\r\",\"methods\":{\"constructor\":{\"details\":\"For the escrow to work properly, you need to set this variables.\\r\",\"params\":{\"_hydroCapitalReceiver\":\"The address of the capital receiver account\\r\",\"_hydroSecurityTokenAddress\":\"The address of the token being issued\\r\",\"_issuingEndingTimestamp\":\"Time+Date when token issuing must stop\\r\",\"_totalHydroCapitalization\":\"Total capitalization accepted, measured in Hydro\\r\"}},\"releaseCollectedCapital()\":{\"return\":\"uint8 The reason code: 0 means success.\\r\"}},\"title\":\"HydroEscrow\\r\"},\"userdoc\":{\"methods\":{\"constructor\":\"Constructor\\r\",\"releaseCollectedCapital()\":{\"notice\":\"Send the collected capital to the capital receiver\\r\"}},\"notice\":\"Stores HYDRO inside as an escrow for HST issuing. This contracts stores any funds sent by the token creator and the funds that users pay to participate in the issuing. It distributes any refunds, and the corresponding dividends and interests to their receivers.\\r\"}},\"settings\":{\"compilationTarget\":{\"/C/Users/Juan/Documents/JL/ETHER/HYDRO/hst/contracts/components/HSTEscrow.sol\":\"HSTEscrow\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/Juan/Documents/JL/ETHER/HYDRO/hst/contracts/components/HSTEscrow.sol\":{\"keccak256\":\"0x06501814b6afcc294b3b5d61fa5b85418f62661f72a0aac365c7d6e0f74e8573\",\"urls\":[\"bzzr://99f6c5e370ad48df2b08dbbf4205c855fd27c531333744e90cfb5e741156a64b\"]},\"/C/Users/Juan/Documents/JL/ETHER/HYDRO/hst/contracts/interfaces/HydroInterface.sol\":{\"keccak256\":\"0x0dc94f8e95dd31b511305d7bc67e3577a863f9d50357ea58bc5722b169bee041\",\"urls\":[\"bzzr://55f6b63c682c9afffae8469d46d8a03c6afd017286b48a850847f4f188d60e93\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5060405160808061068b8339810180604052608081101561003057600080fd5b508051602082015160408301516060909301519192909142841161009f576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260248152602001806106366024913960400191505060405180910390fd5b600160a060020a038316151561011657604080517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601e60248201527f596f75206d757374207365742074686520746f6b656e20616464726573730000604482015290519081900360640190fd5b6000821161016f576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603181526020018061065a6031913960400191505060405180910390fd5b600160a060020a03811615156101e657604080517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601f60248201527f596f75206d757374207365742061206361706974616c20726563656976657200604482015290519081900360640190fd5b60009384556001805433600160a060020a03199182161790915560048054909116600160a060020a039092169190911790555061040c9182915061022a90396000f3fe608060405234801561001057600080fd5b506004361061009a576000357c010000000000000000000000000000000000000000000000000000000090048063c58a4d7011610078578063c58a4d70146100e5578063cb8b8ab1146100ed578063daa37d1c146100f5578063f80ed3e2146101135761009a565b806375d7e4bd1461009f578063840cec81146100c3578063b5a5da38146100cb575b600080fd5b6100a761011b565b60408051600160a060020a039092168252519081900360200190f35b6100a761012a565b6100d3610139565b60408051918252519081900360200190f35b6100a761013f565b6100a761014e565b6100fd61015d565b6040805160ff9092168252519081900360200190f35b6100d3610359565b600254600160a060020a031681565b600454600160a060020a031681565b60005481565b600554600160a060020a031681565b600154600160a060020a031681565b600154600090600160a060020a031633146101c3576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260458152602001806103606045913960600191505060405180910390fd5b60005442101561021e576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603c8152602001806103a5603c913960400191505060405180910390fd5b600554604080517f70a082310000000000000000000000000000000000000000000000000000000081523060048201529051600092600160a060020a0316916370a08231916024808301926020929190829003018186803b15801561028257600080fd5b505afa158015610296573d6000803e3d6000fd5b505050506040513d60208110156102ac57600080fd5b505160055460048054604080517fa9059cbb000000000000000000000000000000000000000000000000000000008152600160a060020a039283169381019390935260248301859052519394509091169163a9059cbb916044808201926020929091908290030181600087803b15801561032557600080fd5b505af1158015610339573d6000803e3d6000fd5b505050506040513d602081101561034f57600080fd5b5060009250505090565b6003548156fe546869732066756e6374696f6e2063616e206f6e6c7920626520657865637574656420627920746865206f726967696e616c20487964726f5365637572697479546f6b656e596f752063616e206f6e6c792072656c656173652066756e64732061667465722074686520746f6b656e2069737375696e672068617320656e646564a165627a7a72305820562c3cbb390c1000ea6aa1a064bb0579793931ab4320973681cfb238df8ebeea002954686520746f6b656e2069737375696e67206d75737420656e64206166746572206e6f7754686520746f74616c206361706974616c697a6174696f6e206d757374206265206c6172676572207468616e207a65726f",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061009a576000357c010000000000000000000000000000000000000000000000000000000090048063c58a4d7011610078578063c58a4d70146100e5578063cb8b8ab1146100ed578063daa37d1c146100f5578063f80ed3e2146101135761009a565b806375d7e4bd1461009f578063840cec81146100c3578063b5a5da38146100cb575b600080fd5b6100a761011b565b60408051600160a060020a039092168252519081900360200190f35b6100a761012a565b6100d3610139565b60408051918252519081900360200190f35b6100a761013f565b6100a761014e565b6100fd61015d565b6040805160ff9092168252519081900360200190f35b6100d3610359565b600254600160a060020a031681565b600454600160a060020a031681565b60005481565b600554600160a060020a031681565b600154600160a060020a031681565b600154600090600160a060020a031633146101c3576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260458152602001806103606045913960600191505060405180910390fd5b60005442101561021e576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603c8152602001806103a5603c913960400191505060405180910390fd5b600554604080517f70a082310000000000000000000000000000000000000000000000000000000081523060048201529051600092600160a060020a0316916370a08231916024808301926020929190829003018186803b15801561028257600080fd5b505afa158015610296573d6000803e3d6000fd5b505050506040513d60208110156102ac57600080fd5b505160055460048054604080517fa9059cbb000000000000000000000000000000000000000000000000000000008152600160a060020a039283169381019390935260248301859052519394509091169163a9059cbb916044808201926020929091908290030181600087803b15801561032557600080fd5b505af1158015610339573d6000803e3d6000fd5b505050506040513d602081101561034f57600080fd5b5060009250505090565b6003548156fe546869732066756e6374696f6e2063616e206f6e6c7920626520657865637574656420627920746865206f726967696e616c20487964726f5365637572697479546f6b656e596f752063616e206f6e6c792072656c656173652066756e64732061667465722074686520746f6b656e2069737375696e672068617320656e646564a165627a7a72305820562c3cbb390c1000ea6aa1a064bb0579793931ab4320973681cfb238df8ebeea0029",
+  "sourceMap": "495:2341:10:-;;;1502:800;8:9:-1;5:2;;;30:1;27;20:12;5:2;1502:800:10;;;;;;;;;;;;;13:3:-1;8;5:12;2:2;;;30:1;27;20:12;2:2;-1:-1;1502:800:10;;;;;;;;;;;;;;;;;;;1709:3;1683:29;;1675:78;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1772:40:10;;;;1764:83;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1894:1;1866:29;;1858:91;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1968:35:10;;;;1960:79;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2050:22;:48;;;2109:25;:38;;2137:10;-1:-1:-1;;;;;;2109:38:10;;;;;;;2243:27;:51;;;;;-1:-1:-1;;;;;2243:51:10;;;;;;;;;-1:-1:-1;495:2341:10;;;;-1:-1:-1;495:2341:10;;;;",
+  "deployedSourceMap": "495:2341:10:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;495:2341:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;612:32;;;:::i;:::-;;;;-1:-1:-1;;;;;612:32:10;;;;;;;;;;;;;;697:50;;;:::i;521:37::-;;;:::i;:::-;;;;;;;;;;;;;;;;754:32;;;:::i;565:40::-;;;:::i;2448:385::-;;;:::i;:::-;;;;;;;;;;;;;;;;;;;651:39;;;:::i;612:32::-;;;-1:-1:-1;;;;;612:32:10;;:::o;697:50::-;;;-1:-1:-1;;;;;697:50:10;;:::o;521:37::-;;;;:::o;754:32::-;;;-1:-1:-1;;;;;754:32:10;;:::o;565:40::-;;;-1:-1:-1;;;;;565:40:10;;:::o;2448:385::-;922:25;;2521:5;;-1:-1:-1;;;;;922:25:10;908:10;:39;900:121;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2554:22;;2547:3;:29;;2539:102;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2686:10;;:35;;;;;;2715:4;2686:35;;;;;;2652:31;;-1:-1:-1;;;;;2686:10:10;;:20;;:35;;;;;;;;;;;;;;:10;:35;;;5:2:-1;;;;30:1;27;20:12;5:2;2686:35:10;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;2686:35:10;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;2686:35:10;2732:10;;2752:27;;;2732:73;;;;;;-1:-1:-1;;;;;2752:27:10;;;2732:73;;;;;;;;;;;;;;2686:35;;-1:-1:-1;2732:10:10;;;;:19;;:73;;;;;2686:35;;2732:73;;;;;;;;:10;;:73;;;5:2:-1;;;;30:1;27;20:12;5:2;2732:73:10;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;2732:73:10;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;2823:1:10;;-1:-1:-1;;;2448:385:10;:::o;651:39::-;;;;:::o",
+  "source": "pragma solidity ^0.5.0;\r\n\r\nimport '../interfaces/HydroInterface.sol';\r\n//import '../HydroSecuritiesToken.sol';\r\n\r\n/**\r\n * @title HydroEscrow\r\n * @notice Stores HYDRO inside as an escrow for HST issuing. This contracts stores any funds sent by the token creator and the funds that users pay to participate in the issuing. It distributes any refunds, and the corresponding dividends and interests to their receivers.\r\n * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>\r\n */\r\ncontract HSTEscrow {\r\n    uint256 public issuingEndingTimestamp;\r\n    address public hydroSecurityTokenAddress;\r\n    address public hydroTokenAddress;\r\n    uint256 public totalHydroCapitalization;\r\n    address payable public hydroCapitalReceiverAddress;\r\n    HydroInterface public hydroToken;\r\n    // HydroSecuritiesToken public hydroSecuritiesToken;\r\n\r\n\r\n    modifier onlyHydroSecurityToken() {\r\n        require(msg.sender == hydroSecurityTokenAddress, 'This function can only be executed by the original HydroSecurityToken');\r\n        _;\r\n    }\r\n\r\n    /**\r\n    * @notice Constructor\r\n    * @dev    For the escrow to work properly, you need to set this variables.\r\n    * @param  _issuingEndingTimestamp Time+Date when token issuing must stop\r\n    * @param  _hydroSecurityTokenAddress The address of the token being issued\r\n    * @param  _totalHydroCapitalization Total capitalization accepted, measured in Hydro\r\n    * @param  _hydroCapitalReceiver The address of the capital receiver account\r\n    */\r\n    constructor(uint256 _issuingEndingTimestamp, address _hydroSecurityTokenAddress, uint256 _totalHydroCapitalization, address payable _hydroCapitalReceiver) public {\r\n        require(_issuingEndingTimestamp > now, 'The token issuing must end after now');\r\n        require(_hydroSecurityTokenAddress != address(0), 'You must set the token address');\r\n        require(_totalHydroCapitalization > 0, 'The total capitalization must be larger than zero');\r\n        require(_hydroCapitalReceiver != address(0), 'You must set a capital receiver');\r\n        issuingEndingTimestamp = _issuingEndingTimestamp;\r\n        hydroSecurityTokenAddress = msg.sender;\r\n        // hydroSecuritiesToken = HydroSecuritiesToken(_hydroSecurityTokenAddress);\r\n        hydroCapitalReceiverAddress = _hydroCapitalReceiver;\r\n    }\r\n\r\n    /**\r\n    * @notice Send the collected capital to the capital receiver\r\n    * @return uint8 The reason code: 0 means success.\r\n    */\r\n    function releaseCollectedCapital() public onlyHydroSecurityToken returns(uint8) {\r\n        require(now >= issuingEndingTimestamp, 'You can only release funds after the token issuing has ended');\r\n        uint256 hydroInsideThisContract = hydroToken.balanceOf(address(this));\r\n        hydroToken.transfer(hydroCapitalReceiverAddress, hydroInsideThisContract);\r\n        return(0);\r\n    }\r\n}\r\n",
+  "sourcePath": "C:/Users/Juan/Documents/JL/ETHER/HYDRO/hst/contracts/components/HSTEscrow.sol",
+  "ast": {
+    "absolutePath": "/C/Users/Juan/Documents/JL/ETHER/HYDRO/hst/contracts/components/HSTEscrow.sol",
+    "exportedSymbols": {
+      "HSTEscrow": [
+        7668
+      ]
+    },
+    "id": 7669,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 7551,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:10"
+      },
+      {
+        "absolutePath": "/C/Users/Juan/Documents/JL/ETHER/HYDRO/hst/contracts/interfaces/HydroInterface.sol",
+        "file": "../interfaces/HydroInterface.sol",
+        "id": 7552,
+        "nodeType": "ImportDirective",
+        "scope": 7669,
+        "sourceUnit": 8934,
+        "src": "27:42:10",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "@title HydroEscrow\r\n@notice Stores HYDRO inside as an escrow for HST issuing. This contracts stores any funds sent by the token creator and the funds that users pay to participate in the issuing. It distributes any refunds, and the corresponding dividends and interests to their receivers.\r\n@author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>\r",
+        "fullyImplemented": true,
+        "id": 7668,
+        "linearizedBaseContracts": [
+          7668
+        ],
+        "name": "HSTEscrow",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 7554,
+            "name": "issuingEndingTimestamp",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "521:37:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 7553,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "521:7:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7556,
+            "name": "hydroSecurityTokenAddress",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "565:40:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 7555,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "565:7:10",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7558,
+            "name": "hydroTokenAddress",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "612:32:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 7557,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "612:7:10",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7560,
+            "name": "totalHydroCapitalization",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "651:39:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 7559,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "651:7:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7562,
+            "name": "hydroCapitalReceiverAddress",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "697:50:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address_payable",
+              "typeString": "address payable"
+            },
+            "typeName": {
+              "id": 7561,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "697:15:10",
+              "stateMutability": "payable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address_payable",
+                "typeString": "address payable"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7564,
+            "name": "hydroToken",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "754:32:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_HydroInterface_$8933",
+              "typeString": "contract HydroInterface"
+            },
+            "typeName": {
+              "contractScope": null,
+              "id": 7563,
+              "name": "HydroInterface",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 8933,
+              "src": "754:14:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_HydroInterface_$8933",
+                "typeString": "contract HydroInterface"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 7575,
+              "nodeType": "Block",
+              "src": "889:152:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 7570,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 7567,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 11316,
+                            "src": "908:3:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 7568,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "908:10:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 7569,
+                          "name": "hydroSecurityTokenAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7556,
+                          "src": "922:25:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "src": "908:39:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "546869732066756e6374696f6e2063616e206f6e6c7920626520657865637574656420627920746865206f726967696e616c20487964726f5365637572697479546f6b656e",
+                        "id": 7571,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "949:71:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_81b32c1681af8accd641ed77ead268df2dad39f330490cf1374b878a42072e5e",
+                          "typeString": "literal_string \"This function can only be executed by the original HydroSecurityToken\""
+                        },
+                        "value": "This function can only be executed by the original HydroSecurityToken"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_81b32c1681af8accd641ed77ead268df2dad39f330490cf1374b878a42072e5e",
+                          "typeString": "literal_string \"This function can only be executed by the original HydroSecurityToken\""
+                        }
+                      ],
+                      "id": 7566,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "900:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7572,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "900:121:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7573,
+                  "nodeType": "ExpressionStatement",
+                  "src": "900:121:10"
+                },
+                {
+                  "id": 7574,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "1032:1:10"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 7576,
+            "name": "onlyHydroSecurityToken",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 7565,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "886:2:10"
+            },
+            "src": "855:186:10",
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 7632,
+              "nodeType": "Block",
+              "src": "1664:638:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 7590,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7588,
+                          "name": "_issuingEndingTimestamp",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7578,
+                          "src": "1683:23:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 7589,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 11318,
+                          "src": "1709:3:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "1683:29:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "54686520746f6b656e2069737375696e67206d75737420656e64206166746572206e6f77",
+                        "id": 7591,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1714:38:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_215602aba5329f787cd3b7f8a3a27364f7b3011cb44ae529b0039b5b7a9a60c0",
+                          "typeString": "literal_string \"The token issuing must end after now\""
+                        },
+                        "value": "The token issuing must end after now"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_215602aba5329f787cd3b7f8a3a27364f7b3011cb44ae529b0039b5b7a9a60c0",
+                          "typeString": "literal_string \"The token issuing must end after now\""
+                        }
+                      ],
+                      "id": 7587,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "1675:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7592,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1675:78:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7593,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1675:78:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 7599,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7595,
+                          "name": "_hydroSecurityTokenAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7580,
+                          "src": "1772:26:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "!=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "hexValue": "30",
+                              "id": 7597,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "kind": "number",
+                              "lValueRequested": false,
+                              "nodeType": "Literal",
+                              "src": "1810:1:10",
+                              "subdenomination": null,
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              },
+                              "value": "0"
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              }
+                            ],
+                            "id": 7596,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "1802:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": "address"
+                          },
+                          "id": 7598,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1802:10:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "1772:40:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "596f75206d757374207365742074686520746f6b656e2061646472657373",
+                        "id": 7600,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1814:32:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_abac1ae0f0f247c539e5d95fd7eaa7815fdeafefe9441aec6312bfbd5477769a",
+                          "typeString": "literal_string \"You must set the token address\""
+                        },
+                        "value": "You must set the token address"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_abac1ae0f0f247c539e5d95fd7eaa7815fdeafefe9441aec6312bfbd5477769a",
+                          "typeString": "literal_string \"You must set the token address\""
+                        }
+                      ],
+                      "id": 7594,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "1764:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7601,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1764:83:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7602,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1764:83:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 7606,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7604,
+                          "name": "_totalHydroCapitalization",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7582,
+                          "src": "1866:25:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "hexValue": "30",
+                          "id": 7605,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "number",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "1894:1:10",
+                          "subdenomination": null,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          },
+                          "value": "0"
+                        },
+                        "src": "1866:29:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "54686520746f74616c206361706974616c697a6174696f6e206d757374206265206c6172676572207468616e207a65726f",
+                        "id": 7607,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1897:51:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_e80505ccc442eca769aa0e39601fda93bab4ac094c80146efa7fc06e22aefd3a",
+                          "typeString": "literal_string \"The total capitalization must be larger than zero\""
+                        },
+                        "value": "The total capitalization must be larger than zero"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_e80505ccc442eca769aa0e39601fda93bab4ac094c80146efa7fc06e22aefd3a",
+                          "typeString": "literal_string \"The total capitalization must be larger than zero\""
+                        }
+                      ],
+                      "id": 7603,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "1858:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7608,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1858:91:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7609,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1858:91:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        "id": 7615,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7611,
+                          "name": "_hydroCapitalReceiver",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7584,
+                          "src": "1968:21:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "!=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "hexValue": "30",
+                              "id": 7613,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "kind": "number",
+                              "lValueRequested": false,
+                              "nodeType": "Literal",
+                              "src": "2001:1:10",
+                              "subdenomination": null,
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              },
+                              "value": "0"
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              }
+                            ],
+                            "id": 7612,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "1993:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": "address"
+                          },
+                          "id": 7614,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1993:10:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "1968:35:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "596f75206d757374207365742061206361706974616c207265636569766572",
+                        "id": 7616,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2005:33:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_60c929f03d5b0e15471005aee02ce9fa2dd0675c97705dbd9ed372b9e6cff3a0",
+                          "typeString": "literal_string \"You must set a capital receiver\""
+                        },
+                        "value": "You must set a capital receiver"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_60c929f03d5b0e15471005aee02ce9fa2dd0675c97705dbd9ed372b9e6cff3a0",
+                          "typeString": "literal_string \"You must set a capital receiver\""
+                        }
+                      ],
+                      "id": 7610,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "1960:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7617,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1960:79:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7618,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1960:79:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 7621,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 7619,
+                      "name": "issuingEndingTimestamp",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7554,
+                      "src": "2050:22:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 7620,
+                      "name": "_issuingEndingTimestamp",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7578,
+                      "src": "2075:23:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "2050:48:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 7622,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2050:48:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 7626,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 7623,
+                      "name": "hydroSecurityTokenAddress",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7556,
+                      "src": "2109:25:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 7624,
+                        "name": "msg",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 11316,
+                        "src": "2137:3:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_magic_message",
+                          "typeString": "msg"
+                        }
+                      },
+                      "id": 7625,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "sender",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "2137:10:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address_payable",
+                        "typeString": "address payable"
+                      }
+                    },
+                    "src": "2109:38:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "id": 7627,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2109:38:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 7630,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 7628,
+                      "name": "hydroCapitalReceiverAddress",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7562,
+                      "src": "2243:27:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address_payable",
+                        "typeString": "address payable"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 7629,
+                      "name": "_hydroCapitalReceiver",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7584,
+                      "src": "2273:21:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address_payable",
+                        "typeString": "address payable"
+                      }
+                    },
+                    "src": "2243:51:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address_payable",
+                      "typeString": "address payable"
+                    }
+                  },
+                  "id": 7631,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2243:51:10"
+                }
+              ]
+            },
+            "documentation": "@notice Constructor\r\n@dev    For the escrow to work properly, you need to set this variables.\r\n@param  _issuingEndingTimestamp Time+Date when token issuing must stop\r\n@param  _hydroSecurityTokenAddress The address of the token being issued\r\n@param  _totalHydroCapitalization Total capitalization accepted, measured in Hydro\r\n@param  _hydroCapitalReceiver The address of the capital receiver account\r",
+            "id": 7633,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 7585,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 7578,
+                  "name": "_issuingEndingTimestamp",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7633,
+                  "src": "1514:31:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 7577,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1514:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 7580,
+                  "name": "_hydroSecurityTokenAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7633,
+                  "src": "1547:34:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 7579,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1547:7:10",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 7582,
+                  "name": "_totalHydroCapitalization",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7633,
+                  "src": "1583:33:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 7581,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1583:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 7584,
+                  "name": "_hydroCapitalReceiver",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7633,
+                  "src": "1618:37:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  },
+                  "typeName": {
+                    "id": 7583,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1618:15:10",
+                    "stateMutability": "payable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address_payable",
+                      "typeString": "address payable"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1513:143:10"
+            },
+            "returnParameters": {
+              "id": 7586,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1664:0:10"
+            },
+            "scope": 7668,
+            "src": "1502:800:10",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 7666,
+              "nodeType": "Block",
+              "src": "2528:305:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 7643,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7641,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 11318,
+                          "src": "2547:3:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 7642,
+                          "name": "issuingEndingTimestamp",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7554,
+                          "src": "2554:22:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "2547:29:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "596f752063616e206f6e6c792072656c656173652066756e64732061667465722074686520746f6b656e2069737375696e672068617320656e646564",
+                        "id": 7644,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2578:62:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_fa441cc85a1666c32c9f5ecf011782d3d66a9c2f4882fccfdf476c64ae0bc176",
+                          "typeString": "literal_string \"You can only release funds after the token issuing has ended\""
+                        },
+                        "value": "You can only release funds after the token issuing has ended"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_fa441cc85a1666c32c9f5ecf011782d3d66a9c2f4882fccfdf476c64ae0bc176",
+                          "typeString": "literal_string \"You can only release funds after the token issuing has ended\""
+                        }
+                      ],
+                      "id": 7640,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "2539:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7645,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2539:102:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7646,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2539:102:10"
+                },
+                {
+                  "assignments": [
+                    7648
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 7648,
+                      "name": "hydroInsideThisContract",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 7666,
+                      "src": "2652:31:10",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 7647,
+                        "name": "uint256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "2652:7:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 7655,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 7652,
+                            "name": "this",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 11388,
+                            "src": "2715:4:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_HSTEscrow_$7668",
+                              "typeString": "contract HSTEscrow"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_HSTEscrow_$7668",
+                              "typeString": "contract HSTEscrow"
+                            }
+                          ],
+                          "id": 7651,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "nodeType": "ElementaryTypeNameExpression",
+                          "src": "2707:7:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_address_$",
+                            "typeString": "type(address)"
+                          },
+                          "typeName": "address"
+                        },
+                        "id": 7653,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "2707:13:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 7649,
+                        "name": "hydroToken",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 7564,
+                        "src": "2686:10:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_HydroInterface_$8933",
+                          "typeString": "contract HydroInterface"
+                        }
+                      },
+                      "id": 7650,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "balanceOf",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 8889,
+                      "src": "2686:20:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) view external returns (uint256)"
+                      }
+                    },
+                    "id": 7654,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2686:35:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "2652:69:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 7659,
+                        "name": "hydroCapitalReceiverAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 7562,
+                        "src": "2752:27:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 7660,
+                        "name": "hydroInsideThisContract",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 7648,
+                        "src": "2781:23:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 7656,
+                        "name": "hydroToken",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 7564,
+                        "src": "2732:10:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_HydroInterface_$8933",
+                          "typeString": "contract HydroInterface"
+                        }
+                      },
+                      "id": 7658,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "transfer",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 8871,
+                      "src": "2732:19:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
+                        "typeString": "function (address,uint256) external returns (bool)"
+                      }
+                    },
+                    "id": 7661,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2732:73:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 7662,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2732:73:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "components": [
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "30",
+                        "id": 7663,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "number",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2823:1:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_rational_0_by_1",
+                          "typeString": "int_const 0"
+                        },
+                        "value": "0"
+                      }
+                    ],
+                    "id": 7664,
+                    "isConstant": false,
+                    "isInlineArray": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "nodeType": "TupleExpression",
+                    "src": "2822:3:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_rational_0_by_1",
+                      "typeString": "int_const 0"
+                    }
+                  },
+                  "functionReturnParameters": 7639,
+                  "id": 7665,
+                  "nodeType": "Return",
+                  "src": "2816:9:10"
+                }
+              ]
+            },
+            "documentation": "@notice Send the collected capital to the capital receiver\r\n@return uint8 The reason code: 0 means success.\r",
+            "id": 7667,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "arguments": null,
+                "id": 7636,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 7635,
+                  "name": "onlyHydroSecurityToken",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 7576,
+                  "src": "2490:22:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "2490:22:10"
+              }
+            ],
+            "name": "releaseCollectedCapital",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 7634,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2480:2:10"
+            },
+            "returnParameters": {
+              "id": 7639,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 7638,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7667,
+                  "src": "2521:5:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 7637,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2521:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2520:7:10"
+            },
+            "scope": 7668,
+            "src": "2448:385:10",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 7669,
+        "src": "495:2341:10"
+      }
+    ],
+    "src": "0:2838:10"
+  },
+  "legacyAST": {
+    "absolutePath": "/C/Users/Juan/Documents/JL/ETHER/HYDRO/hst/contracts/components/HSTEscrow.sol",
+    "exportedSymbols": {
+      "HSTEscrow": [
+        7668
+      ]
+    },
+    "id": 7669,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 7551,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:10"
+      },
+      {
+        "absolutePath": "/C/Users/Juan/Documents/JL/ETHER/HYDRO/hst/contracts/interfaces/HydroInterface.sol",
+        "file": "../interfaces/HydroInterface.sol",
+        "id": 7552,
+        "nodeType": "ImportDirective",
+        "scope": 7669,
+        "sourceUnit": 8934,
+        "src": "27:42:10",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "@title HydroEscrow\r\n@notice Stores HYDRO inside as an escrow for HST issuing. This contracts stores any funds sent by the token creator and the funds that users pay to participate in the issuing. It distributes any refunds, and the corresponding dividends and interests to their receivers.\r\n@author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>\r",
+        "fullyImplemented": true,
+        "id": 7668,
+        "linearizedBaseContracts": [
+          7668
+        ],
+        "name": "HSTEscrow",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 7554,
+            "name": "issuingEndingTimestamp",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "521:37:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 7553,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "521:7:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7556,
+            "name": "hydroSecurityTokenAddress",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "565:40:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 7555,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "565:7:10",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7558,
+            "name": "hydroTokenAddress",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "612:32:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 7557,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "612:7:10",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7560,
+            "name": "totalHydroCapitalization",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "651:39:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 7559,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "651:7:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7562,
+            "name": "hydroCapitalReceiverAddress",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "697:50:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address_payable",
+              "typeString": "address payable"
+            },
+            "typeName": {
+              "id": 7561,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "697:15:10",
+              "stateMutability": "payable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address_payable",
+                "typeString": "address payable"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 7564,
+            "name": "hydroToken",
+            "nodeType": "VariableDeclaration",
+            "scope": 7668,
+            "src": "754:32:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_HydroInterface_$8933",
+              "typeString": "contract HydroInterface"
+            },
+            "typeName": {
+              "contractScope": null,
+              "id": 7563,
+              "name": "HydroInterface",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 8933,
+              "src": "754:14:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_HydroInterface_$8933",
+                "typeString": "contract HydroInterface"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 7575,
+              "nodeType": "Block",
+              "src": "889:152:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 7570,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 7567,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 11316,
+                            "src": "908:3:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 7568,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "908:10:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 7569,
+                          "name": "hydroSecurityTokenAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7556,
+                          "src": "922:25:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "src": "908:39:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "546869732066756e6374696f6e2063616e206f6e6c7920626520657865637574656420627920746865206f726967696e616c20487964726f5365637572697479546f6b656e",
+                        "id": 7571,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "949:71:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_81b32c1681af8accd641ed77ead268df2dad39f330490cf1374b878a42072e5e",
+                          "typeString": "literal_string \"This function can only be executed by the original HydroSecurityToken\""
+                        },
+                        "value": "This function can only be executed by the original HydroSecurityToken"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_81b32c1681af8accd641ed77ead268df2dad39f330490cf1374b878a42072e5e",
+                          "typeString": "literal_string \"This function can only be executed by the original HydroSecurityToken\""
+                        }
+                      ],
+                      "id": 7566,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "900:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7572,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "900:121:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7573,
+                  "nodeType": "ExpressionStatement",
+                  "src": "900:121:10"
+                },
+                {
+                  "id": 7574,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "1032:1:10"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 7576,
+            "name": "onlyHydroSecurityToken",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 7565,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "886:2:10"
+            },
+            "src": "855:186:10",
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 7632,
+              "nodeType": "Block",
+              "src": "1664:638:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 7590,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7588,
+                          "name": "_issuingEndingTimestamp",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7578,
+                          "src": "1683:23:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 7589,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 11318,
+                          "src": "1709:3:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "1683:29:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "54686520746f6b656e2069737375696e67206d75737420656e64206166746572206e6f77",
+                        "id": 7591,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1714:38:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_215602aba5329f787cd3b7f8a3a27364f7b3011cb44ae529b0039b5b7a9a60c0",
+                          "typeString": "literal_string \"The token issuing must end after now\""
+                        },
+                        "value": "The token issuing must end after now"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_215602aba5329f787cd3b7f8a3a27364f7b3011cb44ae529b0039b5b7a9a60c0",
+                          "typeString": "literal_string \"The token issuing must end after now\""
+                        }
+                      ],
+                      "id": 7587,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "1675:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7592,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1675:78:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7593,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1675:78:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 7599,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7595,
+                          "name": "_hydroSecurityTokenAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7580,
+                          "src": "1772:26:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "!=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "hexValue": "30",
+                              "id": 7597,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "kind": "number",
+                              "lValueRequested": false,
+                              "nodeType": "Literal",
+                              "src": "1810:1:10",
+                              "subdenomination": null,
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              },
+                              "value": "0"
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              }
+                            ],
+                            "id": 7596,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "1802:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": "address"
+                          },
+                          "id": 7598,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1802:10:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "1772:40:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "596f75206d757374207365742074686520746f6b656e2061646472657373",
+                        "id": 7600,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1814:32:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_abac1ae0f0f247c539e5d95fd7eaa7815fdeafefe9441aec6312bfbd5477769a",
+                          "typeString": "literal_string \"You must set the token address\""
+                        },
+                        "value": "You must set the token address"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_abac1ae0f0f247c539e5d95fd7eaa7815fdeafefe9441aec6312bfbd5477769a",
+                          "typeString": "literal_string \"You must set the token address\""
+                        }
+                      ],
+                      "id": 7594,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "1764:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7601,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1764:83:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7602,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1764:83:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 7606,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7604,
+                          "name": "_totalHydroCapitalization",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7582,
+                          "src": "1866:25:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "hexValue": "30",
+                          "id": 7605,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "number",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "1894:1:10",
+                          "subdenomination": null,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          },
+                          "value": "0"
+                        },
+                        "src": "1866:29:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "54686520746f74616c206361706974616c697a6174696f6e206d757374206265206c6172676572207468616e207a65726f",
+                        "id": 7607,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1897:51:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_e80505ccc442eca769aa0e39601fda93bab4ac094c80146efa7fc06e22aefd3a",
+                          "typeString": "literal_string \"The total capitalization must be larger than zero\""
+                        },
+                        "value": "The total capitalization must be larger than zero"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_e80505ccc442eca769aa0e39601fda93bab4ac094c80146efa7fc06e22aefd3a",
+                          "typeString": "literal_string \"The total capitalization must be larger than zero\""
+                        }
+                      ],
+                      "id": 7603,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "1858:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7608,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1858:91:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7609,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1858:91:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        "id": 7615,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7611,
+                          "name": "_hydroCapitalReceiver",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7584,
+                          "src": "1968:21:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "!=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "hexValue": "30",
+                              "id": 7613,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "kind": "number",
+                              "lValueRequested": false,
+                              "nodeType": "Literal",
+                              "src": "2001:1:10",
+                              "subdenomination": null,
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              },
+                              "value": "0"
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              }
+                            ],
+                            "id": 7612,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "1993:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": "address"
+                          },
+                          "id": 7614,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1993:10:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "1968:35:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "596f75206d757374207365742061206361706974616c207265636569766572",
+                        "id": 7616,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2005:33:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_60c929f03d5b0e15471005aee02ce9fa2dd0675c97705dbd9ed372b9e6cff3a0",
+                          "typeString": "literal_string \"You must set a capital receiver\""
+                        },
+                        "value": "You must set a capital receiver"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_60c929f03d5b0e15471005aee02ce9fa2dd0675c97705dbd9ed372b9e6cff3a0",
+                          "typeString": "literal_string \"You must set a capital receiver\""
+                        }
+                      ],
+                      "id": 7610,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "1960:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7617,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1960:79:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7618,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1960:79:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 7621,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 7619,
+                      "name": "issuingEndingTimestamp",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7554,
+                      "src": "2050:22:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 7620,
+                      "name": "_issuingEndingTimestamp",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7578,
+                      "src": "2075:23:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "2050:48:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 7622,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2050:48:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 7626,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 7623,
+                      "name": "hydroSecurityTokenAddress",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7556,
+                      "src": "2109:25:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 7624,
+                        "name": "msg",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 11316,
+                        "src": "2137:3:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_magic_message",
+                          "typeString": "msg"
+                        }
+                      },
+                      "id": 7625,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "sender",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "2137:10:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address_payable",
+                        "typeString": "address payable"
+                      }
+                    },
+                    "src": "2109:38:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "id": 7627,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2109:38:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 7630,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 7628,
+                      "name": "hydroCapitalReceiverAddress",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7562,
+                      "src": "2243:27:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address_payable",
+                        "typeString": "address payable"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 7629,
+                      "name": "_hydroCapitalReceiver",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7584,
+                      "src": "2273:21:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address_payable",
+                        "typeString": "address payable"
+                      }
+                    },
+                    "src": "2243:51:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address_payable",
+                      "typeString": "address payable"
+                    }
+                  },
+                  "id": 7631,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2243:51:10"
+                }
+              ]
+            },
+            "documentation": "@notice Constructor\r\n@dev    For the escrow to work properly, you need to set this variables.\r\n@param  _issuingEndingTimestamp Time+Date when token issuing must stop\r\n@param  _hydroSecurityTokenAddress The address of the token being issued\r\n@param  _totalHydroCapitalization Total capitalization accepted, measured in Hydro\r\n@param  _hydroCapitalReceiver The address of the capital receiver account\r",
+            "id": 7633,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 7585,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 7578,
+                  "name": "_issuingEndingTimestamp",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7633,
+                  "src": "1514:31:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 7577,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1514:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 7580,
+                  "name": "_hydroSecurityTokenAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7633,
+                  "src": "1547:34:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 7579,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1547:7:10",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 7582,
+                  "name": "_totalHydroCapitalization",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7633,
+                  "src": "1583:33:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 7581,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1583:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 7584,
+                  "name": "_hydroCapitalReceiver",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7633,
+                  "src": "1618:37:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  },
+                  "typeName": {
+                    "id": 7583,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1618:15:10",
+                    "stateMutability": "payable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address_payable",
+                      "typeString": "address payable"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1513:143:10"
+            },
+            "returnParameters": {
+              "id": 7586,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1664:0:10"
+            },
+            "scope": 7668,
+            "src": "1502:800:10",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 7666,
+              "nodeType": "Block",
+              "src": "2528:305:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 7643,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 7641,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 11318,
+                          "src": "2547:3:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 7642,
+                          "name": "issuingEndingTimestamp",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7554,
+                          "src": "2554:22:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "2547:29:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "596f752063616e206f6e6c792072656c656173652066756e64732061667465722074686520746f6b656e2069737375696e672068617320656e646564",
+                        "id": 7644,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2578:62:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_fa441cc85a1666c32c9f5ecf011782d3d66a9c2f4882fccfdf476c64ae0bc176",
+                          "typeString": "literal_string \"You can only release funds after the token issuing has ended\""
+                        },
+                        "value": "You can only release funds after the token issuing has ended"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_fa441cc85a1666c32c9f5ecf011782d3d66a9c2f4882fccfdf476c64ae0bc176",
+                          "typeString": "literal_string \"You can only release funds after the token issuing has ended\""
+                        }
+                      ],
+                      "id": 7640,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        11319,
+                        11320
+                      ],
+                      "referencedDeclaration": 11320,
+                      "src": "2539:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 7645,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2539:102:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 7646,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2539:102:10"
+                },
+                {
+                  "assignments": [
+                    7648
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 7648,
+                      "name": "hydroInsideThisContract",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 7666,
+                      "src": "2652:31:10",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 7647,
+                        "name": "uint256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "2652:7:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 7655,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 7652,
+                            "name": "this",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 11388,
+                            "src": "2715:4:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_HSTEscrow_$7668",
+                              "typeString": "contract HSTEscrow"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_HSTEscrow_$7668",
+                              "typeString": "contract HSTEscrow"
+                            }
+                          ],
+                          "id": 7651,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "nodeType": "ElementaryTypeNameExpression",
+                          "src": "2707:7:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_address_$",
+                            "typeString": "type(address)"
+                          },
+                          "typeName": "address"
+                        },
+                        "id": 7653,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "2707:13:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 7649,
+                        "name": "hydroToken",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 7564,
+                        "src": "2686:10:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_HydroInterface_$8933",
+                          "typeString": "contract HydroInterface"
+                        }
+                      },
+                      "id": 7650,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "balanceOf",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 8889,
+                      "src": "2686:20:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) view external returns (uint256)"
+                      }
+                    },
+                    "id": 7654,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2686:35:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "2652:69:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 7659,
+                        "name": "hydroCapitalReceiverAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 7562,
+                        "src": "2752:27:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 7660,
+                        "name": "hydroInsideThisContract",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 7648,
+                        "src": "2781:23:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 7656,
+                        "name": "hydroToken",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 7564,
+                        "src": "2732:10:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_HydroInterface_$8933",
+                          "typeString": "contract HydroInterface"
+                        }
+                      },
+                      "id": 7658,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "transfer",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 8871,
+                      "src": "2732:19:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
+                        "typeString": "function (address,uint256) external returns (bool)"
+                      }
+                    },
+                    "id": 7661,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2732:73:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 7662,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2732:73:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "components": [
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "30",
+                        "id": 7663,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "number",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2823:1:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_rational_0_by_1",
+                          "typeString": "int_const 0"
+                        },
+                        "value": "0"
+                      }
+                    ],
+                    "id": 7664,
+                    "isConstant": false,
+                    "isInlineArray": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "nodeType": "TupleExpression",
+                    "src": "2822:3:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_rational_0_by_1",
+                      "typeString": "int_const 0"
+                    }
+                  },
+                  "functionReturnParameters": 7639,
+                  "id": 7665,
+                  "nodeType": "Return",
+                  "src": "2816:9:10"
+                }
+              ]
+            },
+            "documentation": "@notice Send the collected capital to the capital receiver\r\n@return uint8 The reason code: 0 means success.\r",
+            "id": 7667,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "arguments": null,
+                "id": 7636,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 7635,
+                  "name": "onlyHydroSecurityToken",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 7576,
+                  "src": "2490:22:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "2490:22:10"
+              }
+            ],
+            "name": "releaseCollectedCapital",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 7634,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2480:2:10"
+            },
+            "returnParameters": {
+              "id": 7639,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 7638,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 7667,
+                  "src": "2521:5:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 7637,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2521:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2520:7:10"
+            },
+            "scope": 7668,
+            "src": "2448:385:10",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 7669,
+        "src": "495:2341:10"
+      }
+    ],
+    "src": "0:2838:10"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.4+commit.9549d8ff.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.6",
+  "updatedAt": "2019-04-18T14:32:09.971Z",
+  "devdoc": {
+    "author": "Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>\r",
+    "methods": {
+      "constructor": {
+        "details": "For the escrow to work properly, you need to set this variables.\r",
+        "params": {
+          "_hydroCapitalReceiver": "The address of the capital receiver account\r",
+          "_hydroSecurityTokenAddress": "The address of the token being issued\r",
+          "_issuingEndingTimestamp": "Time+Date when token issuing must stop\r",
+          "_totalHydroCapitalization": "Total capitalization accepted, measured in Hydro\r"
+        }
+      },
+      "releaseCollectedCapital()": {
+        "return": "uint8 The reason code: 0 means success.\r"
+      }
+    },
+    "title": "HydroEscrow\r"
+  },
+  "userdoc": {
+    "methods": {
+      "constructor": "Constructor\r",
+      "releaseCollectedCapital()": {
+        "notice": "Send the collected capital to the capital receiver\r"
+      }
+    },
+    "notice": "Stores HYDRO inside as an escrow for HST issuing. This contracts stores any funds sent by the token creator and the funds that users pay to participate in the issuing. It distributes any refunds, and the corresponding dividends and interests to their receivers.\r"
+  }
+}

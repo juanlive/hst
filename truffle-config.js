@@ -1,3 +1,5 @@
+var HDWalletProvider = require("truffle-hdwallet-provider");
+
 const gas = 6.5 * 1e6
 const gasPrice = 2000000000 // 2 gwei
 
@@ -26,6 +28,15 @@ module.exports = {
       gas: gas,
       gasPrice: gasPrice,
       skipDryRun: true
+    },
+    rinkeby: {
+      provider: function() { 
+       return new HDWalletProvider("fix subway blush enemy black reform invest van drive advance birth six", "https://rinkeby.infura.io/YIzss5D72r9iTVYvjB2G");
+       //https://rinkeby.infura.io/v3/<INFURA_Access_Token>");
+      },
+      network_id: 4,
+      gas: 8500000,
+      gasPrice: 10000000000,
     },
     mainIPC: {
       host: 'localhost',

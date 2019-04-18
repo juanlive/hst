@@ -606,6 +606,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
                 "Hydro transfer was not possible");
         }
 
+        // _updateBatches(address(0), _to, _amount);
         // Sell
         _doSell(msg.sender, total);
         emit Sell(msg.sender, total);

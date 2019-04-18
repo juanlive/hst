@@ -59,7 +59,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * Credit: https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/ERC223_Token.sol#L107-L114
    * @param _addr The address of a smart contract
    */
-  modifier withContract(address _addr) {
+  modifier isContract(address _addr) {
     uint length;
     assembly { length := extcodesize(_addr) }
     require(length > 0);
@@ -96,16 +96,13 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   /**
    * @notice Add a new service
    *
-   * @param _token Address of the token that will use the service
-   * @param _category Name of the category the service belongs to
    * @param _service Address of the service to use
    */
-  function addService(bytes32 _categoryName, address _service) withContract(_tokenAddress) withContract(_service) public {
+  function addService(bytes32 _categoryName, address _service) isContract(msg.sender) isContract(_service) public {
     bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
     require (_emptyStringTest.length != 0);
-    address _tokenAddress = msg.sender;
-    serviceRegistry[_tokenAddress][_categoryName] = _service;
-    emit AddService(_tokenAddress, _categoryName, _service);
+    serviceRegistry[msg.sender][_categoryName] = _service;
+    emit AddService(msg.sender, _categoryName, _service);
   }
 
     /**
@@ -113,17 +110,14 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    *
    * @dev This method is only callable by the contract's owner
    *
-   * @param _token Address of the token that will use the service
-   * @param _category Name of the category the service belongs to
    * @param _oldService Old address for the service
    * @param _newService New address for the service to use
    */
-  function replaceService(bytes32 _categoryName, address _oldService, address _newService) onlyOwner withContract(_token) withContract(_newService) public {
+  function replaceService(bytes32 _categoryName, address _oldService, address _newService) onlyOwner isContract(msg.sender) isContract(_newService) public {
     bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
     require (_emptyStringTest.length != 0);
-    address _tokenAddress = msg.sender;
-    serviceRegistry[_tokenAddress][_categoryName] = _newService;
-    emit ReplaceService(_tokenAddress, _categoryName, _oldService, _newService);
+    serviceRegistry[msg.sender][_categoryName] = _newService;
+    emit ReplaceService(msg.sender, _categoryName, _oldService, _newService);
   }
 
 }
