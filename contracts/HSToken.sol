@@ -306,6 +306,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
             _escrowLimitPeriod > (10 * 24 * 60 * 60),
             "Incorrect input data"
         );
+        require(!MAIN_PARAMS_ready, "Params already setted");
         // Load values
         hydroPrice = _hydroPrice;
         ethPrice = _ethPrice;
@@ -335,6 +336,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     ) 
         onlyAdmin onlyAtSetup public 
     {
+        require(!STO_FLAGS_ready, "Flags already setted");
         // Load values
         LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP; 
         PERIOD_LOCKED = _PERIOD_LOCKED;
@@ -361,8 +363,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     ) 
         onlyAdmin onlyAtSetup public 
     {
-        require(STO_FLAGS_ready, "STO_FLAGS has not been sat");
-
+        require(!STO_PARAMS_ready, "Params already setted");
+        require(STO_FLAGS_ready, "STO_FLAGS has not been set");
+        // Load values
         percAllowedTokens = _percAllowedTokens; 
         hydroAllowed = _hydroAllowed;
         ethAllowed = _ethAllowed;
@@ -482,7 +485,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         //serviceRegistry.addService(address(this), bytes32("AML"), _address);
 
     }
-    function removeAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+/*    function removeAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
         require(AMLResolver[_address] != 0, "Resolver does not exist");
         uint8 _number = AMLResolver[_address];
         if (_number < 3) {
@@ -515,9 +518,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         LegalResolverQ --;
         LegalResolver[_address] = 0;
         //serviceRegistry.replaceService(address(this), bytes32("LEGAL"), _address,address(0));
-    }
-
-
+    }*/
 
 
     // Release gains. Only after escrow is released
