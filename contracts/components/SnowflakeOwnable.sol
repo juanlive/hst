@@ -11,7 +11,7 @@ import '../zeppelin/ownership/Ownable.sol';
 // check that Identity Registry address cannot be zero for any operation to work
 
 // TO DO
-// verify that new EIN for Snowflake owner has at least one associated address 
+//
 
 /**
  * @title SnowflakeOwnable
@@ -76,7 +76,6 @@ contract SnowflakeOwnable is Ownable {
     * @dev This works on EINs, not on addresses
     */
     modifier onlySnowflakeOwner() {
-        require(address(identityRegistry) != address(0));
         require(isOwner());
         _;
     }
@@ -87,7 +86,6 @@ contract SnowflakeOwnable is Ownable {
     * @return true if `msg.sender` is the owner of the contract
     */
     function isOwner() public view returns(bool) {
-        require(address(identityRegistry) != address(0));
         uint caller = identityRegistry.getEIN(msg.sender);
         return (caller == ownerEIN);
     }
@@ -97,7 +95,6 @@ contract SnowflakeOwnable is Ownable {
     * @dev Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner modifier anymore.
     */
     function renounceOwnership() public onlySnowflakeOwner {
-        require(address(identityRegistry) != address(0));
         emit OwnershipTransferred(ownerEIN, 0);
         ownerEIN = 0;
     }
@@ -108,6 +105,7 @@ contract SnowflakeOwnable is Ownable {
     * @param _newOwner EIN to transfer ownership to
     */
     function transferOwnership(uint _newOwner) public onlySnowflakeOwner {
+        require(identityRegistry.getEIN(_newOwner) > 0);
         _transferOwnership(_newOwner);
     }
 
@@ -117,7 +115,6 @@ contract SnowflakeOwnable is Ownable {
     * @param _newOwner EIN to transfer ownership to
     */
     function _transferOwnership(uint _newOwner) internal onlySnowflakeOwner {
-        require(address(identityRegistry) != address(0));
         require(identityRegistry.identityExists(_newOwner));
         require(_newOwner != 0);
         emit OwnershipTransferred(ownerEIN, _newOwner);

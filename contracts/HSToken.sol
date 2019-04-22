@@ -78,7 +78,7 @@ contract STO_FLAGS {
 
 contract STO_PARAMS {
     bool public STO_PARAMS_ready;
-    // @param percAllowedTokens Where 100% = 1 ether, 50% = 0.5 ether
+    // @param percAllowedTokens: 100% = 1 ether, 50% = 0.5 ether
     uint256 public percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
     uint256 public hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
     uint256 public ethAllowed; // considered if ETH_AMOUNT_TYPE
@@ -104,7 +104,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     struct Investor {
-        bool exist;
+        bool exists;
         uint256 etherSent;
         uint256 hydroSent;
     }
@@ -553,9 +553,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         bytes32 ETH =  keccak256(abi.encode("ETH"));
         bytes32 coin = keccak256(abi.encode(_coin));
 
-        if (!investors[_ein].exist) {
+        if (!investors[_ein].exists) {
             investorsQuantity++;
-            investors[_ein].exist = true;
+            investors[_ein].exists = true;
             require(investorsQuantity <= maxInvestors || maxInvestors == 0, "Maximum investors reached");
         }
  
