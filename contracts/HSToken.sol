@@ -74,6 +74,8 @@ contract STO_FLAGS {
     bool public AML_RESTRICTED;
     bool public WHITELIST_RESTRICTED;
     bool public BLACKLIST_RESTRICTED;
+    bool public ETH_ORACLE;
+    bool public HYDRO_ORACLE;
 }
 
 contract STO_PARAMS {
@@ -85,6 +87,8 @@ contract STO_PARAMS {
     uint256 public lockPeriod; // in days
     uint256 public minInvestors;
     uint256 public maxInvestors;
+    address public ethOracle;
+    address public hydroOracle;
 }
 
 
@@ -332,7 +336,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         bool _KYC_RESTRICTED, 
         bool _AML_RESTRICTED,
         bool _WHITELIST_RESTRICTED,
-        bool _BLACKLIST_RESTRICTED
+        bool _BLACKLIST_RESTRICTED,
+        bool _ETH_ORACLE,
+        bool _HYDRO_ORACLE
     ) 
         onlyAdmin onlyAtSetup public 
     {
@@ -349,6 +355,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         AML_RESTRICTED = _AML_RESTRICTED;
         WHITELIST_RESTRICTED = _WHITELIST_RESTRICTED;
         BLACKLIST_RESTRICTED = _BLACKLIST_RESTRICTED;
+        ETH_ORACLE = _ETH_ORACLE;
+        HYDRO_ORACLE = _HYDRO_ORACLE;
         // Set flag
         STO_FLAGS_ready = true;
     }
@@ -359,7 +367,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 _ethAllowed,
         uint256 _lockPeriod,
         uint256 _minInvestors,
-        uint256 _maxInvestors
+        uint256 _maxInvestors,
+        address _eth_oracle,
+        address _hydro_oracle,
     ) 
         onlyAdmin onlyAtSetup public 
     {
@@ -372,6 +382,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         lockPeriod = _lockPeriod;
         minInvestors = _minInvestors;
         maxInvestors = _maxInvestors;
+        ethOracle = _ethOracle;
+        hydroOracle = _hydroOracle;
         // Set flag
         STO_PARAMS_ready = true;
     }
@@ -455,7 +467,22 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
-    // Only at Prelaunch functions: adding and removing resolvers
+    // Only at Prelaunch functions: a
+
+    // Setting oracles
+
+    function addEthOracle(address _newAddress) onlyAdmin public {
+    	ethOracle = _newAddress;
+    }
+
+    function addHydroOracle(address _newAddress) onlyAdmin public {
+    	hydroOracle = _newAddress;
+    }
+
+
+
+
+    // Adding and removing resolvers
 
     // Feature #3
     function addKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
@@ -719,6 +746,16 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
+    // ONLY FOR ORACLES
+
+    function updateEthPrice(uint256 _newPrice) external {
+    	require(msg.sender == ethOracle);
+    	ethPrice = _newPrice;
+    }
+    function updateHydroPrice(uint256 _newPrice) external {
+    	require(msg.sender == hydroOracle);
+    	hydroPrice = _newPrice;
+    }
 
     // PRIVATE FUNCTIONS ----------------------------------------------------------
 
