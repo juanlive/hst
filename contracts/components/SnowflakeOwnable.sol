@@ -105,7 +105,6 @@ contract SnowflakeOwnable is Ownable {
     * @param _newOwner EIN to transfer ownership to
     */
     function transferOwnership(uint _newOwner) public onlySnowflakeOwner {
-        require(identityRegistry.getEIN(_newOwner) > 0);
         _transferOwnership(_newOwner);
     }
 

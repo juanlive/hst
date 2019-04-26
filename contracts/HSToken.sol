@@ -368,8 +368,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 _lockPeriod,
         uint256 _minInvestors,
         uint256 _maxInvestors,
-        address _eth_oracle,
-        address _hydro_oracle,
+        address _ethOracle,
+        address _hydroOracle
     ) 
         onlyAdmin onlyAtSetup public 
     {

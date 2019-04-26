@@ -129,6 +129,8 @@ it('HSToken can be created', async () => {
         true, // _AML_WHITELIST_RESTRICTED
         true, // WHITELIST_RESTRICTED
         true, // BLACKLIST_RESTRICTED
+        false, // ETH_ORACLE
+        false, // HYDRO_ORACLE
       { from: user.address }
       )
   })
@@ -142,6 +144,8 @@ it('HSToken can be created', async () => {
         daysToSeconds(12).toString(), // _lockPeriod,
         "1", // _minInvestors,
         "4", // _maxInvestors
+        user.address, // ethOracle
+        user.address, // hydroOracle
       { from: user.address }
       )
   })
