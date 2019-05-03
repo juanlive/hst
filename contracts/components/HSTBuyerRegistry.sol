@@ -5,54 +5,67 @@ import './SnowflakeOwnable.sol';
 //import '../zeppelin/ownership/Ownable.sol';
 
 // DONE
-// create default categories
-// add categories - onlySnowflakeOwnable
-// add services for a token
-// replace services for a token
-// create contract SnowflakeOwnable and modifier onlySnowflakeOwner
+
 
 // TODO
-// create modifier afterEndOfIssuance
 
-// add services for a token - afterEndOfIssuance
-// record authorizations in IdentityRegistryInterface.sol
+// create structure and mapping for buyers
+// adapt KYC for multiple providers
+// adapt AML for multiple providers
+// create methods for managing buyers
 
-// replace services for a token - afterEndOfIssuance
-// record authorizations in IdentityRegistryInterface.sol
+// analyze the following:
 
-// retrieve all services by category name (example: "KYC")
-// retrieve all services by token address
-// retrieve all tokens by service address
+// age restrictions
+// net-worth restrictions
+// salary restrictions
+// country/geography restrictions on ownership
+// Restricted Transfers - override normal ERC-20 transfer methods to block transfers of HST between wallets if not on a KYC/AML whitelist
 
 
 /**
- * @title HSTServiceRegistry
- * @notice A service registry to hold adresses of service contracts for each security token
- * @dev The Service Registry contract has an array of token address, and provides addresses of service providers for tokens, this simplifies the creation of an ecosystems of service providers.
+ * @title HSTBuyerRegistry
+ * @notice A service registry to hold EINs of buyers for any security token
+ * @dev The Service Registry contract has an array of EINs, holds and provides information for buyers of any token, this simplifies the management of an ecosystems of buyers.
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
-contract HSTServiceRegistry is SnowflakeOwnable {
+contract HSTBuyerRegistry is SnowflakeOwnable {
 
-  // service category symbol => category description
-  mapping(bytes32 => string) serviceCategories;
+  struct buyerData {
+    string  firstName;
+    string  lastName;
+    uint8   age;
+    uint64  networth;
+    uint32  salary;
+    bytes32 isoCountryCode;
+    bytes32 KYCprovider; // adapt pending
+    bytes32 AMLprovider; // adapt pending
+  }
 
-  // token address => service category symbol => service address
-  mapping(address => mapping(bytes32 => address)) public serviceRegistry;
+  // buyer EIN => buyer data
+  mapping(uint => buyerData) public buyerRegistry;
+
+  // buyer EIN => token address => service category for KYC
+  mapping(uint => mapping(address => bytes32)) public kycRegistry;
+
+  // buyer EIN => token address => service category for AML
+  mapping(uint => mapping(address => bytes32)) public amlRegistry;
+
 
   /**
-   * @notice Triggered when category is added
+   * @notice Triggered when buyer is added
    */
-  event AddCategory(bytes32 _name, string _description);
+  event AddBuyer(uint _buyerEIN, string _firstName, string _lastName);
 
   /**
-   * @notice Triggered when service address is added
+   * @notice Triggered when service is added
    */
-  event AddService(address _token, bytes32 _category, address _service);
+  event AddServiceToBuyer(uint _buyerEIN, address _token, bytes32 _category);
 
   /**
-   * @notice Triggered when service address is replaced
+   * @notice Triggered when service is replaced
    */
-  event ReplaceService(address _token, bytes32 _category, address _oldService, address _newService);
+  event ReplaceServiceForBuyer(uint _buyerEIN, address _token, bytes32 _oldCategory, bytes32 _newCategory);
 
   /**
    * @dev Validate that a contract exists in an address received as such
@@ -68,18 +81,8 @@ contract HSTServiceRegistry is SnowflakeOwnable {
 
   /**
    * @notice Constructor
-   * @dev    Create basic service categories
    */
   constructor() public {
-    // create default categories
-    serviceCategories["KYC"]   = "Know Your Customer";
-    emit AddCategory("KYC", "Know Your Customer");
-    serviceCategories["AML"]   = "Anti Money Laundering - Origin of funds";
-    emit AddCategory("AML", "Anti Money Laundering - Origin of funds");
-    serviceCategories["CFT"]   = "Counter Financing of Terrorism - Destination of funds";
-    emit AddCategory("CFT", "Counter Financing of Terrorism - Destination of funds");
-    serviceCategories["LEGAL"] = "Legal advisor for issuance";
-    emit AddCategory("LEGAL", "Legal advisor for issuance");
   }
 
   /**
