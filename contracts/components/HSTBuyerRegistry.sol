@@ -34,22 +34,20 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   struct buyerData {
     string  firstName;
     string  lastName;
-    uint8   age;
-    uint64  networth;
-    uint32  salary;
     bytes32 isoCountryCode;
-    bytes32 KYCprovider; // adapt pending
-    bytes32 AMLprovider; // adapt pending
+    uint8   age;
+    uint64  netWorth;
+    uint32  salary;
   }
 
   // buyer EIN => buyer data
   mapping(uint => buyerData) public buyerRegistry;
 
-  // buyer EIN => token address => service category for KYC
-  mapping(uint => mapping(address => bytes32)) public kycRegistry;
+  // buyer EIN => token address => service category for KYC provider
+  mapping(uint => mapping(address => bytes32)) public kycDetailForBuyers;
 
-  // buyer EIN => token address => service category for AML
-  mapping(uint => mapping(address => bytes32)) public amlRegistry;
+  // buyer EIN => token address => service category for AML provider
+  mapping(uint => mapping(address => bytes32)) public amlDetailForBuyers;
 
 
   /**
@@ -86,14 +84,14 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   }
 
   /**
-   * @notice Add a new service category
+   * @notice Add a new buyer
    * @dev    This method is only callable by the contract's owner
    * @param _name Name of the new service category
    * @param _description Description of the new service category
    */
-  function addCategory(bytes32 _name, string memory _description) onlySnowflakeOwner public {
+  function addBuyer(bytes32 _name, string memory _description) onlySnowflakeOwner public {
     serviceCategories[_name] = _description;
-    emit AddCategory(_name, _description);
+    emit addBuyer(_name, _description);
   }
 
   /**
@@ -101,11 +99,11 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
    *
    * @param _service Address of the service to use
    */
-  function addService(bytes32 _categoryName, address _service) isContract(msg.sender) isContract(_service) public {
+  function addServiceToBuyer(bytes32 _categoryName, address _service) isContract(msg.sender) isContract(_service) public {
     bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
     require (_emptyStringTest.length != 0);
     serviceRegistry[msg.sender][_categoryName] = _service;
-    emit AddService(msg.sender, _categoryName, _service);
+    emit AddServiceToBuyer(msg.sender, _categoryName, _service);
   }
 
     /**
@@ -116,11 +114,11 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
    * @param _oldService Old address for the service
    * @param _newService New address for the service to use
    */
-  function replaceService(bytes32 _categoryName, address _oldService, address _newService) onlyOwner isContract(msg.sender) isContract(_newService) public {
+  function replaceServiceForBuyer(bytes32 _categoryName, address _oldService, address _newService) onlyOwner isContract(msg.sender) isContract(_newService) public {
     bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
     require (_emptyStringTest.length != 0);
     serviceRegistry[msg.sender][_categoryName] = _newService;
-    emit ReplaceService(msg.sender, _categoryName, _oldService, _newService);
+    emit ReplaceServiceForBuyer(msg.sender, _categoryName, _oldService, _newService);
   }
 
 }
