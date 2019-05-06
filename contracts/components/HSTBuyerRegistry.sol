@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 //import '../interfaces/HSTControlService.sol';
 import './SnowflakeOwnable.sol';
+import '../apis/datetimeapi.sol';
 //import '../zeppelin/ownership/Ownable.sol';
 
 // DONE
@@ -10,6 +11,8 @@ import './SnowflakeOwnable.sol';
 // TODO
 
 // create structure and mapping for buyers
+// adapt datetime management
+
 // adapt KYC for multiple providers
 // adapt AML for multiple providers
 // create methods for managing buyers

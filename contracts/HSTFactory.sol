@@ -12,11 +12,6 @@ import './interfaces/IdentityRegistryInterface.sol';
  * Hydro addresses on Rinkeby blockchain
  *********************************
  *
- * Token contract Rinkeby:
- * 0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20
- * Nº decimals: 18
- * Symbol: HYDRO
- *
  * DateTime contract Rinkeby
  * 0x92482Ba45A4D2186DafB486b322C6d0B88410FE7
  *
@@ -25,6 +20,11 @@ import './interfaces/IdentityRegistryInterface.sol';
  *
  * Snowflake contract Rinkeby
  * 0xb0d5a36733886a4c5597849a05b315626af5222e
+ *
+ * Token contract Rinkeby:
+ * 0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20
+ * Nº decimals: 18
+ * Symbol: HYDRO
  *
  */
 
