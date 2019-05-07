@@ -5,28 +5,12 @@ import './components/SnowflakeOwnable.sol';
 import './interfaces/IdentityRegistryInterface.sol';
 
 // TO DO
+
 // check if token exists, then check if it is active
 // allow new deployment if any of both is false, if both are true reject deployment
 
- /*********************************
- * Hydro addresses on Rinkeby blockchain
- *********************************
- *
- * DateTime contract Rinkeby
- * 0x92482Ba45A4D2186DafB486b322C6d0B88410FE7
- *
- * IdentityRegistry contract Rinkeby
- * 0xa7ba71305be9b2dfead947dc0e5730ba2abd28ea
- *
- * Snowflake contract Rinkeby
- * 0xb0d5a36733886a4c5597849a05b315626af5222e
- *
- * Token contract Rinkeby:
- * 0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20
- * Nº decimals: 18
- * Symbol: HYDRO
- *
- */
+// add mainnet addresses
+// add a parameter to choose deployment network
 
 /**
  * @title HSTFactory
@@ -35,18 +19,41 @@ import './interfaces/IdentityRegistryInterface.sol';
  */
 contract HSTFactory is SnowflakeOwnable {
 
-    address public HydroToken;
-    address public IdentityRegistry;
+ /*************************************************
+ * Hydro and other addresses on Rinkeby blockchain
+ **************************************************/
+
+    // DateTime contract Rinkeby
+    address public dateTimeRinkeby = 0x92482Ba45A4D2186DafB486b322C6d0B88410FE7;
+
+    // IdentityRegistry contract Rinkeby
+    address public identityRinkeby = 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA;
+
+    // Snowflake contract Rinkeby
+    address public snowflakeRinkeby = 0xB0D5a36733886a4c5597849a05B315626aF5222E;
+
+    // Hydro Token contract Rinkeby, 18 decimals, symbol = HYDRO
+    address public hydroTokenRinkeby = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
 
     // name of the token => address of the token
     mapping(bytes32 => address) tokens;
 
+
+ /*******************************************************
+ * Hydro and other addresses that will be used to deploy
+ *******************************************************/
+
+    address dateTime;
+    address IdentityRegistry;
+    address HydroToken;
+
    /**
    * @notice Constructor
    */
-    constructor(address _HydroToken, address _IdentityRegistry) public {
-      HydroToken = _HydroToken;
-      IdentityRegistry = _IdentityRegistry;
+    constructor() public {
+      IdentityRegistry = identityRinkeby;
+      HydroToken = hydroTokenRinkeby;
+
     }
 
    /**
