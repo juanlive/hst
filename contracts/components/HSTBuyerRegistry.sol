@@ -34,6 +34,10 @@ import '../apis/datetimeapi.sol';
  */
 contract HSTBuyerRegistry is SnowflakeOwnable {
 
+  //address public dateTimeAddress = 0x92482Ba45A4D2186DafB486b322C6d0B88410FE7;
+
+  DateTime dateTime;
+
   struct buyerData {
     string  firstName;
     string  lastName;
@@ -77,13 +81,14 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     uint length;
     assembly { length := extcodesize(_addr) }
     require(length > 0);
-    _;
+    _; 
   }
 
   /**
    * @notice Constructor
    */
-  constructor() public {
+  constructor(address _dateTimeAddress) public {
+      dateTime = DateTime(_dateTimeAddress);
   }
 
   /**
