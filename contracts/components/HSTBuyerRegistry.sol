@@ -10,15 +10,9 @@ import '../apis/datetimeapi.sol';
 
 // TODO
 
-// create structure and mapping for buyers
-// adapt datetime management
-
-// adapt KYC for multiple providers
-// adapt AML for multiple providers
-// create methods for managing buyers
+// code replace methods
 
 // analyze the following:
-
 // age restrictions
 // net-worth restrictions
 // salary restrictions
@@ -42,7 +36,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     string  firstName;
     string  lastName;
     bytes32 isoCountryCode;
-    uint8   age;
+    uint    birthTimestamp;
     uint64  netWorth;
     uint32  salary;
   }
@@ -63,9 +57,14 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   event AddBuyer(uint _buyerEIN, string _firstName, string _lastName);
 
   /**
-   * @notice Triggered when service is added
+   * @notice Triggered when KYC service is added
    */
-  event AddServiceToBuyer(uint _buyerEIN, address _token, bytes32 _category);
+  event AddKYCServiceToBuyer(uint _buyerEIN, address _token, bytes32 _category);
+
+  /**
+   * @notice Triggered when AML service is added
+   */
+  event AddAMLServiceToBuyer(uint _buyerEIN, address _token, bytes32 _category);
 
   /**
    * @notice Triggered when service is replaced
@@ -80,8 +79,8 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   modifier isContract(address _addr) {
     uint length;
     assembly { length := extcodesize(_addr) }
-    require(length > 0);
-    _; 
+    require(length > 0, "Address cannot be blank");
+    _;
   }
 
   /**
@@ -94,24 +93,58 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   /**
    * @notice Add a new buyer
    * @dev    This method is only callable by the contract's owner
-   * @param _name Name of the new service category
-   * @param _description Description of the new service category
-   */
-  function addBuyer(bytes32 _name, string memory _description) onlySnowflakeOwner public {
-    serviceCategories[_name] = _description;
-    emit addBuyer(_name, _description);
+   * @param _firstName First name of the buyer
+   * @param _lastName Last name of the buyer
+   * @param _isoCountryCode ISO country code of the buyer
+   * @param _yearOfBirth Year of birth of the buyer
+   * @param _monthOfBirth Month of birth of the buyer
+   * @param _dayOfBirth Day of birth of the buyer
+   * @param _netWorth Net worth declared by the buyer
+   * @param _salary Salary declared by the buyer
+  }   */
+  function addBuyer(uint _buyerEIN,
+                    string memory _firstName, string memory _lastName,
+                    bytes32 _isoCountryCode,
+                    uint16 _yearOfBirth, uint8 _monthOfBirth, uint8 _dayOfBirth,
+                    uint64 _netWorth, uint32 _salary)
+                    public onlySnowflakeOwner {
+    buyerData _bd;
+    _bd.firstName = _firstName;
+    _bd.lastName = _lastName;
+    _bd.isoCountryCode = _isoCountryCode;
+    _bd.birthTimestamp = dateTime.toTimestamp(_yearOfBirth, _monthOfBirth, _dayOfBirth);
+    _bd.netWorth = _netWorth;
+    _bd.salary = _salary;
+    buyerRegistry[_buyerEIN] = _bd;
+    emit addBuyer(_buyerEIN, _firstName, _lastName);
   }
 
   /**
-   * @notice Add a new service
+   * @notice Add a new KYC service
    *
-   * @param _service Address of the service to use
+   * @param _EIN EIN of the buyer
+   * @param _tokenFor Token that uses this service
+   * @param _serviceCategory For this buyer and this token, the service category to use for KYC
    */
-  function addServiceToBuyer(bytes32 _categoryName, address _service) isContract(msg.sender) isContract(_service) public {
-    bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
-    require (_emptyStringTest.length != 0);
-    serviceRegistry[msg.sender][_categoryName] = _service;
-    emit AddServiceToBuyer(msg.sender, _categoryName, _service);
+  function addKYCServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(tokenFor) {
+    bytes memory _emptyStringTest = bytes(_serviceCategory);
+    require (_emptyStringTest.length != 0, "Service category cannot be blank");
+    kycDetailForBuyers[_EIN][_tokenFor] = _serviceCategory;
+    emit AddKYCServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
+  }
+
+  /**
+   * @notice Add a new AML service
+   *
+   * @param _EIN EIN of the buyer
+   * @param _tokenFor Token that uses this service
+   * @param _serviceCategory For this buyer and this token, the service category to use for AML
+   */
+  function addAMLServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(tokenFor) {
+    bytes memory _emptyStringTest = bytes(_serviceCategory);
+    require (_emptyStringTest.length != 0, "Service category cannot be blank");
+    amlDetailForBuyers[_EIN][_tokenFor] = _serviceCategory;
+    emit AddAMLServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
   }
 
     /**
