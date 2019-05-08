@@ -59,17 +59,23 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   /**
    * @notice Triggered when KYC service is added
    */
-  event AddKYCServiceToBuyer(uint _buyerEIN, address _token, bytes32 _category);
+  event AddKYCServiceToBuyer(uint _buyerEIN, address _token, bytes32 _serviceCategory);
 
   /**
    * @notice Triggered when AML service is added
    */
-  event AddAMLServiceToBuyer(uint _buyerEIN, address _token, bytes32 _category);
+  event AddAMLServiceToBuyer(uint _buyerEIN, address _token, bytes32 _serviceCategory);
 
   /**
-   * @notice Triggered when service is replaced
+   * @notice Triggered when KYC service is replaced
    */
-  event ReplaceServiceForBuyer(uint _buyerEIN, address _token, bytes32 _oldCategory, bytes32 _newCategory);
+  event ReplaceKYCServiceForBuyer(uint _buyerEIN, address _token, bytes32 _serviceCategory);
+
+  /**
+   * @notice Triggered when AML service is replaced
+   */
+  event ReplaceAMLServiceForBuyer(uint _buyerEIN, address _token, bytes32 _serviceCategory);
+
 
   /**
    * @dev Validate that a contract exists in an address received as such
@@ -120,7 +126,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   }
 
   /**
-   * @notice Add a new KYC service
+   * @notice Add a new KYC service for a buyer
    *
    * @param _EIN EIN of the buyer
    * @param _tokenFor Token that uses this service
@@ -134,7 +140,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   }
 
   /**
-   * @notice Add a new AML service
+   * @notice Add a new AML service for a buyer
    *
    * @param _EIN EIN of the buyer
    * @param _tokenFor Token that uses this service
@@ -148,18 +154,35 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   }
 
     /**
-   * @notice Replaces the address pointer to a service for a new address
+   * @notice Replaces an existing KYC service for a buyer
    *
    * @dev This method is only callable by the contract's owner
    *
-   * @param _oldService Old address for the service
-   * @param _newService New address for the service to use
+   * @param _EIN EIN of the buyer
+   * @param _tokenFor Token that uses this service
+   * @param _serviceCategory For this buyer and this token, the service category to use for KYC
    */
-  function replaceServiceForBuyer(bytes32 _categoryName, address _oldService, address _newService) onlyOwner isContract(msg.sender) isContract(_newService) public {
-    bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
-    require (_emptyStringTest.length != 0);
-    serviceRegistry[msg.sender][_categoryName] = _newService;
-    emit ReplaceServiceForBuyer(msg.sender, _categoryName, _oldService, _newService);
+  function replaceKYCServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(tokenFor) {
+    bytes memory _emptyStringTest = bytes(_serviceCategory);
+    require (_emptyStringTest.length != 0, "Service category cannot be blank");
+    kycDetailForBuyers[_EIN][_tokenFor] = _serviceCategory;
+    emit ReplaceKYCServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
+  }
+
+    /**
+   * @notice Replaces an existing AML service for a buyer
+   *
+   * @dev This method is only callable by the contract's owner
+   *
+   * @param _EIN EIN of the buyer
+   * @param _tokenFor Token that uses this service
+   * @param _serviceCategory For this buyer and this token, the service category to use for KYC
+   */
+  function replaceAMLServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(tokenFor) {
+    bytes memory _emptyStringTest = bytes(_serviceCategory);
+    require (_emptyStringTest.length != 0, "Service category cannot be blank");
+    amlDetailForBuyers[_EIN][_tokenFor] = _serviceCategory;
+    emit ReplaceAMLServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
   }
 
 }
