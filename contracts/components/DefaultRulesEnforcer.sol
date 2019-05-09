@@ -57,5 +57,10 @@ contract DefaultRulesEnforcer {
     emit LiftCountryBan(_tokenAddress, _isoCountryCode);
   }
 
+    function checkRules() {
+    
+
+    }
+
 }
 
