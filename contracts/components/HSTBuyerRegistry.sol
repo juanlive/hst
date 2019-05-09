@@ -5,12 +5,7 @@ import './SnowflakeOwnable.sol';
 import '../apis/datetimeapi.sol';
 //import '../zeppelin/ownership/Ownable.sol';
 
-// DONE
-
-
 // TODO
-
-// code replace methods
 
 // analyze the following:
 // age restrictions
@@ -41,14 +36,16 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     uint32  salary;
   }
 
+  struct buyerServicesDetail {
+    bytes32  kycProvider;
+    bytes32  amlProvider;
+  }
+
   // buyer EIN => buyer data
   mapping(uint => buyerData) public buyerRegistry;
 
-  // buyer EIN => token address => service category for KYC provider
-  mapping(uint => mapping(address => bytes32)) public kycDetailForBuyers;
-
-  // buyer EIN => token address => service category for AML provider
-  mapping(uint => mapping(address => bytes32)) public amlDetailForBuyers;
+  // buyer EIN => token address => service details for buyer
+  mapping(uint => mapping(address => buyerServicesDetail)) public serviceDetailForBuyers;
 
 
   /**
@@ -135,7 +132,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   function addKYCServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(tokenFor) {
     bytes memory _emptyStringTest = bytes(_serviceCategory);
     require (_emptyStringTest.length != 0, "Service category cannot be blank");
-    kycDetailForBuyers[_EIN][_tokenFor] = _serviceCategory;
+    buyerServicesDetail[_EIN][_tokenFor].kycProvider = _serviceCategory;
     emit AddKYCServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
   }
 
@@ -149,7 +146,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   function addAMLServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(tokenFor) {
     bytes memory _emptyStringTest = bytes(_serviceCategory);
     require (_emptyStringTest.length != 0, "Service category cannot be blank");
-    amlDetailForBuyers[_EIN][_tokenFor] = _serviceCategory;
+    buyerServicesDetail[_EIN][_tokenFor].amlProvider = _serviceCategory;
     emit AddAMLServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
   }
 
@@ -165,7 +162,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   function replaceKYCServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(tokenFor) {
     bytes memory _emptyStringTest = bytes(_serviceCategory);
     require (_emptyStringTest.length != 0, "Service category cannot be blank");
-    kycDetailForBuyers[_EIN][_tokenFor] = _serviceCategory;
+    buyerServicesDetail[_EIN][_tokenFor].kycProvider = _serviceCategory;
     emit ReplaceKYCServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
   }
 
@@ -181,7 +178,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   function replaceAMLServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(tokenFor) {
     bytes memory _emptyStringTest = bytes(_serviceCategory);
     require (_emptyStringTest.length != 0, "Service category cannot be blank");
-    amlDetailForBuyers[_EIN][_tokenFor] = _serviceCategory;
+    buyerServicesDetail[_EIN][_tokenFor].amlProvider = _serviceCategory;
     emit ReplaceAMLServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
   }
 

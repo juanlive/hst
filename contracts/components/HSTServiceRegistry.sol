@@ -33,6 +33,9 @@ import './SnowflakeOwnable.sol';
  */
 contract HSTServiceRegistry is SnowflakeOwnable {
 
+  // default rules enforcer
+  address defaultRulesEnforcer;
+
   // service category symbol => category description
   mapping(bytes32 => string) serviceCategories;
 
@@ -52,7 +55,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   /**
    * @notice Triggered when service address is replaced
    */
-  event ReplaceService(address _token, bytes32 _category, address _oldService, address _newService);
+  event ReplaceService(address _token, bytes32 _category, address _newService);
 
   /**
    * @dev Validate that a contract exists in an address received as such
@@ -62,7 +65,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   modifier isContract(address _addr) {
     uint length;
     assembly { length := extcodesize(_addr) }
-    require(length > 0);
+    require(length > 0, "This is not a contract");
     _;
   }
 
@@ -70,13 +73,15 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @notice Constructor
    * @dev    Create basic service categories
    */
-  constructor() public {
+  constructor(address _defaultRulesEnforcer) public {
+    // set default rules enforcer
+    defaultRulesEnforcer = _defaultRulesEnforcer;
     // create default categories
-    serviceCategories["KYC"]   = "Know Your Customer";
+    serviceCategories["KYC"] = "Know Your Customer";
     emit AddCategory("KYC", "Know Your Customer");
-    serviceCategories["AML"]   = "Anti Money Laundering - Origin of funds";
+    serviceCategories["AML"] = "Anti Money Laundering - Origin of funds";
     emit AddCategory("AML", "Anti Money Laundering - Origin of funds");
-    serviceCategories["CFT"]   = "Counter Financing of Terrorism - Destination of funds";
+    serviceCategories["CFT"] = "Counter Financing of Terrorism - Destination of funds";
     emit AddCategory("CFT", "Counter Financing of Terrorism - Destination of funds");
     serviceCategories["LEGAL"] = "Legal advisor for issuance";
     emit AddCategory("LEGAL", "Legal advisor for issuance");
@@ -88,7 +93,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _name Name of the new service category
    * @param _description Description of the new service category
    */
-  function addCategory(bytes32 _name, string memory _description) onlySnowflakeOwner public {
+  function addCategory(bytes32 _name, string memory _description) public onlySnowflakeOwner {
     serviceCategories[_name] = _description;
     emit AddCategory(_name, _description);
   }
@@ -98,9 +103,9 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    *
    * @param _service Address of the service to use
    */
-  function addService(bytes32 _categoryName, address _service) isContract(msg.sender) isContract(_service) public {
+  function addService(bytes32 _categoryName, address _service) public isContract(msg.sender) isContract(_service) {
     bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
-    require (_emptyStringTest.length != 0);
+    require (_emptyStringTest.length != 0, "Category name cannot be blank");
     serviceRegistry[msg.sender][_categoryName] = _service;
     emit AddService(msg.sender, _categoryName, _service);
   }
@@ -113,11 +118,11 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _oldService Old address for the service
    * @param _newService New address for the service to use
    */
-  function replaceService(bytes32 _categoryName, address _oldService, address _newService) onlyOwner isContract(msg.sender) isContract(_newService) public {
+  function replaceService(bytes32 _categoryName, address _newService) public onlyOwner isContract(msg.sender) isContract(_newService) {
     bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
-    require (_emptyStringTest.length != 0);
+    require (_emptyStringTest.length != 0, "Category name cannot be blank");
     serviceRegistry[msg.sender][_categoryName] = _newService;
-    emit ReplaceService(msg.sender, _categoryName, _oldService, _newService);
+    emit ReplaceService(msg.sender, _categoryName, _newService);
   }
 
 }
