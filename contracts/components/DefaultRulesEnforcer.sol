@@ -27,17 +27,35 @@ contract DefaultRulesEnforcer {
   /**
    * @notice Triggered when rules data is added for a token
    */
-  event AddTokenData(address _tokenAddress, bytes32 isoCountryCode);
+  event AddTokenData(address _tokenAddress);
 
   /**
    * @notice Triggered when a country is banned for a token
    */
-  event AddCountryBan(address _tokenAddress, bytes32 isoCountryCode);
+  event AddCountryBan(address _tokenAddress, bytes32 _isoCountryCode);
 
   /**
    * @notice Triggered when a country ban is lifted for a token
    */
-  event LiftCountryBan(address _tokenAddress);
+  event LiftCountryBan(address _tokenAddress, bytes32 _isoCountryCode);
+
+
+  function addTokenData(address _tokenAddress, uint _minimumAge, uint64  _minimumNetWorth, uint32  _minimumSalary) public {
+    tokenData[_tokenAddress].minimumAge = _minimumAge;
+    tokenData[_tokenAddress].minimumNetWorth = _minimumNetWorth;
+    tokenData[_tokenAddress].minimumSalary = _minimumSalary;
+    emit AddTokenData(_tokenAddress);
+  }
+
+  function addCountryBan(address _tokenAddress, bytes32 _isoCountryCode) public {
+    bannedCountries[_tokenAddress][_isoCountryCode] = true;
+    emit AddCountryBan(_tokenAddress, _isoCountryCode);
+  }
+
+  function liftCountryBan(address _tokenAddress, bytes32 _isoCountryCode) public {
+    bannedCountries[_tokenAddress][_isoCountryCode] = false;
+    emit LiftCountryBan(_tokenAddress, _isoCountryCode);
+  }
 
 }
 
