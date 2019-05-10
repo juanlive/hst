@@ -76,7 +76,7 @@ contract SnowflakeOwnable is Ownable {
     * @dev This works on EINs, not on addresses
     */
     modifier onlySnowflakeOwner() {
-        require(isOwner());
+        require(isOwner(), "Must be owner to call this function");
         _;
     }
 
@@ -114,8 +114,8 @@ contract SnowflakeOwnable is Ownable {
     * @param _newOwner EIN to transfer ownership to
     */
     function _transferOwnership(uint _newOwner) internal onlySnowflakeOwner {
-        require(identityRegistry.identityExists(_newOwner));
-        require(_newOwner != 0);
+        require(identityRegistry.identityExists(_newOwner), "Owner must exist");
+        require(_newOwner != 0, "Owner must exist");
         emit OwnershipTransferred(ownerEIN, _newOwner);
         ownerEIN = _newOwner;
     }

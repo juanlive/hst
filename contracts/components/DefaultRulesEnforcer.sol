@@ -27,7 +27,7 @@ contract DefaultRulesEnforcer {
   /**
    * @notice Triggered when rules data is added for a token
    */
-  event AddTokenData(address _tokenAddress);
+  event TokenValuesAssigned(address _tokenAddress);
 
   /**
    * @notice Triggered when a country is banned for a token
@@ -40,11 +40,11 @@ contract DefaultRulesEnforcer {
   event LiftCountryBan(address _tokenAddress, bytes32 _isoCountryCode);
 
 
-  function addTokenData(address _tokenAddress, uint _minimumAge, uint64  _minimumNetWorth, uint32  _minimumSalary) public {
+  function assignTokenValues(address _tokenAddress, uint _minimumAge, uint64  _minimumNetWorth, uint32  _minimumSalary) public {
     tokenData[_tokenAddress].minimumAge = _minimumAge;
     tokenData[_tokenAddress].minimumNetWorth = _minimumNetWorth;
     tokenData[_tokenAddress].minimumSalary = _minimumSalary;
-    emit AddTokenData(_tokenAddress);
+    emit TokenValuesAssigned(_tokenAddress);
   }
 
   function addCountryBan(address _tokenAddress, bytes32 _isoCountryCode) public {
@@ -57,10 +57,32 @@ contract DefaultRulesEnforcer {
     emit LiftCountryBan(_tokenAddress, _isoCountryCode);
   }
 
-    function checkRules() {
-    
+  function checkRules() public {
+    // check if token has designated values
+    bool _designatedDefaultValues = true;
+    if ((tokenData[msg.sender].minimumAge == 0) ||
+        (tokenData[msg.sender].minimumNetWorth == 0) ||
+        (tokenData[msg.sender].minimumSalary == 0)) {
+        _designatedDefaultValues = false;
+        }
+    require(_designatedDefaultValues == true, "Token must designated default values");
+    // enforce rules for the investor:
 
-    }
+    // KYC restrictions
+
+    // AML restrictions
+
+    // age restrictions
+
+    // net-worth restrictions
+
+    // salary restrictions
+
+    // accredited investor status
+
+    // country/geography restrictions on ownership
+
+  }
 
 }
 

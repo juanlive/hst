@@ -8,10 +8,6 @@ import '../apis/datetimeapi.sol';
 // TODO
 
 // analyze the following:
-// age restrictions
-// net-worth restrictions
-// salary restrictions
-// country/geography restrictions on ownership
 // Restricted Transfers - override normal ERC-20 transfer methods to block transfers of HST between wallets if not on a KYC/AML whitelist
 
 

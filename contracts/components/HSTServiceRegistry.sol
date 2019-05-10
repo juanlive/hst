@@ -77,14 +77,16 @@ contract HSTServiceRegistry is SnowflakeOwnable {
     // set default rules enforcer
     defaultRulesEnforcer = _defaultRulesEnforcer;
     // create default categories
-    serviceCategories["KYC"] = "Know Your Customer";
-    emit AddCategory("KYC", "Know Your Customer");
     serviceCategories["AML"] = "Anti Money Laundering - Origin of funds";
     emit AddCategory("AML", "Anti Money Laundering - Origin of funds");
     serviceCategories["CFT"] = "Counter Financing of Terrorism - Destination of funds";
     emit AddCategory("CFT", "Counter Financing of Terrorism - Destination of funds");
+    serviceCategories["KYC"] = "Know Your Customer";
+    emit AddCategory("KYC", "Know Your Customer");
     serviceCategories["LEGAL"] = "Legal advisor for issuance";
     emit AddCategory("LEGAL", "Legal advisor for issuance");
+    serviceCategories["RULES"] = "Rules enforcer for Token";
+    emit AddCategory("RULES", "Rules enforcer for Token");
   }
 
   /**
@@ -110,6 +112,10 @@ contract HSTServiceRegistry is SnowflakeOwnable {
     emit AddService(msg.sender, _categoryName, _service);
   }
 
+  function addDefaultRulesService() public isContract(msg.sender) {
+      serviceRegistry[msg.sender][_categoryName] = defaultRulesEnforcer;
+  }
+
     /**
    * @notice Replaces the address pointer to a service for a new address
    *
@@ -125,4 +131,17 @@ contract HSTServiceRegistry is SnowflakeOwnable {
     emit ReplaceService(msg.sender, _categoryName, _newService);
   }
 
+  /**
+   * @notice Get existing service address
+   * @dev if checking about "RULES" services and it is blank, fill it with default
+   *
+   * @param _service Address of the service to use
+   */
+  function getService(bytes32 _categoryName) public isContract(msg.sender) isContract(_service) returns(address _service) {
+    bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
+    require (_emptyStringTest.length != 0, "Category name cannot be blank");
+    return serviceRegistry[msg.sender][_categoryName];
+  }
+
 }
+
