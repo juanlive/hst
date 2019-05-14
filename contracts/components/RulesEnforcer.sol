@@ -170,7 +170,7 @@ contract RulesEnforcer is SnowflakeOwnable {
     * @param _serviceCategory For this buyer and this token, the service category to use for KYC
     */
     function addKYCServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(_tokenFor) {
-        bytes memory _emptyStringTest = bytes(_serviceCategory);
+        bytes32 _emptyStringTest = _serviceCategory;
         require (_emptyStringTest.length != 0, "Service category cannot be blank");
         serviceDetailForBuyers[_EIN][_tokenFor].kycProvider = _serviceCategory;
         emit AddKYCServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
@@ -184,7 +184,7 @@ contract RulesEnforcer is SnowflakeOwnable {
     * @param _serviceCategory For this buyer and this token, the service category to use for AML
     */
     function addAMLServiceToBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(_tokenFor) {
-        bytes memory _emptyStringTest = bytes(_serviceCategory);
+        bytes32 _emptyStringTest = _serviceCategory;
         require (_emptyStringTest.length != 0, "Service category cannot be blank");
         serviceDetailForBuyers[_EIN][_tokenFor].amlProvider = _serviceCategory;
         emit AddAMLServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
@@ -200,7 +200,7 @@ contract RulesEnforcer is SnowflakeOwnable {
     * @param _serviceCategory For this buyer and this token, the service category to use for KYC
     */
     function replaceKYCServiceForBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(_tokenFor) {
-        bytes memory _emptyStringTest = bytes(_serviceCategory);
+        bytes32 _emptyStringTest = _serviceCategory;
         require (_emptyStringTest.length != 0, "Service category cannot be blank");
         serviceDetailForBuyers[_EIN][_tokenFor].kycProvider = _serviceCategory;
         emit ReplaceKYCServiceForBuyer(_EIN, _tokenFor, _serviceCategory);
@@ -216,7 +216,7 @@ contract RulesEnforcer is SnowflakeOwnable {
     * @param _serviceCategory For this buyer and this token, the service category to use for KYC
     */
     function replaceAMLServiceForBuyer(uint _EIN, address _tokenFor, bytes32 _serviceCategory) public isContract(_tokenFor) {
-        bytes memory _emptyStringTest = bytes(_serviceCategory);
+        bytes32 _emptyStringTest = _serviceCategory;
         require (_emptyStringTest.length != 0, "Service category cannot be blank");
         serviceDetailForBuyers[_EIN][_tokenFor].amlProvider = _serviceCategory;
         emit ReplaceAMLServiceForBuyer(_EIN, _tokenFor, _serviceCategory);
