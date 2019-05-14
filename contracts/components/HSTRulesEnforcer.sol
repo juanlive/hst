@@ -11,7 +11,7 @@ import '../components/DateTime.sol';
 
 
 /**
- * @title RulesEnforcer
+ * @title HSTRulesEnforcer
  *
  * @notice Rules enforcement and registry of buyers
  *
@@ -25,7 +25,7 @@ import '../components/DateTime.sol';
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
 
-contract RulesEnforcer is SnowflakeOwnable {
+contract HSTRulesEnforcer is SnowflakeOwnable {
 
     // token rules data
 
