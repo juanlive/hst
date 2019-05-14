@@ -29,7 +29,7 @@ contract RulesEnforcer is SnowflakeOwnable {
 
     // token rules data
 
-    struct rulesData {
+    struct tokenRulesData {
         uint    minimumAge;
         uint64  minimumNetWorth;
         uint32  minimumSalary;
@@ -37,7 +37,7 @@ contract RulesEnforcer is SnowflakeOwnable {
     }
 
     // token address => data to enforce rules
-    mapping(address => rulesData) public tokenData;
+    mapping(address => tokenRulesData) public tokenData;
 
     // token address => ISO country code => country is banned
     mapping(address => mapping(bytes32 => bool)) public bannedCountries;
@@ -263,17 +263,35 @@ contract RulesEnforcer is SnowflakeOwnable {
 
         // AML restrictions
 
+    struct tokenRulesData {
+        uint    minimumAge;
+        uint64  minimumNetWorth;
+        uint32  minimumSalary;
+        bool    accreditedInvestorStatusRequired;
+    }
+    struct buyerData {
+        string  firstName;
+        string  lastName;
+        bytes32 isoCountryCode;
+        uint    birthTimestamp;
+        uint64  netWorth;
+        uint32  salary;
+        bool    accreditedInvestorStatus;
+    }
+
         // age restrictions *** WORKING ***
-        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
-            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+        if (tokenData[msg.sender].minimumAge > 0) {
+            // TO DO calculate buyer age
+            buyerAge = 0;
+            require (buyerAge >= minimumAge, "Buyer must be older than minimum age");
         }
-        // net-worth restrictions *** WORKING ***
-        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
-            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+        // net-worth restrictions
+        if (tokenData[msg.sender].minimumNetWorth > 0) {
+            require (buyerRegistry[_buyerEIN].netWorth >= tokenData[msg.sender].minimumNetWorth, "Buyer must reach minimum net worth");
         }
-        // salary restrictions *** WORKING ***
-        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
-            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+        // salary restrictions
+        if (tokenData[msg.sender].minimumSalary > 0) {
+            require (buyerRegistry[_buyerEIN].salary >= tokenData[msg.sender].minimumSalary, "Buyer must reach minimum salary");
         }
         // accredited investor status
         if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
