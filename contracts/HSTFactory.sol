@@ -24,16 +24,16 @@ contract HSTFactory is SnowflakeOwnable {
  **************************************************/
 
     // DateTime contract Rinkeby
-    address public dateTimeRinkeby = 0x92482Ba45A4D2186DafB486b322C6d0B88410FE7;
+    //address public dateTimeRinkeby = 0x92482Ba45A4D2186DafB486b322C6d0B88410FE7;
 
     // IdentityRegistry contract Rinkeby
-    address public identityRinkeby = 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA;
+    //address public identityRinkeby = 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA;
 
     // Snowflake contract Rinkeby
-    address public snowflakeRinkeby = 0xB0D5a36733886a4c5597849a05B315626aF5222E;
+    //address public snowflakeRinkeby = 0xB0D5a36733886a4c5597849a05B315626aF5222E;
 
     // Hydro Token contract Rinkeby, 18 decimals, symbol = HYDRO
-    address public hydroTokenRinkeby = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
+    //address public hydroTokenRinkeby = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
 
     // name of the token => address of the token
     mapping(bytes32 => address) tokens;
@@ -44,16 +44,16 @@ contract HSTFactory is SnowflakeOwnable {
  *******************************************************/
 
     address dateTime;
-    address IdentityRegistry;
-    address HydroToken;
+    address identityRegistry;
+    address hydroToken;
 
    /**
    * @notice Constructor
    */
-    constructor() public {
-      IdentityRegistry = identityRinkeby;
-      HydroToken = hydroTokenRinkeby;
-
+    constructor(address _dateTime, address _identityRegistry, address _hydroToken) public {
+      dateTime = _dateTime;
+      identityRegistry = _identityRegistry;
+      hydroToken = _hydroToken;
     }
 
    /**
@@ -86,10 +86,11 @@ contract HSTFactory is SnowflakeOwnable {
     event ContractDeployed(bytes32 _name, bytes32 _type, address indexed _addr);
 
     /**
-    * @notice Deploy a Hydro Securities Token contract set 
+    * @notice Deploy a Hydro Securities Token contract set
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deploySecuritiesTokenContractSet(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public payable returns(bool) {
+    function deploySecuritiesTokenContractSet(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals)
+    public payable returns(bool) {
       emit SecuritiesDeployStarted(_tokenName);
       bool _deploymentAllowed = true;
       // check if token to be deployed already exists in the list of tokens
@@ -100,7 +101,7 @@ contract HSTFactory is SnowflakeOwnable {
           // token exists and it is alive, cancel deploy
           _deploymentAllowed = false;
           emit SecuritiesDeployCancelled(_tokenName, "Token exists and it is alive");
-        }  
+        }
       } else {
           _deploymentAllowed = false;
       }
@@ -111,11 +112,12 @@ contract HSTFactory is SnowflakeOwnable {
     }
 
     /**
-    * @notice Deploy a Hydro Securities Token contract   
+    * @notice Deploy a Hydro Securities Token contract
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deployToken(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals) public onlySnowflakeOwner returns(address) {
-      HSToken _token = new HSToken(1, _tokenName, _description, _symbol, _decimals, HydroToken, IdentityRegistry);
+    function deployToken(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals)
+     public onlySnowflakeOwner returns(address) {
+      HSToken _token = new HSToken(1, _tokenName, _description, _symbol, _decimals, hydroToken, identityRegistry);
       address _tokenAddress = address(_token);
       tokens[_tokenName] = _tokenAddress;
       emit ContractDeployed(_tokenName, "TOKEN", _tokenAddress);
