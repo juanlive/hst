@@ -27,12 +27,13 @@ import '../components/DateTime.sol';
 
 contract RulesEnforcer is SnowflakeOwnable {
 
-    // rules data
+    // token rules data
 
     struct rulesData {
         uint    minimumAge;
         uint64  minimumNetWorth;
         uint32  minimumSalary;
+        bool    accreditedInvestorStatusRequired;
     }
 
     // token address => data to enforce rules
@@ -52,6 +53,7 @@ contract RulesEnforcer is SnowflakeOwnable {
         uint    birthTimestamp;
         uint64  netWorth;
         uint32  salary;
+        bool    accreditedInvestorStatus;
     }
 
     struct buyerServicesDetail {
@@ -224,10 +226,15 @@ contract RulesEnforcer is SnowflakeOwnable {
 
     // functions for rules enforcement
 
-    function assignTokenValues(address _tokenAddress, uint _minimumAge, uint64  _minimumNetWorth, uint32  _minimumSalary) public {
+    function assignTokenValues(address _tokenAddress,
+                                uint _minimumAge,
+                                uint64  _minimumNetWorth,
+                                uint32  _minimumSalary,
+                                bool _accreditedInvestorStatusRequired) public {
         tokenData[_tokenAddress].minimumAge = _minimumAge;
         tokenData[_tokenAddress].minimumNetWorth = _minimumNetWorth;
         tokenData[_tokenAddress].minimumSalary = _minimumSalary;
+        tokenData[_tokenAddress].accreditedInvestorStatusRequired = _accreditedInvestorStatusRequired;
         emit TokenValuesAssigned(_tokenAddress);
     }
 
@@ -241,7 +248,7 @@ contract RulesEnforcer is SnowflakeOwnable {
         emit LiftCountryBan(_tokenAddress, _isoCountryCode);
     }
 
-    function checkRules() public {
+    function checkRules(uint _buyerEIN) public {
         // check if token has designated values
         bool _designatedDefaultValues = true;
         if ((tokenData[msg.sender].minimumAge == 0) ||
@@ -256,15 +263,24 @@ contract RulesEnforcer is SnowflakeOwnable {
 
         // AML restrictions
 
-        // age restrictions
-
-        // net-worth restrictions
-
-        // salary restrictions
-
+        // age restrictions *** WORKING ***
+        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
+            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+        }
+        // net-worth restrictions *** WORKING ***
+        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
+            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+        }
+        // salary restrictions *** WORKING ***
+        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
+            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+        }
         // accredited investor status
-
+        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
+            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+        }
         // country/geography restrictions on ownership
+        require (bannedCountries[msg.sender][buyerRegistry[_buyerEIN].isoCountryCode] == false, "Country of Buyer must not be banned for token");
 
     }
 
