@@ -27,8 +27,11 @@ import './SnowflakeOwnable.sol';
 
 /**
  * @title HSTServiceRegistry
+ *
  * @notice A service registry to hold adresses of service contracts for each security token
+ *
  * @dev The Service Registry contract has an array of token address, and provides addresses of service providers for tokens, this simplifies the creation of an ecosystems of service providers.
+ *
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
 contract HSTServiceRegistry is SnowflakeOwnable {
@@ -36,8 +39,8 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   // default rules enforcer
   address defaultRulesEnforcer;
 
-  // service category symbol => category description
-  mapping(bytes32 => string) serviceCategories;
+  // token address => service category symbol => category description
+  mapping(address => mapping(bytes32 => string)) serviceCategories;
 
   // token address => service category symbol => service address
   mapping(address => mapping(bytes32 => address)) public serviceRegistry;
@@ -45,7 +48,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   /**
    * @notice Triggered when category is added
    */
-  event AddCategory(bytes32 _name, string _description);
+  event AddCategory(address _tokenAddress, bytes32 _name, string _description);
 
   /**
    * @notice Triggered when service address is added
@@ -76,28 +79,19 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   constructor(address _defaultRulesEnforcer) public {
     // set default rules enforcer
     defaultRulesEnforcer = _defaultRulesEnforcer;
-    // create default categories
-    serviceCategories["AML"] = "Anti Money Laundering - Origin of funds";
-    emit AddCategory("AML", "Anti Money Laundering - Origin of funds");
-    serviceCategories["CFT"] = "Counter Financing of Terrorism - Destination of funds";
-    emit AddCategory("CFT", "Counter Financing of Terrorism - Destination of funds");
-    serviceCategories["KYC"] = "Know Your Customer";
-    emit AddCategory("KYC", "Know Your Customer");
-    serviceCategories["LEGAL"] = "Legal advisor for issuance";
-    emit AddCategory("LEGAL", "Legal advisor for issuance");
-    serviceCategories["RULES"] = "Rules enforcer for Token";
-    emit AddCategory("RULES", "Rules enforcer for Token");
   }
 
   /**
    * @notice Add a new service category
    * @dev    This method is only callable by the contract's owner
-   * @param _name Name of the new service category
+   * @param _categoryName Name of the new service category
    * @param _description Description of the new service category
    */
-  function addCategory(bytes32 _name, string memory _description) public onlySnowflakeOwner {
-    serviceCategories[_name] = _description;
-    emit AddCategory(_name, _description);
+  function addCategory(address _tokenAddress, bytes32 _categoryName, string memory _description) public onlySnowflakeOwner {
+    require (_tokenAddress != address(0), "Token address cannot be blank");
+    require (_categoryName.length != 0, "Category name cannot be blank");
+    serviceCategories[_tokenAddress][_categoryName] = _description;
+    emit AddCategory(_tokenAddress, _categoryName, _description);
   }
 
   /**
@@ -105,11 +99,11 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    *
    * @param _service Address of the service to use
    */
-  function addService(bytes32 _categoryName, address _service) public isContract(msg.sender) isContract(_service) {
-    bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
-    require (_emptyStringTest.length != 0, "Category name cannot be blank");
-    serviceRegistry[msg.sender][_categoryName] = _service;
-    emit AddService(msg.sender, _categoryName, _service);
+  function addService(address _tokenAddress, bytes32 _categoryName, address _service) public isContract(msg.sender) isContract(_service) {
+    require (_tokenAddress != address(0), "Token address cannot be blank");
+    require (_categoryName.length != 0, "Category name cannot be blank");
+    serviceRegistry[_tokenAddress][_categoryName] = _service;
+    emit AddService(_tokenAddress, _categoryName, _service);
   }
 
   function addDefaultRulesService() public isContract(msg.sender) {
@@ -124,11 +118,12 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _categoryName Category name of the service
    * @param _newService New address for the service to use
    */
-  function replaceService(bytes32 _categoryName, address _newService) public onlyOwner isContract(msg.sender) isContract(_newService) {
-    bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
-    require (_emptyStringTest.length != 0, "Category name cannot be blank");
-    serviceRegistry[msg.sender][_categoryName] = _newService;
-    emit ReplaceService(msg.sender, _categoryName, _newService);
+  function replaceService(address _tokenAddress, bytes32 _categoryName, address _newService)
+    public onlyOwner isContract(msg.sender) isContract(_newService) {
+    require (_tokenAddress != address(0), "Token address cannot be blank");
+    require (_categoryName.length != 0, "Category name cannot be blank");
+    serviceRegistry[_tokenAddress][_categoryName] = _newService;
+    emit ReplaceService(_tokenAddress, _categoryName, _newService);
   }
 
   /**
@@ -137,10 +132,11 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    *
    * @param _service Address of the service to use
    */
-  function getService(bytes32 _categoryName) public isContract(msg.sender) isContract(_service) returns(address _service) {
-    bytes memory _emptyStringTest = bytes(serviceCategories[_categoryName]);
-    require (_emptyStringTest.length != 0, "Category name cannot be blank");
-    return serviceRegistry[msg.sender][_categoryName];
+  function getService(address _tokenAddress, bytes32 _categoryName)
+    public view isContract(msg.sender) isContract(_service) returns(address _service) {
+    require (_tokenAddress != address(0), "Token address cannot be blank");
+    require (_categoryName.length != 0, "Category name cannot be blank");
+    return serviceRegistry[_tokenAddress][_categoryName];
   }
 
 }

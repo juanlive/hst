@@ -31,7 +31,7 @@ import './zeppelin/ownership/Ownable.sol';
 
 /**
  * @title HSToken
- * @notice The Hydro Security Token is a system to allow people to create their own Security Tokens, 
+ * @notice The Hydro Security Token is a system to allow people to create their own Security Tokens,
  *         related to their Snowflake identities and attached to external KYC, AML and other rules.
  * @author Juan Livingston <juanlivingston@gmail.com>
  */
@@ -63,14 +63,14 @@ contract MAIN_PARAMS {
 contract STO_FLAGS {
     bool public STO_FLAGS_ready;
 
-    bool public LIMITED_OWNERSHIP; 
+    bool public LIMITED_OWNERSHIP;
     bool public PERIOD_LOCKED;  // Locked period active or inactive
     bool public PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
     bool public HYDRO_AMOUNT_TYPE; // is Hydro amount limited
     bool public ETH_AMOUNT_TYPE; // is Ether amount limited
     bool public HYDRO_ALLOWED; // Is Hydro allowed to purchase
     bool public ETH_ALLOWED; // Is Ether allowed for purchase
-    bool public KYC_RESTRICTED; 
+    bool public KYC_RESTRICTED;
     bool public AML_RESTRICTED;
     bool public WHITELIST_RESTRICTED;
     bool public BLACKLIST_RESTRICTED;
@@ -95,7 +95,7 @@ contract STO_PARAMS {
 contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     using SafeMath for uint256;
-    
+
     enum Stage {
         SETUP, PRELAUNCH, ACTIVE, FINALIZED
     }
@@ -180,7 +180,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // TokenWithDates private tokenWithDates;
 
     event HydroSTCreated(
-        uint256 indexed id, 
+        uint256 indexed id,
         bytes32 name,
         string symbol,
         uint8 decimals,
@@ -253,11 +253,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         address _HydroToken,
         address _IdentityRegistry
         // address _RaindropAddress
-    ) 
-        public 
+    )
+        public
     {
 
-        id = _id; 
+        id = _id;
         name = _name;
         description = _description;
         symbol = _symbol;
@@ -297,8 +297,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 _endDate,
         uint256 _maxSupply,
         uint256 _escrowLimitPeriod
-    ) 
-        onlyAdmin onlyAtSetup public  
+    )
+        public onlyAdmin onlyAtSetup
     {
         // Validations
         require(
@@ -326,32 +326,32 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
 
     function set_STO_FLAGS(
-        bool _LIMITED_OWNERSHIP, 
+        bool _LIMITED_OWNERSHIP,
         bool _PERIOD_LOCKED,
         bool _PERC_OWNERSHIP_TYPE,
         bool _HYDRO_AMOUNT_TYPE,
         bool _ETH_AMOUNT_TYPE,
         bool _HYDRO_ALLOWED,
         bool _ETH_ALLOWED,
-        bool _KYC_RESTRICTED, 
+        bool _KYC_RESTRICTED,
         bool _AML_RESTRICTED,
         bool _WHITELIST_RESTRICTED,
         bool _BLACKLIST_RESTRICTED,
         bool _ETH_ORACLE,
         bool _HYDRO_ORACLE
-    ) 
-        onlyAdmin onlyAtSetup public 
+    )
+        public onlyAdmin onlyAtSetup
     {
         require(!STO_FLAGS_ready, "Flags already setted");
         // Load values
-        LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP; 
+        LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP;
         PERIOD_LOCKED = _PERIOD_LOCKED;
         PERC_OWNERSHIP_TYPE = _PERC_OWNERSHIP_TYPE;
         HYDRO_AMOUNT_TYPE = _HYDRO_AMOUNT_TYPE;
         ETH_AMOUNT_TYPE = _ETH_AMOUNT_TYPE;
         HYDRO_ALLOWED = _HYDRO_ALLOWED;
         ETH_ALLOWED = _ETH_ALLOWED;
-        KYC_RESTRICTED = _KYC_RESTRICTED; 
+        KYC_RESTRICTED = _KYC_RESTRICTED;
         AML_RESTRICTED = _AML_RESTRICTED;
         WHITELIST_RESTRICTED = _WHITELIST_RESTRICTED;
         BLACKLIST_RESTRICTED = _BLACKLIST_RESTRICTED;
@@ -362,7 +362,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     function set_STO_PARAMS(
-        uint256 _percAllowedTokens, 
+        uint256 _percAllowedTokens,
         uint256 _hydroAllowed,
         uint256 _ethAllowed,
         uint256 _lockPeriod,
@@ -370,13 +370,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 _maxInvestors,
         address _ethOracle,
         address _hydroOracle
-    ) 
-        onlyAdmin onlyAtSetup public 
+    )
+        public onlyAdmin onlyAtSetup
     {
         require(!STO_PARAMS_ready, "Params already setted");
         require(STO_FLAGS_ready, "STO_FLAGS has not been set");
         // Load values
-        percAllowedTokens = _percAllowedTokens; 
+        percAllowedTokens = _percAllowedTokens;
         hydroAllowed = _hydroAllowed;
         ethAllowed = _ethAllowed;
         lockPeriod = _lockPeriod;
@@ -389,8 +389,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
-    function stagePrelaunch() 
-        onlyAdmin onlyAtSetup public 
+    function stagePrelaunch()
+        onlyAdmin onlyAtSetup public
     {
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
@@ -400,18 +400,26 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         stage = Stage.PRELAUNCH;
     }
 
-    function stageActivate() 
-        onlyAdmin onlyAtPreLaunch public 
+    function stageActivate()
+        onlyAdmin onlyAtPreLaunch public
     {
         stage = Stage.ACTIVE;
     }
 
     // Feature #10: ADMIN FUNCTIONS
 
+    function getTokenEINowner() public view returns(uint) {
+        return einOwner;
+    }
+
+    function getTokenOwner() public view returns(address) {
+        return Owner;
+    }
+
 
     // Feature #9
     function setLockupPeriod(uint256 _lockEnds)
-        onlyAdmin public 
+        onlyAdmin public
     {
         if (_lockEnds == 0) {
             PERIOD_LOCKED = false;
@@ -502,10 +510,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         KYCResolverArray[KYCResolverQ - 1] = address(0);
         KYCResolverQ --;
         KYCResolver[_address] = 0;
-        //serviceRegistry.replaceService(address(this), bytes32("KYC"), _address,address(0)); 
+        //serviceRegistry.replaceService(address(this), bytes32("KYC"), _address,address(0));
     }
 
-    function addAMLResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+    function addAMLResolver(address _address) public onlyAdmin onlyAtPreLaunch {
         require(AMLResolverQ < 2, "There are already 3 resolvers for AML");
         AMLResolverArray[AMLResolverQ] = _address;
         AMLResolverQ ++;
@@ -523,7 +531,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         AMLResolverArray[AMLResolverQ - 1] = address(0);
         AMLResolverQ --;
         AMLResolver[_address] = 0;
-        //serviceRegistry.replaceService(address(this), bytes32("AML"), _address,address(0)); 
+        //serviceRegistry.replaceService(address(this), bytes32("AML"), _address,address(0));
     }
 
     function addLegalResolver(address _address) onlyAdmin onlyAtPreLaunch public {
@@ -551,17 +559,17 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // Release gains. Only after escrow is released
 
     // Retrieve tokens and ethers
-    function releaseHydroTokens() onlyAdmin escrowReleased public {
+    function releaseHydroTokens() public onlyAdmin escrowReleased {
         uint256 thisBalance = hydroToken.balanceOf(address(this));
         require(thisBalance > 0, "There are not HydroTokens in this account");
         hydrosReleased = hydrosReleased + thisBalance;
-        require(hydroToken.transfer(Owner, thisBalance));
+        require(hydroToken.transfer(Owner, thisBalance), "Error while releasing Tokens");
     }
 
-    function releaseEthers() onlyAdmin escrowReleased public {
+    function releaseEthers() public onlyAdmin escrowReleased {
         require(address(this).balance > 0, "There are not ethers in this account");
         ethersReleased = ethersReleased + address(this).balance;
-        require(Owner.send(address(this).balance));
+        require(Owner.send(address(this).balance), "Error while releasing Ether");
     }
 
 
