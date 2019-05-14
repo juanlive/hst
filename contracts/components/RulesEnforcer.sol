@@ -263,27 +263,27 @@ contract RulesEnforcer is SnowflakeOwnable {
 
         // AML restrictions
 
-    struct tokenRulesData {
-        uint    minimumAge;
-        uint64  minimumNetWorth;
-        uint32  minimumSalary;
-        bool    accreditedInvestorStatusRequired;
-    }
-    struct buyerData {
-        string  firstName;
-        string  lastName;
-        bytes32 isoCountryCode;
-        uint    birthTimestamp;
-        uint64  netWorth;
-        uint32  salary;
-        bool    accreditedInvestorStatus;
-    }
+    // struct tokenRulesData {
+    //     uint    minimumAge;
+    //     uint64  minimumNetWorth;
+    //     uint32  minimumSalary;
+    //     bool    accreditedInvestorStatusRequired;
+    // }
+    // struct buyerData {
+    //     string  firstName;
+    //     string  lastName;
+    //     bytes32 isoCountryCode;
+    //     uint    birthTimestamp;
+    //     uint64  netWorth;
+    //     uint32  salary;
+    //     bool    accreditedInvestorStatus;
+    // }
 
         // age restrictions *** WORKING ***
         if (tokenData[msg.sender].minimumAge > 0) {
             // TO DO calculate buyer age
-            buyerAge = 0;
-            require (buyerAge >= minimumAge, "Buyer must be older than minimum age");
+            uint buyerAge = 0;
+            require (buyerAge >= tokenData[msg.sender].minimumAge, "Buyer must reachs minimum age");
         }
         // net-worth restrictions
         if (tokenData[msg.sender].minimumNetWorth > 0) {
