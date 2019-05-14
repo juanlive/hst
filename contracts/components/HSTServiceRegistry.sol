@@ -113,7 +113,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   }
 
   function addDefaultRulesService() public isContract(msg.sender) {
-      serviceRegistry[msg.sender][_categoryName] = defaultRulesEnforcer;
+      serviceRegistry[msg.sender]["RULES"] = defaultRulesEnforcer;
   }
 
     /**
@@ -121,7 +121,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    *
    * @dev This method is only callable by the contract's owner
    *
-   * @param _oldService Old address for the service
+   * @param _categoryName Category name of the service
    * @param _newService New address for the service to use
    */
   function replaceService(bytes32 _categoryName, address _newService) public onlyOwner isContract(msg.sender) isContract(_newService) {

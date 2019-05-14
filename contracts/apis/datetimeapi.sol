@@ -1,3 +1,5 @@
+pragma solidity ^0.5.0;
+
 contract DateTimeAPI {
         /*
          *  Abstract contract for interfacing with the DateTime contract.
