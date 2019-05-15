@@ -10,13 +10,17 @@ Architecture draft:
 
 To run tests:
 
-In a console window, run the following:
+1. Run the following:
+npm install
 
-- npm run chain
+2. Build dependencies with:
+npm run build
 
-Then in another console window, run this:
+3. Spin up a development blockchain using:
+npm run chain
 
-- npm run test
+4. Then in another console window, run this:
+npm run test
 
 
 Features:
