@@ -72,8 +72,52 @@ async function verifyIdentity (ein, IdentityRegistry, expectedIdentity) {
   assert.deepEqual(identity.resolvers, expectedIdentity.resolvers, 'unexpected resolvers.')
 }
 
+
+const createIdentity = async(_user, instances) => {
+
+    const timestamp = Math.round(new Date() / 1000) - 1
+    const permissionString = web3.utils.soliditySha3(
+      '0x19', '0x00', instances.IdentityRegistry.address,
+      'I authorize the creation of an Identity on my behalf.',
+      _user.recoveryAddress,
+      _user.address,
+      { t: 'address[]', v: [instances.Snowflake.address] },
+      { t: 'address[]', v: [] },
+      timestamp
+    )
+
+    const permission = await sign(permissionString, _user.address, _user.private)
+
+    await instances.Snowflake.createIdentityDelegated(
+      _user.recoveryAddress, _user.address, [], _user.hydroID, permission.v, permission.r, permission.s, timestamp
+      , {from: _user.address})
+
+    _user.identity = web3.utils.toBN(_user.id)
+
+    await verifyIdentity(_user.identity, instances.IdentityRegistry, {
+      recoveryAddress:     _user.recoveryAddress,
+      associatedAddresses: [_user.address],
+      providers:           [instances.Snowflake.address],
+      resolvers:           [instances.ClientRaindrop.address]
+    })
+
+}
+
+
+function daysOn(_days) {
+  return parseInt(new Date() / 1000 + daysToSeconds(_days)).toString();
+}
+
+function daysToSeconds(_days) {
+  return _days * 24 * 60 * 60;
+}
+
+
 module.exports = {
   sign: sign,
   timeTravel: timeTravel,
-  verifyIdentity: verifyIdentity
+  verifyIdentity: verifyIdentity,
+  daysOn: daysOn,
+  daysToSeconds: daysToSeconds,
+  createIdentity: createIdentity
 }

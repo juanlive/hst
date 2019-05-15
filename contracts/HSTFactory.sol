@@ -17,7 +17,7 @@ import './interfaces/IdentityRegistryInterface.sol';
  * @notice Perform deployment of contracts for the issuance of Hydro Securities
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
-contract HSTFactory is SnowflakeOwnable {
+contract HSTFactory is SnowflakeOwnable(_IdentityRegistry) {
 
  /*************************************************
  * Hydro and other addresses on Rinkeby blockchain
@@ -36,24 +36,31 @@ contract HSTFactory is SnowflakeOwnable {
     //address public hydroTokenRinkeby = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
 
     // name of the token => address of the token
-    mapping(bytes32 => address) tokens;
+
+    struct Token {
+      uint256 id;
+      address addr;
+      uint256 owner;
+      bool exist;
+    }
+
+    uint256 last_id = 0;
+
+    mapping(bytes32 => Token) tokens;
 
 
  /*******************************************************
  * Hydro and other addresses that will be used to deploy
  *******************************************************/
 
-    address dateTime;
-    address identityRegistry;
-    address hydroToken;
+    address DateTime;
+    address IdentityRegistry;
+    address HydroToken;
 
-   /**
-   * @notice Constructor
-   */
-    constructor(address _dateTime, address _identityRegistry, address _hydroToken) public {
-      dateTime = _dateTime;
-      identityRegistry = _identityRegistry;
-      hydroToken = _hydroToken;
+    constructor(address _DateTime, address _IdentityRegistry, address _HydroToken) public {
+      DateTime = _DateTime;
+      IdentityRegistry = _IdentityRegistry;
+      HydroToken = _HydroToken;
     }
 
    /**
@@ -83,45 +90,65 @@ contract HSTFactory is SnowflakeOwnable {
     /**
     * @notice Triggered when each contract is deployed
     */
-    event ContractDeployed(bytes32 _name, bytes32 _type, address indexed _addr);
+    event ContractDeployed(bytes32 indexed _name, bytes32 _type, address indexed _addr);
 
     /**
     * @notice Deploy a Hydro Securities Token contract set
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deploySecuritiesTokenContractSet(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals)
+    function deploySecuritiesTokenContractSet(
+      bytes32 _tokenName, 
+      string memory _description, 
+      string memory _symbol, 
+      uint8 _decimals)
     public payable returns(bool) {
+
       emit SecuritiesDeployStarted(_tokenName);
-      bool _deploymentAllowed = true;
-      // check if token to be deployed already exists in the list of tokens
-      if ( tokens[_tokenName] != address(0) ) {
-        // token exists, check if is alive
-        HSToken _token = HSToken(tokens[_tokenName]);
+
+      if ( tokens[_tokenName].exist ) {
+        HSToken _token = HSToken(tokens[_tokenName].address);
         if ( _token.isAlive() ) {
-          // token exists and it is alive, cancel deploy
-          _deploymentAllowed = false;
           emit SecuritiesDeployCancelled(_tokenName, "Token exists and it is alive");
+          return false;
         }
-      } else {
-          _deploymentAllowed = false;
       }
-      if ( _deploymentAllowed == true ) {
-        tokens[_tokenName] = deployToken(_tokenName, _description, _symbol, _decimals);
-        emit SecuritiesDeployFinished(_tokenName);
-      }
+
+      _deployToken(_tokenName, _description, _symbol, _decimals)  
+      emit SecuritiesDeployFinished(_tokenName);
+      return true;
     }
 
     /**
     * @notice Deploy a Hydro Securities Token contract
     * @param  _tokenName The name of the token contract set to be deployed
     */
-    function deployToken(bytes32 _tokenName, string memory _description, string memory _symbol, uint8 _decimals)
-     public onlySnowflakeOwner returns(address) {
-      HSToken _token = new HSToken(1, _tokenName, _description, _symbol, _decimals, hydroToken, identityRegistry);
+    function _deployToken(
+      bytes32 _tokenName, 
+      string memory _description, 
+      string memory _symbol, 
+      uint8 _decimals)
+    private {
+
+      last_id++; // Prepare unique id
+
+      HSToken _token = new HSToken(
+        last_id, 
+        _tokenName, 
+        _description, 
+        _symbol, 
+        _decimals, 
+        HydroToken, 
+        IdentityRegistry,
+        msg.sender);
+
       address _tokenAddress = address(_token);
-      tokens[_tokenName] = _tokenAddress;
-      emit ContractDeployed(_tokenName, "TOKEN", _tokenAddress);
-      return _tokenAddress;
+
+      tokens[_tokenName].id = last_id;
+      tokens[_tokenName].addr = _tokenAddress;
+      tokens[_tokenName].owner = IdentityRegistry.getEin(msg.sender);
+      tokens[_tokenName].exist = true;
+
+      emit ContractDeployed(_tokenName, "HSTOKEN", _tokenAddress);
     }
 
 }

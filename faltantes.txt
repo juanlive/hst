@@ -1,0 +1,12 @@
+Faltantes para HydroToken
+
+
+En Factory
+
+- Incorporar id para tokens
+- Evitar distintos tokens con el mismo nombre, por más que no esté vivo
+- Crear struct para token
+- Corregir la lógica del deployado (la address se asigna dentro de la función deployadora y afuera también; ahora se asigna todo adentro)
+- Agregar al struct del token el ein del owner
+- Deploy pasa a private
+- Mayuscula inicial en addresses de contratos

@@ -124,6 +124,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     uint8 public decimals;
     address payable public Owner;
     uint256 public einOwner;
+    address public createdBy;
 
     // State Memory
     Stage public stage; // SETUP, PRELAUNCH, ACTIVE, FINALIZED
@@ -251,7 +252,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         string memory _symbol,
         uint8 _decimals,
         address _HydroToken,
-        address _IdentityRegistry
+        address _IdentityRegistry,
+        address payable _owner
         // address _RaindropAddress
     )
         public
@@ -279,8 +281,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         // serviceRegistry = new HSTServiceRegistry();
         // raindropAddress = _RaindropAddress;
 
-        Owner = msg.sender;
+        Owner = _owner;
         einOwner = identityRegistry.getEIN(Owner);
+        createdBy = msg.sender;
 
         emit HydroSTCreated(id, name, symbol, decimals, einOwner);
     }
@@ -408,7 +411,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Feature #10: ADMIN FUNCTIONS
 
-    function getTokenEINowner() public view returns(uint) {
+    function getTokenEINOwner() public view returns(uint) {
         return einOwner;
     }
 
