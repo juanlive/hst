@@ -44,7 +44,7 @@ contract HSTFactory is SnowflakeOwnable(_IdentityRegistry) {
       bool exist;
     }
 
-    uint256 last_id = 0;
+    uint256 public last_id = 0;
 
     mapping(bytes32 => Token) tokens;
 
