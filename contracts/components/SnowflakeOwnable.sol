@@ -44,6 +44,25 @@ contract SnowflakeOwnable is Ownable {
     }
 
     /**
+    * @notice Throws if called by any account other than the owner
+    * @dev This works on EINs, not on addresses
+    */
+    modifier onlySnowflakeOwner() {
+        require(isOwner(), "Must be owner to call this function");
+        _;
+    }
+
+    /**
+    * @notice Check if caller is owner
+    * @dev This works on EINs, not on addresses
+    * @return true if `msg.sender` is the owner of the contract
+    */
+    function isOwner() public view returns(bool) {
+        uint caller = identityRegistry.getEIN(msg.sender);
+        return (caller == ownerEIN);
+    }
+
+    /**
     * @notice Set the address for the Identity Registry
     * @param _identityRegistryAddress The address of the IdentityRegistry contract
     */
@@ -69,25 +88,6 @@ contract SnowflakeOwnable is Ownable {
     */
     function getOwnerEIN() public view returns(uint) {
         return ownerEIN;
-    }
-
-    /**
-    * @notice Throws if called by any account other than the owner
-    * @dev This works on EINs, not on addresses
-    */
-    modifier onlySnowflakeOwner() {
-        require(isOwner(), "Must be owner to call this function");
-        _;
-    }
-
-    /**
-    * @notice Check if caller is owner
-    * @dev This works on EINs, not on addresses
-    * @return true if `msg.sender` is the owner of the contract
-    */
-    function isOwner() public view returns(bool) {
-        uint caller = identityRegistry.getEIN(msg.sender);
-        return (caller == ownerEIN);
     }
 
     /**

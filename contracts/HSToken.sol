@@ -393,7 +393,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
 
     function stagePrelaunch()
-        onlyAdmin onlyAtSetup public
+        public onlyAdmin onlyAtSetup
     {
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
@@ -404,7 +404,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     function stageActivate()
-        onlyAdmin onlyAtPreLaunch public
+        public onlyAdmin onlyAtPreLaunch
     {
         stage = Stage.ACTIVE;
     }
@@ -422,7 +422,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Feature #9
     function setLockupPeriod(uint256 _lockEnds)
-        onlyAdmin public
+        public onlyAdmin
     {
         if (_lockEnds == 0) {
             PERIOD_LOCKED = false;
@@ -432,46 +432,46 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
-    function lock() onlyAdmin public {
+    function lock() public onlyAdmin {
         locked = true;
     }
 
-    function unLock() onlyAdmin public {
+    function unLock() public onlyAdmin {
         locked = false;
     }
 
-    function addWhitelist(uint256[] memory _einList) onlyAdmin public {
+    function addWhitelist(uint256[] memory _einList) public onlyAdmin {
         for (uint i = 0; i < _einList.length; i++) {
           whitelist[_einList[i]] = true;
         }
     }
 
-    function addBlacklist(uint256[] memory _einList) onlyAdmin public {
+    function addBlacklist(uint256[] memory _einList) public onlyAdmin {
         for (uint i = 0; i < _einList.length; i++) {
           blacklist[_einList[i]] = true;
         }
     }
 
-    function removeWhitelist(uint256[] memory _einList) onlyAdmin public {
+    function removeWhitelist(uint256[] memory _einList) public onlyAdmin {
         for (uint i = 0; i < _einList.length; i++) {
           whitelist[_einList[i]] = false;
         }
 
     }
 
-    function removeBlacklist(uint256[] memory _einList) onlyAdmin public {
+    function removeBlacklist(uint256[] memory _einList) public onlyAdmin {
         for (uint i = 0; i < _einList.length; i++) {
           blacklist[_einList[i]] = false;
         }
     }
 
-    function freeze(uint256[] memory _einList) onlyAdmin public {
+    function freeze(uint256[] memory _einList) public onlyAdmin {
         for (uint i = 0; i < _einList.length; i++) {
           freezed[_einList[i]] = true;
         }
     }
 
-    function unFreeze(uint256[] memory _einList) onlyAdmin public {
+    function unFreeze(uint256[] memory _einList) public onlyAdmin {
         for (uint i = 0; i < _einList.length; i++) {
           freezed[_einList[i]] = false;
         }
@@ -482,11 +482,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Setting oracles
 
-    function addEthOracle(address _newAddress) onlyAdmin public {
+    function addEthOracle(address _newAddress) public onlyAdmin {
     	ethOracle = _newAddress;
     }
 
-    function addHydroOracle(address _newAddress) onlyAdmin public {
+    function addHydroOracle(address _newAddress) public onlyAdmin {
     	hydroOracle = _newAddress;
     }
 
@@ -496,13 +496,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // Adding and removing resolvers
 
     // Feature #3
-    function addKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+    function addKYCResolver(address _address) public onlyAdmin onlyAtPreLaunch {
         require(KYCResolverQ < 2, "There are already 3 resolvers for KYC");
         KYCResolverArray[KYCResolverQ] = _address;
         KYCResolverQ ++;
         //serviceRegistry.addService(address(this), bytes32("KYC"), _address);
     }
-    function removeKYCResolver(address _address) onlyAdmin onlyAtPreLaunch public {
+    function removeKYCResolver(address _address) public onlyAdmin onlyAtPreLaunch {
         require(KYCResolver[_address] != 0, "Resolver does not exist");
         uint8 _number = KYCResolver[_address];
         if (_number < 3) {
@@ -581,14 +581,14 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // PUBLIC FUNCTIONS FOR INVESTORS -----------------------------------------------------------------
 
 
-    function buyTokens(string memory _coin, uint256 _amount) 
-        onlyActive public payable 
-        returns(bool) 
+    function buyTokens(string memory _coin, uint256 _amount)
+        public onlyActive payable
+        returns(bool)
     {
         uint256 total;
         uint256 _ein = identityRegistry.getEIN(msg.sender);
         bytes32 HYDRO = keccak256(abi.encode("HYDRO"));
-        bytes32 ETH =  keccak256(abi.encode("ETH"));
+        bytes32 ETH = keccak256(abi.encode("ETH"));
         bytes32 coin = keccak256(abi.encode(_coin));
 
         if (!investors[_ein].exists) {
@@ -596,7 +596,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
             investors[_ein].exists = true;
             require(investorsQuantity <= maxInvestors || maxInvestors == 0, "Maximum investors reached");
         }
- 
+
         require(stage == Stage.ACTIVE, "Current stage is not active");
 
         // CHECKINGS (to be exported as  a contract)
@@ -622,26 +622,26 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         if (coin == HYDRO) {
             total = _amount.mul(hydroPrice) / 1 ether;
             investors[_ein].hydroSent = investors[_ein].hydroSent.add(_amount);
-            hydroReceived = hydroReceived.add(_amount);      
+            hydroReceived = hydroReceived.add(_amount);
         } else
         if (coin == ETH) {
             total = msg.value.mul(ethPrice) / 1 ether;
             investors[_ein].etherSent += msg.value;
             ethReceived = ethReceived + msg.value;
-        } else 
+        } else
         revert("_coin should be ETH or HYDRO");
 
         // Check with maxSupply
         require(issuedTokens.add(total) <= maxSupply, "Max supply of Tokens is exceeded");
 
-        // Check for ownership percentage 
+        // Check for ownership percentage
         if (PERC_OWNERSHIP_TYPE) {
-            require ((issuedTokens.add(total).mul(1 ether) / maxSupply) < percAllowedTokens, 
+            require ((issuedTokens.add(total).mul(1 ether) / maxSupply) < percAllowedTokens,
                 "Perc ownership exceeded");
         }
         // Transfer Hydrotokens from buyer to this contract
         if (coin == HYDRO) {
-            require(hydroToken.transferFrom(msg.sender, address(this), _amount), 
+            require(hydroToken.transferFrom(msg.sender, address(this), _amount),
                 "Hydro transfer was not possible");
         }
 
@@ -653,9 +653,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
-    function claimInterests() 
-        public pure 
-        returns(bool) 
+    function claimInterests()
+        public pure
+        returns(bool)
     {
         //return(interestSolver(msg.sender));
         return true;
@@ -666,11 +666,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // Token ERC-20 wrapper -----------------------------------------------------------
 
     // Feature #11
-    function transfer(address _to, uint256 _amount) 
-        isUnlocked isUnfreezed(msg.sender, _to) 
-        public 
-        returns(bool success) 
-    {    
+    function transfer(address _to, uint256 _amount)
+        public isUnlocked isUnfreezed(msg.sender, _to)
+        returns(bool success)
+    {
         if (KYC_RESTRICTED) _checkKYC(_to, _amount);
         if (AML_RESTRICTED) _checkAML(_to, _amount);
         // _updateBatches(msg.sender, _to, _amount);
@@ -679,11 +678,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     // Feature #11
-    function transferFrom(address _from, address _to, uint256 _amount) 
-        isUnlocked isUnfreezed(_from, _to) 
-        public 
-        returns(bool success) 
-    { 
+    function transferFrom(address _from, address _to, uint256 _amount)
+        public isUnlocked isUnfreezed(_from, _to)
+        returns(bool success)
+    {
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         if (KYC_RESTRICTED) _checkKYC(_to, _amount);
         if (AML_RESTRICTED) _checkAML(_to, _amount);
@@ -760,11 +758,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // ONLY FOR ORACLES
 
     function updateEthPrice(uint256 _newPrice) external {
-    	require(msg.sender == ethOracle);
+    	require(msg.sender == ethOracle, "This can only be executed by the Oracle");
     	ethPrice = _newPrice;
     }
     function updateHydroPrice(uint256 _newPrice) external {
-    	require(msg.sender == hydroOracle);
+    	require(msg.sender == hydroOracle, "This can only be executed by the Oracle");
     	hydroPrice = _newPrice;
     }
 
@@ -779,7 +777,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         balance[_to] = balance[_to].add(_amount);
         balance[_from] = balance[_from].sub(_amount);
         emit Transfer(_from, _to, _amount);
-    } 
+    }
 
     // Permissions checking
 
@@ -795,7 +793,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 einTo = identityRegistry.getEIN(_to);
         for (uint8 i = 0; i < AMLResolverQ; i++) {
             ResolverInterface resolver = ResolverInterface(AMLResolverArray[i]);
-            require(resolver.isApproved(einTo, _amount));
+            require(resolver.isApproved(einTo, _amount), "Resolver is not approved");
         }
     }
 
@@ -803,7 +801,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         uint256 einTo = identityRegistry.getEIN(_to);
         for (uint8 i = 0; i < LegalResolverQ; i++) {
             ResolverInterface resolver = ResolverInterface(LegalResolverArray[i]);
-            require(resolver.isApproved(einTo, _amount));
+            require(resolver.isApproved(einTo, _amount), "Resolver is not approved");
         }
     }
 

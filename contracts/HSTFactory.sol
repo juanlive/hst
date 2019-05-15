@@ -17,7 +17,7 @@ import './interfaces/IdentityRegistryInterface.sol';
  * @notice Perform deployment of contracts for the issuance of Hydro Securities
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
-contract HSTFactory is SnowflakeOwnable(_IdentityRegistry) {
+contract HSTFactory is SnowflakeOwnable {
 
  /*************************************************
  * Hydro and other addresses on Rinkeby blockchain
@@ -39,7 +39,7 @@ contract HSTFactory is SnowflakeOwnable(_IdentityRegistry) {
 
     struct Token {
       uint256 id;
-      address addr;
+      address tokenAddress;
       uint256 owner;
       bool exist;
     }
@@ -53,14 +53,17 @@ contract HSTFactory is SnowflakeOwnable(_IdentityRegistry) {
  * Hydro and other addresses that will be used to deploy
  *******************************************************/
 
-    address DateTime;
-    address IdentityRegistry;
-    address HydroToken;
+    address dateTimeAddress;
+    address identityRegistryAddress;
+    address hydroTokenAddress;
 
-    constructor(address _DateTime, address _IdentityRegistry, address _HydroToken) public {
-      DateTime = _DateTime;
-      IdentityRegistry = _IdentityRegistry;
-      HydroToken = _HydroToken;
+    IdentityRegistry identityRegistry;
+
+    constructor(address _dateTimeAddress, address _identityRegistryAddress, address _hydroTokenAddress) public {
+      dateTimeAddress = _dateTimeAddress;
+      identityRegistryAddress = _identityRegistryAddress;
+      hydroTokenAddress = _hydroTokenAddress;
+      identityRegistry = IdentityRegistry(_identityRegistryAddress);
     }
 
    /**
@@ -69,7 +72,7 @@ contract HSTFactory is SnowflakeOwnable(_IdentityRegistry) {
     * @return the address of the token contract corresponding to that name
     */
     function getSecuritiesTokenAddress(bytes32 _tokenName) public view returns(address) {
-      return tokens[_tokenName];
+      return tokens[_tokenName].tokenAddress;
     }
 
     /**
@@ -97,23 +100,23 @@ contract HSTFactory is SnowflakeOwnable(_IdentityRegistry) {
     * @param  _tokenName The name of the token contract set to be deployed
     */
     function deploySecuritiesTokenContractSet(
-      bytes32 _tokenName, 
-      string memory _description, 
-      string memory _symbol, 
+      bytes32 _tokenName,
+      string memory _description,
+      string memory _symbol,
       uint8 _decimals)
     public payable returns(bool) {
 
       emit SecuritiesDeployStarted(_tokenName);
 
       if ( tokens[_tokenName].exist ) {
-        HSToken _token = HSToken(tokens[_tokenName].address);
+        HSToken _token = HSToken(tokens[_tokenName].tokenAddress);
         if ( _token.isAlive() ) {
           emit SecuritiesDeployCancelled(_tokenName, "Token exists and it is alive");
           return false;
         }
       }
 
-      _deployToken(_tokenName, _description, _symbol, _decimals)  
+      _deployToken(_tokenName, _description, _symbol, _decimals);
       emit SecuritiesDeployFinished(_tokenName);
       return true;
     }
@@ -123,29 +126,29 @@ contract HSTFactory is SnowflakeOwnable(_IdentityRegistry) {
     * @param  _tokenName The name of the token contract set to be deployed
     */
     function _deployToken(
-      bytes32 _tokenName, 
-      string memory _description, 
-      string memory _symbol, 
+      bytes32 _tokenName,
+      string memory _description,
+      string memory _symbol,
       uint8 _decimals)
     private {
 
       last_id++; // Prepare unique id
 
       HSToken _token = new HSToken(
-        last_id, 
-        _tokenName, 
-        _description, 
-        _symbol, 
-        _decimals, 
-        HydroToken, 
-        IdentityRegistry,
+        last_id,
+        _tokenName,
+        _description,
+        _symbol,
+        _decimals,
+        hydroTokenAddress,
+        identityRegistryAddress,
         msg.sender);
 
       address _tokenAddress = address(_token);
 
       tokens[_tokenName].id = last_id;
-      tokens[_tokenName].addr = _tokenAddress;
-      tokens[_tokenName].owner = IdentityRegistry.getEin(msg.sender);
+      tokens[_tokenName].tokenAddress = _tokenAddress;
+      tokens[_tokenName].owner = identityRegistry.getEIN(msg.sender);
       tokens[_tokenName].exist = true;
 
       emit ContractDeployed(_tokenName, "HSTOKEN", _tokenAddress);
