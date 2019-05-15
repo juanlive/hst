@@ -45,7 +45,7 @@ contract HSTFactory {
 
     uint256 public last_id = 0;
 
-    mapping(bytes32 => Token) tokens;
+    mapping(bytes32 => Token) public tokens;
 
 
  /*******************************************************
@@ -57,22 +57,6 @@ contract HSTFactory {
     address hydroTokenAddress;
 
     IdentityRegistryInterface IdentityRegistry;
-
-    constructor(address _dateTimeAddress, address _identityRegistryAddress, address _hydroTokenAddress) public {
-      dateTimeAddress = _dateTimeAddress;
-      identityRegistryAddress = _identityRegistryAddress;
-      hydroTokenAddress = _hydroTokenAddress;
-      IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
-    }
-
-   /**
-    * @notice Get a Hydro Securities token contract deployed address
-    * @param  _tokenName The name of the token contract set to be deployed
-    * @return the address of the token contract corresponding to that name
-    */
-    function getSecuritiesTokenAddress(bytes32 _tokenName) public view returns(address) {
-      return tokens[_tokenName].tokenAddress;
-    }
 
     /**
     * @notice Triggered when a whole set of contracts for a hydro securities token deploy is started
@@ -93,6 +77,24 @@ contract HSTFactory {
     * @notice Triggered when each contract is deployed
     */
     event ContractDeployed(bytes32 indexed _name, bytes32 _type, address indexed _addr);
+
+
+
+    constructor(address _dateTimeAddress, address _identityRegistryAddress, address _hydroTokenAddress) public {
+      dateTimeAddress = _dateTimeAddress;
+      identityRegistryAddress = _identityRegistryAddress;
+      hydroTokenAddress = _hydroTokenAddress;
+      IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
+    }
+
+   /**
+    * @notice Get a Hydro Securities token contract deployed address
+    * @param  _tokenName The name of the token contract set to be deployed
+    * @return the address of the token contract corresponding to that name
+    */
+    function getSecuritiesTokenAddress(bytes32 _tokenName) public view returns(address) {
+      return tokens[_tokenName].tokenAddress;
+    }
 
     /**
     * @notice Deploy a Hydro Securities Token contract set
