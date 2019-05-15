@@ -1,7 +1,6 @@
 pragma solidity ^0.5.0;
 
 import './HSToken.sol';
-import './components/SnowflakeOwnable.sol';
 import './interfaces/IdentityRegistryInterface.sol';
 
 // TO DO
@@ -17,7 +16,7 @@ import './interfaces/IdentityRegistryInterface.sol';
  * @notice Perform deployment of contracts for the issuance of Hydro Securities
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
-contract HSTFactory is SnowflakeOwnable {
+contract HSTFactory {
 
  /*************************************************
  * Hydro and other addresses on Rinkeby blockchain
