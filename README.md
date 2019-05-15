@@ -8,13 +8,13 @@ Architecture draft:
   <img src="https://github.com/juanlive/hst/blob/master/images/HST%20Securities%20Architecture.png" width="500">
 </p>
 
-Running tests:
+To run tests:
 
-In a console:
+In a console window, run the following:
 
 - npm run chain
 
-In another console:
+Then in another console window, run this:
 
 - npm run test
 
