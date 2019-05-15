@@ -11,7 +11,8 @@ contract KYCResolver {
     }
 
 
-    function isApproved(uint256 _ein) external view returns (bool) {
+    function isApproved(uint256 _ein, uint256 _amount) external view returns (bool) {
+        require(_amount > 0);
         if (rejectedEin[_ein]) return false;
         return true;
     }

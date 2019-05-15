@@ -11,7 +11,7 @@ import '../components/DateTime.sol';
 
 
 /**
- * @title HSTRulesEnforcer
+ * @title RulesEnforcer
  *
  * @notice Rules enforcement and registry of buyers
  *
@@ -25,11 +25,11 @@ import '../components/DateTime.sol';
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
 
-contract HSTRulesEnforcer is SnowflakeOwnable {
+contract RulesEnforcer is SnowflakeOwnable {
 
     // token rules data
 
-    struct tokenRulesData {
+    struct rulesData {
         uint    minimumAge;
         uint64  minimumNetWorth;
         uint32  minimumSalary;
@@ -37,7 +37,7 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
     }
 
     // token address => data to enforce rules
-    mapping(address => tokenRulesData) public tokenData;
+    mapping(address => rulesData) public tokenData;
 
     // token address => ISO country code => country is banned
     mapping(address => mapping(bytes32 => bool)) public bannedCountries;
@@ -149,14 +149,10 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
     }   */
     function addBuyer(
         uint _buyerEIN,
-        string memory _firstName, 
-        string memory _lastName,
+        string memory _firstName, string memory _lastName,
         bytes32 _isoCountryCode,
-        uint16 _yearOfBirth, 
-        uint8 _monthOfBirth, 
-        uint8 _dayOfBirth,
-        uint64 _netWorth, 
-        uint32 _salary)
+        uint16 _yearOfBirth, uint8 _monthOfBirth, uint8 _dayOfBirth,
+        uint64 _netWorth, uint32 _salary)
     public onlySnowflakeOwner {
         buyerData memory _bd;
         _bd.firstName = _firstName;
@@ -261,12 +257,18 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
         emit TokenValuesAssigned(_tokenAddress);
     }
 
-    function addCountryBan(address _tokenAddress, bytes32 _isoCountryCode) public {
+    function addCountryBan(
+        address _tokenAddress, 
+        bytes32 _isoCountryCode) 
+    public {
         bannedCountries[_tokenAddress][_isoCountryCode] = true;
         emit AddCountryBan(_tokenAddress, _isoCountryCode);
     }
 
-    function liftCountryBan(address _tokenAddress, bytes32 _isoCountryCode) public {
+    function liftCountryBan(
+        address _tokenAddress, 
+        bytes32 _isoCountryCode) 
+    public {
         bannedCountries[_tokenAddress][_isoCountryCode] = false;
         emit LiftCountryBan(_tokenAddress, _isoCountryCode);
     }
@@ -286,35 +288,17 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
 
         // AML restrictions
 
-    // struct tokenRulesData {
-    //     uint    minimumAge;
-    //     uint64  minimumNetWorth;
-    //     uint32  minimumSalary;
-    //     bool    accreditedInvestorStatusRequired;
-    // }
-    // struct buyerData {
-    //     string  firstName;
-    //     string  lastName;
-    //     bytes32 isoCountryCode;
-    //     uint    birthTimestamp;
-    //     uint64  netWorth;
-    //     uint32  salary;
-    //     bool    accreditedInvestorStatus;
-    // }
-
         // age restrictions *** WORKING ***
-        if (tokenData[msg.sender].minimumAge > 0) {
-            // TO DO calculate buyer age
-            uint buyerAge = 0;
-            require (buyerAge >= tokenData[msg.sender].minimumAge, "Buyer must reachs minimum age");
+        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
+            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
         }
-        // net-worth restrictions
-        if (tokenData[msg.sender].minimumNetWorth > 0) {
-            require (buyerRegistry[_buyerEIN].netWorth >= tokenData[msg.sender].minimumNetWorth, "Buyer must reach minimum net worth");
+        // net-worth restrictions *** WORKING ***
+        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
+            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
         }
-        // salary restrictions
-        if (tokenData[msg.sender].minimumSalary > 0) {
-            require (buyerRegistry[_buyerEIN].salary >= tokenData[msg.sender].minimumSalary, "Buyer must reach minimum salary");
+        // salary restrictions *** WORKING ***
+        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
+            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
         }
         // accredited investor status
         if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {

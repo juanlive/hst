@@ -174,8 +174,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     // address[] public escrowContractsArray;
 
     // Declaring interfaces
-    IdentityRegistryInterface public identityRegistry;
-    HydroInterface public hydroToken;
+    IdentityRegistryInterface public IdentityRegistry;
+    HydroInterface public HydroToken;
     // HSTServiceRegistry public serviceRegistry;
     // SnowflakeViaInterface public snowflakeVia;
     // TokenWithDates private tokenWithDates;
@@ -210,8 +210,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     modifier isUnfreezed(address _from, address _to) {
-        require(!freezed[identityRegistry.getEIN(_to)], "Target EIN is freezed");
-        require(!freezed[identityRegistry.getEIN(_from)], "Source EIN is freezed");
+        require(!freezed[IdentityRegistry.getEIN(_to)], "Target EIN is freezed");
+        require(!freezed[IdentityRegistry.getEIN(_from)], "Source EIN is freezed");
         _;
     }
 
@@ -229,7 +229,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     modifier onlyAdmin() {
         // Check if EIN of sender is the same as einOwner
-        require(identityRegistry.getEIN(msg.sender) == einOwner, "Only for admins");
+        require(IdentityRegistry.getEIN(msg.sender) == einOwner, "Only for admins");
         _;
     }
 
@@ -251,8 +251,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         string memory _description,
         string memory _symbol,
         uint8 _decimals,
-        address _HydroToken,
-        address _IdentityRegistry,
+        address _hydroToken,
+        address _identityRegistry,
         address payable _owner
         // address _RaindropAddress
     )
@@ -276,13 +276,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         // RegistryRules = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
         // InterestSolver = address(0x0);
 
-        hydroToken = HydroInterface(_HydroToken); // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
-        identityRegistry = IdentityRegistryInterface(_IdentityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
+        HydroToken = HydroInterface(_hydroToken); // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
+        IdentityRegistry = IdentityRegistryInterface(_identityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
         // serviceRegistry = new HSTServiceRegistry();
         // raindropAddress = _RaindropAddress;
 
         Owner = _owner;
-        einOwner = identityRegistry.getEIN(Owner);
+        einOwner = IdentityRegistry.getEIN(Owner);
         createdBy = msg.sender;
 
         emit HydroSTCreated(id, name, symbol, decimals, einOwner);
@@ -563,10 +563,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Retrieve tokens and ethers
     function releaseHydroTokens() public onlyAdmin escrowReleased {
-        uint256 thisBalance = hydroToken.balanceOf(address(this));
+        uint256 thisBalance = HydroToken.balanceOf(address(this));
         require(thisBalance > 0, "There are not HydroTokens in this account");
         hydrosReleased = hydrosReleased + thisBalance;
-        require(hydroToken.transfer(Owner, thisBalance), "Error while releasing Tokens");
+        require(HydroToken.transfer(Owner, thisBalance), "Error while releasing Tokens");
     }
 
     function releaseEthers() public onlyAdmin escrowReleased {
@@ -586,7 +586,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         returns(bool)
     {
         uint256 total;
-        uint256 _ein = identityRegistry.getEIN(msg.sender);
+        uint256 _ein = IdentityRegistry.getEIN(msg.sender);
         bytes32 HYDRO = keccak256(abi.encode("HYDRO"));
         bytes32 ETH = keccak256(abi.encode("ETH"));
         bytes32 coin = keccak256(abi.encode(_coin));
@@ -599,7 +599,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
         require(stage == Stage.ACTIVE, "Current stage is not active");
 
-        // CHECKINGS (to be exported as  a contract)
+        // CHECKINGS (to be replaced by HSTRulesEnforcer)
         // Coin allowance
         if (coin == HYDRO) require(HYDRO_ALLOWED, "Hydro is not allowed");
         if (coin == ETH) require(ETH_ALLOWED, "Ether is not allowed");
@@ -610,6 +610,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
         if (ETH_AMOUNT_TYPE && coin == ETH) {
             require((ethReceived + msg.value) <= ethAllowed, "Ether amount exceeded");
         }
+
         // Check with KYC and AML providers
         if (KYC_RESTRICTED && KYCResolverQ > 0) _checkKYC(msg.sender, _amount);
         if (AML_RESTRICTED && AMLResolverQ > 0) _checkAML(msg.sender, _amount);
@@ -639,9 +640,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
             require ((issuedTokens.add(total).mul(1 ether) / maxSupply) < percAllowedTokens,
                 "Perc ownership exceeded");
         }
+
         // Transfer Hydrotokens from buyer to this contract
         if (coin == HYDRO) {
-            require(hydroToken.transferFrom(msg.sender, address(this), _amount),
+            require(HydroToken.transferFrom(msg.sender, address(this), _amount),
                 "Hydro transfer was not possible");
         }
 
@@ -783,14 +785,14 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // Feature #8
     function _checkKYC(address _to, uint256 _amount) private view {
-        uint256 einTo = identityRegistry.getEIN(_to);
+        uint256 einTo = IdentityRegistry.getEIN(_to);
         for (uint8 i = 0; i < KYCResolverQ; i++) {
             ResolverInterface resolver = ResolverInterface(KYCResolverArray[i]);
             require(resolver.isApproved(einTo, _amount), "KYC not approved");
         }
     }
     function _checkAML(address _to, uint256 _amount) private view {
-        uint256 einTo = identityRegistry.getEIN(_to);
+        uint256 einTo = IdentityRegistry.getEIN(_to);
         for (uint8 i = 0; i < AMLResolverQ; i++) {
             ResolverInterface resolver = ResolverInterface(AMLResolverArray[i]);
             require(resolver.isApproved(einTo, _amount), "Resolver is not approved");
@@ -798,7 +800,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     function _checkLegaL(address _to, uint256 _amount) private view {
-        uint256 einTo = identityRegistry.getEIN(_to);
+        uint256 einTo = IdentityRegistry.getEIN(_to);
         for (uint8 i = 0; i < LegalResolverQ; i++) {
             ResolverInterface resolver = ResolverInterface(LegalResolverArray[i]);
             require(resolver.isApproved(einTo, _amount), "Resolver is not approved");
@@ -806,12 +808,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
     function _checkWhitelist(address _user) private view {
-        uint256 einUser = identityRegistry.getEIN(_user);
+        uint256 einUser = IdentityRegistry.getEIN(_user);
         require(whitelist[einUser], "EIN address not in whitelist");
     }
 
     function _checkBlacklist(address _user) private view {
-        uint256 einUser = identityRegistry.getEIN(_user);
+        uint256 einUser = IdentityRegistry.getEIN(_user);
         require(!blacklist[einUser], "EIN address is blacklisted");
     }
 

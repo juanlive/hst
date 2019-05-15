@@ -57,13 +57,13 @@ contract HSTFactory is SnowflakeOwnable {
     address identityRegistryAddress;
     address hydroTokenAddress;
 
-    IdentityRegistry identityRegistry;
+    IdentityRegistryInterface IdentityRegistry;
 
     constructor(address _dateTimeAddress, address _identityRegistryAddress, address _hydroTokenAddress) public {
       dateTimeAddress = _dateTimeAddress;
       identityRegistryAddress = _identityRegistryAddress;
       hydroTokenAddress = _hydroTokenAddress;
-      identityRegistry = IdentityRegistry(_identityRegistryAddress);
+      IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
     }
 
    /**
@@ -148,7 +148,7 @@ contract HSTFactory is SnowflakeOwnable {
 
       tokens[_tokenName].id = last_id;
       tokens[_tokenName].tokenAddress = _tokenAddress;
-      tokens[_tokenName].owner = identityRegistry.getEIN(msg.sender);
+      tokens[_tokenName].owner = IdentityRegistry.getEIN(msg.sender);
       tokens[_tokenName].exist = true;
 
       emit ContractDeployed(_tokenName, "HSTOKEN", _tokenAddress);
