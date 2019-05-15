@@ -2,14 +2,10 @@ pragma solidity ^0.5.0;
 
 //import '../interfaces/HSTControlService.sol';
 import './SnowflakeOwnable.sol';
+import '../HSToken.sol';
+import '../_testing/IdentityRegistry.sol';
 //import '../zeppelin/ownership/Ownable.sol';
 
-// DONE
-// create default categories
-// add categories - onlySnowflakeOwnable
-// add services for a token
-// replace services for a token
-// create contract SnowflakeOwnable and modifier onlySnowflakeOwner
 
 // TODO
 // create modifier afterEndOfIssuance
@@ -34,10 +30,16 @@ import './SnowflakeOwnable.sol';
  *
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
+
 contract HSTServiceRegistry is SnowflakeOwnable {
 
-  // default rules enforcer
-  address defaultRulesEnforcer;
+  // existing contracts to call
+  address defaultRulesEnforcerAddress;
+  address identityRegistryAddress;
+
+  IdentityRegistry identityRegistry;
+  HSToken token;
+  uint tokenEINOwner;
 
   // token address => service category symbol => category description
   mapping(address => mapping(bytes32 => string)) serviceCategories;
@@ -61,6 +63,16 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   event ReplaceService(address _token, bytes32 _category, address _newService);
 
   /**
+   * @notice Constructor
+   * @dev    Create basic service categories
+   */
+  constructor(address _defaultRulesEnforcerAddress, address _identityRegistryAddress) public {
+    // set default rules enforcer
+    defaultRulesEnforcerAddress = _defaultRulesEnforcerAddress;
+    identityRegistryAddress = _identityRegistryAddress;
+  }
+
+  /**
    * @dev Validate that a contract exists in an address received as such
    * Credit: https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/ERC223_Token.sol#L107-L114
    * @param _addr The address of a smart contract
@@ -73,12 +85,25 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   }
 
   /**
-   * @notice Constructor
-   * @dev    Create basic service categories
-   */
-  constructor(address _defaultRulesEnforcer) public {
-    // set default rules enforcer
-    defaultRulesEnforcer = _defaultRulesEnforcer;
+  * @notice Throws if called by any account other than the owner
+  * @dev This works on EINs, not on addresses
+  */
+  modifier onlyTokenOwner(address _tokenAddress) {
+      require(isTokenOwner(_tokenAddress), "Must be owner to call this function");
+      _;
+  }
+
+  /**
+  * @notice Check if caller is owner
+  * @dev This works on EINs, not on addresses
+  * @return true if `msg.sender` is the owner of the contract
+  */
+  function isTokenOwner(address _tokenAddress) public returns(bool) {
+      token = HSToken(_tokenAddress);
+      tokenEINOwner = token.getTokenEINOwner();
+      identityRegistry = IdentityRegistry(identityRegistryAddress);
+      uint _senderEIN = identityRegistry.getEIN(msg.sender);
+      return (_senderEIN == tokenEINOwner);
   }
 
   /**
@@ -87,7 +112,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _categoryName Name of the new service category
    * @param _description Description of the new service category
    */
-  function addCategory(address _tokenAddress, bytes32 _categoryName, string memory _description) public onlySnowflakeOwner {
+  function addCategory(address _tokenAddress, bytes32 _categoryName, string memory _description) public onlyTokenOwner(_tokenAddress) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
     require (_categoryName.length != 0, "Category name cannot be blank");
     serviceCategories[_tokenAddress][_categoryName] = _description;
@@ -99,15 +124,15 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    *
    * @param _service Address of the service to use
    */
-  function addService(address _tokenAddress, bytes32 _categoryName, address _service) public isContract(msg.sender) isContract(_service) {
+  function addService(address _tokenAddress, bytes32 _categoryName, address _service) public onlyTokenOwner(_tokenAddress) isContract(_service) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
     require (_categoryName.length != 0, "Category name cannot be blank");
     serviceRegistry[_tokenAddress][_categoryName] = _service;
     emit AddService(_tokenAddress, _categoryName, _service);
   }
 
-  function addDefaultRulesService() public isContract(msg.sender) {
-      serviceRegistry[msg.sender]["RULES"] = defaultRulesEnforcer;
+  function addDefaultRulesService(address _tokenAddress) public onlyTokenOwner(_tokenAddress) {
+      serviceRegistry[_tokenAddress]["RULES"] = defaultRulesEnforcerAddress;
   }
 
     /**
@@ -119,7 +144,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _newService New address for the service to use
    */
   function replaceService(address _tokenAddress, bytes32 _categoryName, address _newService)
-    public onlyOwner isContract(msg.sender) isContract(_newService) {
+    public onlyTokenOwner(_tokenAddress) isContract(_newService) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
     require (_categoryName.length != 0, "Category name cannot be blank");
     serviceRegistry[_tokenAddress][_categoryName] = _newService;
@@ -133,7 +158,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _service Address of the service to use
    */
   function getService(address _tokenAddress, bytes32 _categoryName)
-    public view isContract(msg.sender) isContract(_service) returns(address _service) {
+    public view returns(address _service) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
     require (_categoryName.length != 0, "Category name cannot be blank");
     return serviceRegistry[_tokenAddress][_categoryName];
