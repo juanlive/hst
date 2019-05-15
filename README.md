@@ -8,6 +8,17 @@ Architecture draft:
   <img src="https://github.com/juanlive/hst/blob/master/images/HST%20Securities%20Architecture.png" width="500">
 </p>
 
+Running tests:
+
+In a console:
+
+- npm run chain
+
+In another console:
+
+- npm run test
+
+
 Features:
 
     Create Security Token - unique IDs are attributed to each token, called a Hydro Security Token or HST

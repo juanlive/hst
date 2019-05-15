@@ -1,4 +1,5 @@
-const truffleAssert = require('truffle-assertions');
+const truffleAssert = require('truffle-assertions')
+const HSTFactory = artifacts.require('./HSTFactory.sol')
 const HSToken = artifacts.require('./HSToken.sol')
 
 const common = require('./common.js')
@@ -80,22 +81,23 @@ it('Snowflake identities created for all accounts', async() => {
 
 describe('Checking HSToken functionality', async() =>{
 
-it('HSToken can be created', async () => {
-  newToken = await HSToken.new(
-      1,
-      web3.utils.stringToHex("HydroSecurityToken"),
-      "Hydro Security",
-      "HTST",
-      18,
-      instances.HydroToken.address, // HydroToken Rinkeby
-      instances.IdentityRegistry.address, // IdentityRegistry Rinkeby
-      {from: user.address}
-    )
-    console.log("HSToken Address", newToken.address)
-    console.log("User", user.address)
 
-})
-
+  it('HSToken can be created', async () => {
+    newToken = await HSToken.new(
+        1,
+        web3.utils.stringToHex("HydroSecurityToken"),
+        "Hydro Security",
+        "HTST",
+        18,
+        instances.HydroToken.address, 
+        instances.IdentityRegistry.address,
+        user.address,
+        {from: user.address}
+      )
+      console.log("HSToken Address", newToken.address)
+      console.log("User", user.address)
+  })
+  
 
   it('HSToken exists', async () => {
     userId = await newToken.Owner();
@@ -161,6 +163,7 @@ it('HSToken can be created', async () => {
   })
 
 
+
   it('HSToken activate Launch', async () => {
     await newToken.stageActivate({ from: user.address });
   })
@@ -185,7 +188,7 @@ it('HSToken can be created', async () => {
         { from: user.address })
   })
 
-// Reject Identity 1 and try to buy
+  // Reject Identity 1 and try to buy
 
   it('KYCResolver reject EIN identity 1', async () => {
     await instances.KYCResolver.rejectEin(
