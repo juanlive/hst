@@ -23,7 +23,7 @@ npm run chain
 npm run test
 
 
-Features:
+Features (some are yet work-in-progress):
 
     Create Security Token - unique IDs are attributed to each token, called a Hydro Security Token or HST
 

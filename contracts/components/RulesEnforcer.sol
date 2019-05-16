@@ -149,10 +149,14 @@ contract RulesEnforcer is SnowflakeOwnable {
     }   */
     function addBuyer(
         uint _buyerEIN,
-        string memory _firstName, string memory _lastName,
+        string memory _firstName,
+        string memory _lastName,
         bytes32 _isoCountryCode,
-        uint16 _yearOfBirth, uint8 _monthOfBirth, uint8 _dayOfBirth,
-        uint64 _netWorth, uint32 _salary)
+        uint16 _yearOfBirth,
+        uint8 _monthOfBirth,
+        uint8 _dayOfBirth,
+        uint64 _netWorth,
+        uint32 _salary)
     public onlySnowflakeOwner {
         buyerData memory _bd;
         _bd.firstName = _firstName;
@@ -173,9 +177,9 @@ contract RulesEnforcer is SnowflakeOwnable {
     * @param _serviceCategory For this buyer and this token, the service category to use for KYC
     */
     function addKYCServiceToBuyer(
-        uint _EIN, 
-        address _tokenFor, 
-        bytes32 _serviceCategory) 
+        uint _EIN,
+        address _tokenFor,
+        bytes32 _serviceCategory)
     public isContract(_tokenFor) {
         bytes32 _emptyStringTest = _serviceCategory;
         require (_emptyStringTest.length != 0, "Service category cannot be blank");
@@ -191,9 +195,9 @@ contract RulesEnforcer is SnowflakeOwnable {
     * @param _serviceCategory For this buyer and this token, the service category to use for AML
     */
     function addAMLServiceToBuyer(
-        uint _EIN, 
-        address _tokenFor, 
-        bytes32 _serviceCategory) 
+        uint _EIN,
+        address _tokenFor,
+        bytes32 _serviceCategory)
     public isContract(_tokenFor) {
         bytes32 _emptyStringTest = _serviceCategory;
         require (_emptyStringTest.length != 0, "Service category cannot be blank");
@@ -211,9 +215,9 @@ contract RulesEnforcer is SnowflakeOwnable {
     * @param _serviceCategory For this buyer and this token, the service category to use for KYC
     */
     function replaceKYCServiceForBuyer(
-        uint _EIN, 
-        address _tokenFor, 
-        bytes32 _serviceCategory) 
+        uint _EIN,
+        address _tokenFor,
+        bytes32 _serviceCategory)
     public isContract(_tokenFor) {
         bytes32 _emptyStringTest = _serviceCategory;
         require (_emptyStringTest.length != 0, "Service category cannot be blank");
@@ -231,9 +235,9 @@ contract RulesEnforcer is SnowflakeOwnable {
     * @param _serviceCategory For this buyer and this token, the service category to use for KYC
     */
     function replaceAMLServiceForBuyer(
-        uint _EIN, 
-        address _tokenFor, 
-        bytes32 _serviceCategory) 
+        uint _EIN,
+        address _tokenFor,
+        bytes32 _serviceCategory)
     public isContract(_tokenFor) {
         bytes32 _emptyStringTest = _serviceCategory;
         require (_emptyStringTest.length != 0, "Service category cannot be blank");
@@ -246,9 +250,9 @@ contract RulesEnforcer is SnowflakeOwnable {
     function assignTokenValues(
         address _tokenAddress,
         uint _minimumAge,
-        uint64  _minimumNetWorth,
-        uint32  _minimumSalary,
-        bool _accreditedInvestorStatusRequired) 
+        uint64 _minimumNetWorth,
+        uint32 _minimumSalary,
+        bool _accreditedInvestorStatusRequired)
     public {
         tokenData[_tokenAddress].minimumAge = _minimumAge;
         tokenData[_tokenAddress].minimumNetWorth = _minimumNetWorth;
@@ -258,16 +262,16 @@ contract RulesEnforcer is SnowflakeOwnable {
     }
 
     function addCountryBan(
-        address _tokenAddress, 
-        bytes32 _isoCountryCode) 
+        address _tokenAddress,
+        bytes32 _isoCountryCode)
     public {
         bannedCountries[_tokenAddress][_isoCountryCode] = true;
         emit AddCountryBan(_tokenAddress, _isoCountryCode);
     }
 
     function liftCountryBan(
-        address _tokenAddress, 
-        bytes32 _isoCountryCode) 
+        address _tokenAddress,
+        bytes32 _isoCountryCode)
     public {
         bannedCountries[_tokenAddress][_isoCountryCode] = false;
         emit LiftCountryBan(_tokenAddress, _isoCountryCode);
