@@ -233,13 +233,13 @@ Release HydroTokens held in escrow to the owner/issuer.
 
 getTokenEINOwner()
 
-isTokenLocked()
+isLocked()
 
-isTokenAlive()
+isAlive()
 
-getTokenStage()
+getStage()
 
-tokenInSetUpStage()
+isSetupTime()
 
-tokenInPrelaunchStage( )
+isPrelaunchTime( )
 
