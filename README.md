@@ -69,7 +69,7 @@ This tutorial shows you how to issue a new token using the Hydro Securities Toke
 
 Token creation
 
-Call the HSToken Constructor
+1. Call the HSToken Constructor
 
 The following are required values for the creation of a new token, and must be provided by the owner/issuer of the token, possibly through a dApp, or as parameters if invoking the smart contract directly.
 
@@ -96,7 +96,7 @@ is not active
 its name is protected
 The owner/issuer has 15 days to fill the main parameters to setup the token. This was made to facilitate the life of the token owner/issuer.
 
-Token setup
+2. Token setup
 
 To setup the token, 3 different functions shall be called, each one with their corresponding parameters:
 
@@ -139,7 +139,7 @@ To setup the token, 3 different functions shall be called, each one with their c
     )
 
 
-Token pre-launch
+3. Token pre-launch
 
 After calling these three functions, the owner/issuer can call:
 
@@ -164,7 +164,7 @@ addBlacklist(uint[])
 
 
 
-Token activation
+4. Token activation
 
 Owner/issuer can activate the token by calling the function
 
@@ -187,7 +187,7 @@ There can be restrictions of amount per investor, total amount of tokens, quanti
 
 
 
-Token issuing closes
+5. Token issuing closes
 
 Issuing will end once endDate parameter has been reached. When that occurs, token will change to stage = FINALIZED
 
@@ -195,7 +195,7 @@ Once issuing has finalized, the HSToken will be able to be transacted as ERC20 t
 
 
 
-Token oraclizing
+6. Token oraclizing
 
 An Oracle can be assigned to the token, and it should call the following function to update the price of the token in Ethers:
 
@@ -208,7 +208,7 @@ addEthOracle(address)
 
 
 
-Other administrative functions
+7. Other administrative functions
 
 setLockUpPeriod(uint _lockEnds)
 
@@ -229,7 +229,7 @@ Release HydroTokens held in escrow to the owner/issuer.
 
 
 
-Public Getters
+8. Public Getters
 
 getTokenEINOwner()
 
