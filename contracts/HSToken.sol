@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 
-//import './components/SnowflakeOwnable.sol';
+import './components/SnowflakeOwnable.sol';
 //import './components/TokenWithDates.sol';
 import './components/HSTServiceRegistry.sol';
 import './interfaces/HydroInterface.sol';
@@ -241,7 +241,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     modifier onlyAtSetup() {
         require(stage == Stage.SETUP, "Stage is not setup");
-        require(isSetupTime(), "Setup time has expired");
+        require(tokenInSetupStage(), "Setup time has expired");
         _;
     }
 
@@ -491,8 +491,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
     }
 
 
-
-
     // Adding and removing resolvers
 
     // Feature #3
@@ -724,34 +722,34 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS {
 
     // PUBLIC GETTERS ----------------------------------------------------------------
 
-    function isLocked() public view returns(bool) {
+    function isTokenLocked() public view returns(bool) {
         if (locked) return true;
         if (PERIOD_LOCKED && now < lockEnds) return true;
         return false;
     }
 
-    function isAlive() public view returns(bool) {
+    function isTokenAlive() public view returns(bool) {
         if (!exists) return false;
-        if (stage == Stage.SETUP && !isSetupTime()) return false;
+        if (stage == Stage.SETUP && !tokenInSetupStage()) return false;
         return true;
     }
 
-    function getStage() public view returns(string memory _stage) {
+    function getTokenStage() public view returns(string memory _stage) {
         if (stage == Stage.FINALIZED || stage == Stage.ACTIVE && endDate < now) return "FINALIZED";
         if (stage == Stage.ACTIVE || stage == Stage.PRELAUNCH && beginningDate > 0 && beginningDate > now) return "ACTIVE";
         if (stage == Stage.PRELAUNCH) return "PRELAUNCH";
-        if (stage == Stage.SETUP && isSetupTime()) return "SETUP";
+        if (stage == Stage.SETUP && tokenInSetupStage()) return "SETUP";
         return "TOKEN IS INACTIVE";
     }
 
     // PRIVATE GETTERS
 
-    function isSetupTime() private view returns(bool) {
+    function tokenInSetupStage() private view returns(bool) {
         // 15 days to complete setup
         return((now - registerDate) < (15 * 24 * 60 * 60));
     }
 
-    function isPrelaunchTime() private view returns(bool) {
+    function tokenInPrelaunchStage() private view returns(bool) {
         // 15 days to complete setup
         return((now - registerDate) < (15 * 24 * 60 * 60));
     }

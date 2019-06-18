@@ -45,6 +45,7 @@ contract HSTFactory {
 
     uint256 public last_id = 0;
 
+    // Token Name => Token data structure
     mapping(bytes32 => Token) public tokens;
 
 
@@ -78,8 +79,6 @@ contract HSTFactory {
     */
     event ContractDeployed(bytes32 indexed _name, bytes32 _type, address indexed _addr);
 
-
-
     constructor(address _dateTimeAddress, address _identityRegistryAddress, address _hydroTokenAddress) public {
       dateTimeAddress = _dateTimeAddress;
       identityRegistryAddress = _identityRegistryAddress;
@@ -111,7 +110,7 @@ contract HSTFactory {
 
       if ( tokens[_tokenName].exist ) {
         HSToken _token = HSToken(tokens[_tokenName].tokenAddress);
-        if ( _token.isAlive() ) {
+        if ( _token.isTokenAlive() ) {
           emit SecuritiesDeployCancelled(_tokenName, "Token exists and it is alive");
           return false;
         }

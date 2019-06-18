@@ -6,8 +6,10 @@ import '../components/DateTime.sol';
 
 // TODO
 
-// analyze the following:
-// Restricted Transfers - override normal ERC-20 transfer methods to block transfers of HST between wallets if not on a KYC/AML whitelist
+// review SECURITY and allow certain functions to be called only by:
+// - token
+// - token owner
+// (create a modifier for this)
 
 
 /**
@@ -34,6 +36,8 @@ contract RulesEnforcer is SnowflakeOwnable {
         uint64  minimumNetWorth;
         uint32  minimumSalary;
         bool    accreditedInvestorStatusRequired;
+        bool    amlWhitelistingRequired;
+        bool    cftWhitelistingRequired;
     }
 
     // token address => data to enforce rules
@@ -42,7 +46,7 @@ contract RulesEnforcer is SnowflakeOwnable {
     // token address => ISO country code => country is banned
     mapping(address => mapping(bytes32 => bool)) public bannedCountries;
 
-    // buyer data
+    // buyer rules data
 
     DateTime dateTime;
 
@@ -54,6 +58,9 @@ contract RulesEnforcer is SnowflakeOwnable {
         uint64  netWorth;
         uint32  salary;
         bool    accreditedInvestorStatus;
+        bool    kycWhitelisted;
+        bool    amlWhitelisted;
+        bool    cftWhitelisted;
     }
 
     struct buyerServicesDetail {
@@ -131,7 +138,6 @@ contract RulesEnforcer is SnowflakeOwnable {
     constructor(address _dateTimeAddress) public {
         dateTime = DateTime(_dateTimeAddress);
     }
-
 
     // functions for buyer's registry
 
@@ -247,6 +253,17 @@ contract RulesEnforcer is SnowflakeOwnable {
 
     // functions for rules enforcement
 
+    /**
+    * @notice Assign rule values for each token
+    *
+    * @dev This method is only callable by the contract's owner
+    *
+    * @param _tokenAddress Address for the Token
+    * @param _minimumAge Required minimum age to buy this Token
+    * @param _minimumNetWorth Required minimum net work to buy this Token
+    * @param _minimumSalary Required minimum salary to buy this Token
+    * @param _accreditedInvestorStatusRequired Determines if buyer must be an accredited investor to buy this Token
+    */
     function assignTokenValues(
         address _tokenAddress,
         uint _minimumAge,
@@ -261,6 +278,14 @@ contract RulesEnforcer is SnowflakeOwnable {
         emit TokenValuesAssigned(_tokenAddress);
     }
 
+    /**
+    * @notice TO DO
+    *
+    * @dev This method is only callable by the contract's owner
+    *
+    * @param _tokenAddress Address for the Token
+    * @param _isoCountryCode Country to be banned for this Token
+    */
     function addCountryBan(
         address _tokenAddress,
         bytes32 _isoCountryCode)
@@ -269,6 +294,14 @@ contract RulesEnforcer is SnowflakeOwnable {
         emit AddCountryBan(_tokenAddress, _isoCountryCode);
     }
 
+    /**
+    * @notice TO DO
+    *
+    * @dev This method is only callable by the contract's owner
+    *
+    * @param _tokenAddress Address for the Token
+    * @param _isoCountryCode Country to be unbanned for this Token
+    */
     function liftCountryBan(
         address _tokenAddress,
         bytes32 _isoCountryCode)
@@ -277,7 +310,14 @@ contract RulesEnforcer is SnowflakeOwnable {
         emit LiftCountryBan(_tokenAddress, _isoCountryCode);
     }
 
-    function checkRules(uint _buyerEIN) public view {
+    /**
+    * @notice Enforce rules for the investor
+    *
+    * @dev This method is only callable by a contract
+    *
+    * @param _buyerEIN EIN of the buyer
+    */
+    function checkRules(uint _buyerEIN) public view isContract(msg.sender) {
         // check if token has designated values
         bool _designatedDefaultValues = true;
         if ((tokenData[msg.sender].minimumAge == 0) ||
@@ -286,28 +326,42 @@ contract RulesEnforcer is SnowflakeOwnable {
             _designatedDefaultValues = false;
             }
         require(_designatedDefaultValues == true, "Token must designated default values");
-        // enforce rules for the investor:
 
-        // KYC restrictions
+        // KYC restriction (not optional)
+        require (buyerRegistry[_buyerEIN].kycWhitelisted == true, "Buyer must be approved for KYC");
 
-        // AML restrictions
+        // AML restriction
+        if (tokenData[msg.sender].amlWhitelistingRequired == true) {
+            require (buyerRegistry[_buyerEIN].amlWhitelisted == true, "Buyer must be approved for AML");
+        }
 
-        // age restrictions *** WORKING ***
-        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
-            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+        // CFT restriction
+        if (tokenData[msg.sender].cftWhitelistingRequired == true) {
+            require (buyerRegistry[_buyerEIN].cftWhitelisted == true, "Buyer must be approved for CFT");
         }
-        // net-worth restrictions *** WORKING ***
-        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
-            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+
+        // age restriction
+        if (tokenData[msg.sender].minimumAge > 0) {
+            uint256 _buyerAgeSeconds = now - buyerRegistry[_buyerEIN].birthTimestamp;
+            uint16 _buyerAgeYears = dateTime.getYear(_buyerAgeSeconds);
+            require (_buyerAgeYears >= tokenData[msg.sender].minimumAge, "Buyer must reach minimum age");
         }
-        // salary restrictions *** WORKING ***
-        if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
-            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+
+        // net-worth restriction
+        if (tokenData[msg.sender].minimumNetWorth > 0) {
+            require (buyerRegistry[_buyerEIN].netWorth >= tokenData[msg.sender].minimumNetWorth, "Buyer must reach minimum net worth");
         }
+
+        // salary restriction
+        if (tokenData[msg.sender].minimumSalary > 0) {
+            require (buyerRegistry[_buyerEIN].salary >= tokenData[msg.sender].minimumSalary, "Buyer must  reach minimum salary");
+        }
+
         // accredited investor status
         if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
             require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
         }
+
         // country/geography restrictions on ownership
         require (bannedCountries[msg.sender][buyerRegistry[_buyerEIN].isoCountryCode] == false, "Country of Buyer must not be banned for token");
 
