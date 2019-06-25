@@ -1,10 +1,10 @@
-const IdentityRegistry = artifacts.require('./_testing/IdentityRegistry.sol')
-const HydroToken = artifacts.require('./_testing/HydroToken.sol')
-const Snowflake = artifacts.require('./Snowflake.sol')
 const ClientRaindrop = artifacts.require('./resolvers/ClientRaindrop/ClientRaindrop.sol')
-const OldClientRaindrop = artifacts.require('./_testing/OldClientRaindrop.sol')
-const KYCResolver = artifacts.require('./samples/KYCResolver.sol')
 const DateTime = artifacts.require('./components/DateTime.sol')
+const HydroToken = artifacts.require('./_testing/HydroToken.sol')
+const IdentityRegistry = artifacts.require('./_testing/IdentityRegistry.sol')
+const KYCResolver = artifacts.require('./samples/KYCResolver.sol')
+const OldClientRaindrop = artifacts.require('./_testing/OldClientRaindrop.sol')
+const Snowflake = artifacts.require('./Snowflake.sol')
 
 
 async function initialize (owner, users) {
@@ -29,7 +29,6 @@ async function initialize (owner, users) {
     instances.IdentityRegistry.address, instances.HydroToken.address, { from: owner }
   )
 
-
   instances.OldClientRaindrop = await OldClientRaindrop.new({ from: owner })
 
   instances.ClientRaindrop = await ClientRaindrop.new(
@@ -40,8 +39,8 @@ async function initialize (owner, users) {
   instances.KYCResolver = await KYCResolver.new( {from: owner })
   
   console.log("KYC Resolver", instances.KYCResolver.address)
-
-
+  console.log("Identity Registry", instances.IdentityRegistry.address)
+  
   return instances
 }
 

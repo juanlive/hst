@@ -22,10 +22,16 @@ import '../zeppelin/ownership/Ownable.sol';
 contract SnowflakeOwnable is Ownable {
 
     //address private _owner;
-    uint ownerEIN;
+    uint public ownerEIN;
 
     // access identity registry to get EINs for addresses
     IdentityRegistryInterface public identityRegistry;
+
+    /**
+    * @notice Emit when setting address for the Identity Registry
+    * @param  _identityRegistryAddress The address of the Identity Registry
+    */
+    event IdentityRegistryWasSet(address _identityRegistryAddress);
 
     /**
     * @notice Emit when transferring ownership
@@ -41,6 +47,7 @@ contract SnowflakeOwnable is Ownable {
     */
     constructor(address _identityRegistryAddress) public {
         setIdentityRegistryAddress(_identityRegistryAddress);
+        //setOwnerEIN();
     }
 
     /**
@@ -63,14 +70,21 @@ contract SnowflakeOwnable is Ownable {
     }
 
     /**
+    * @notice Set the EIN for the owner
+    */
+    function setOwnerEIN() public onlyOwner {
+        ownerEIN = identityRegistry.getEIN(msg.sender);
+        emit OwnershipTransferred(0, ownerEIN);
+    }
+
+    /**
     * @notice Set the address for the Identity Registry
     * @param _identityRegistryAddress The address of the IdentityRegistry contract
     */
     function setIdentityRegistryAddress(address _identityRegistryAddress) public onlyOwner {
         require(_identityRegistryAddress != address(0), 'The identity registry address is required');
         identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
-        ownerEIN = identityRegistry.getEIN(msg.sender);
-        emit OwnershipTransferred(0, ownerEIN);
+        emit IdentityRegistryWasSet(_identityRegistryAddress);
     }
 
     /**
