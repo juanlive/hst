@@ -29,6 +29,7 @@ import '../components/DateTime.sol';
 
 contract RulesEnforcer is SnowflakeOwnable {
 
+
     // token rules data
 
     struct rulesData {
@@ -45,6 +46,7 @@ contract RulesEnforcer is SnowflakeOwnable {
 
     // token address => ISO country code => country is banned
     mapping(address => mapping(bytes32 => bool)) public bannedCountries;
+
 
     // buyer rules data
 
@@ -73,6 +75,11 @@ contract RulesEnforcer is SnowflakeOwnable {
 
     // buyer EIN => token address => service details for buyer
     mapping(uint => mapping(address => buyerServicesDetail)) public serviceDetailForBuyers;
+
+
+    // SnowflakeOwnable data
+
+    address _identityRegistryAddress;
 
 
     // rules events

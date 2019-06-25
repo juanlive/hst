@@ -58,12 +58,12 @@ describe('Checking RulesEnforcer functionality', async() =>{
         instances.DateTime.address,
         {from: user.address}
       )
-      console.log("RulesEnforcer Address", newFactory.address)
+      console.log("RulesEnforcer Address", newRulesEnforcer.address)
       console.log("User", user.address)
   })
 
   it('RulesEnforcer exists', async () => {
-    userId = await newFactory.Owner();
+    userId = await newRulesEnforcer.ownerEIN();
   })
 
 

@@ -25,6 +25,7 @@ contract SnowflakeOwnable is Ownable {
     uint public ownerEIN;
 
     // access identity registry to get EINs for addresses
+    address identityRegistryAddress;
     IdentityRegistryInterface public identityRegistry;
 
     /**
@@ -41,16 +42,6 @@ contract SnowflakeOwnable is Ownable {
     event OwnershipTransferred(uint _previousOwnerEIN, uint _newOwnerEIN);
 
     /**
-    * @notice Constructor
-    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-    * account
-    */
-    constructor(address _identityRegistryAddress) public {
-        setIdentityRegistryAddress(_identityRegistryAddress);
-        //setOwnerEIN();
-    }
-
-    /**
     * @notice Throws if called by any account other than the owner
     * @dev This works on EINs, not on addresses
     */
@@ -60,11 +51,20 @@ contract SnowflakeOwnable is Ownable {
     }
 
     /**
+    * @notice Constructor
+    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+    * account
+    */
+    //constructor() public {
+    //}
+
+    /**
     * @notice Check if caller is owner
     * @dev This works on EINs, not on addresses
     * @return true if `msg.sender` is the owner of the contract
     */
     function isOwner() public view returns(bool) {
+        require(identityRegistryAddress != address(0), 'The identity registry address is required');
         uint caller = identityRegistry.getEIN(msg.sender);
         return (caller == ownerEIN);
     }
@@ -72,19 +72,31 @@ contract SnowflakeOwnable is Ownable {
     /**
     * @notice Set the EIN for the owner
     */
-    function setOwnerEIN() public onlyOwner {
+    function updateOwnerEIN() private {
         ownerEIN = identityRegistry.getEIN(msg.sender);
         emit OwnershipTransferred(0, ownerEIN);
+    }
+
+    /**
+    * @notice Set the EIN for the owner
+    */
+    function setOwnerEIN() public onlyOwner {
+        updateOwnerEIN();
     }
 
     /**
     * @notice Set the address for the Identity Registry
     * @param _identityRegistryAddress The address of the IdentityRegistry contract
     */
-    function setIdentityRegistryAddress(address _identityRegistryAddress) public onlyOwner {
-        require(_identityRegistryAddress != address(0), 'The identity registry address is required');
+    function updateIdentityRegistryAddress(address _identityRegistryAddress) private {
+        identityRegistryAddress = _identityRegistryAddress;
         identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
         emit IdentityRegistryWasSet(_identityRegistryAddress);
+    }
+
+    function setIdentityRegistryAddress(address _identityRegistryAddress) public onlyOwner {
+        require(_identityRegistryAddress != address(0), 'The identity registry address is required');
+        updateIdentityRegistryAddress(_identityRegistryAddress);
     }
 
     /**
@@ -92,7 +104,7 @@ contract SnowflakeOwnable is Ownable {
     * @return The address of the IdentityRegistry contract
     */
     function getIdentityRegistryAddress() public view returns(address) {
-        return(address(identityRegistry));
+        return(identityRegistryAddress);
     }
 
     /**
@@ -101,6 +113,7 @@ contract SnowflakeOwnable is Ownable {
     * @return the address of the owner
     */
     function getOwnerEIN() public view returns(uint) {
+        require(identityRegistryAddress != address(0), 'The identity registry address is required');
         return ownerEIN;
     }
 
@@ -128,6 +141,7 @@ contract SnowflakeOwnable is Ownable {
     * @param _newOwner EIN to transfer ownership to
     */
     function _transferOwnership(uint _newOwner) internal onlySnowflakeOwner {
+        require(identityRegistryAddress != address(0), 'The identity registry address is required');
         require(identityRegistry.identityExists(_newOwner), "Owner must exist");
         require(_newOwner != 0, "Owner must exist");
         emit OwnershipTransferred(ownerEIN, _newOwner);

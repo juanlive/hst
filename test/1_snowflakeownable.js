@@ -99,15 +99,16 @@ describe('Checking SnowflakeOwnable functionality', async() =>{
     console.log("Owner EIN", userId)
   })
 
-  it('SnowflakeOwnable set owner EIN', async () => {
-    await newSnowflakeOwnable.setOwnerEIN({from: user.address})
-  })
-
   it('SnowflakeOwnable set Identity Registry', async () => {
+    console.log("Identity Registry Address", instances.IdentityRegistry.address)
     await newSnowflakeOwnable.setIdentityRegistryAddress(
       instances.IdentityRegistry.address,
       {from: user.address}
-      )
+    )
+  })
+
+  it('SnowflakeOwnable set owner EIN', async () => {
+    await newSnowflakeOwnable.setOwnerEIN({from: user.address})
   })
 
 })
