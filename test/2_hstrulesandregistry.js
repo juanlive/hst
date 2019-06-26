@@ -1,6 +1,6 @@
 const truffleAssert = require('truffle-assertions')
 const RulesEnforcer = artifacts.require('./components/RulesEnforcer.sol')
-const HSTFactory = artifacts.require('./HSTServiceRegistry.sol')
+const ServiceRegistry = artifacts.require('./HSTServiceRegistry.sol')
 
 const common = require('./common.js')
 const { sign, verifyIdentity, daysOn, daysToSeconds, createIdentity } = require('./utilities')
@@ -74,17 +74,17 @@ describe('Checking HSTServiceRegistry functionality', async() =>{
 
 
   it('HSTServiceRegistry can be created', async () => {
-    newServiceRegistry = await HSTServiceRegistry.new(
+    newServiceRegistry = await ServiceRegistry.new(
         newRulesEnforcer.address,
         instances.IdentityRegistry.address,
         {from: user.address}
       )
-      console.log("HSTFactory Address", newFactory.address)
+      console.log("HSTServiceRegistry Address", newServiceRegistry.address)
       console.log("User", user.address)
   })
 
-  it('HSTFactory exists', async () => {
-    userId = await newFactory.Owner();
+  it('HSTServiceRegistry exists', async () => {
+    userId = await newServiceRegistry.ownerEIN();
   })
 
 
