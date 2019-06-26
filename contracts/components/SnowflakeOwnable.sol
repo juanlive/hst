@@ -46,7 +46,7 @@ contract SnowflakeOwnable is Ownable {
     * @dev This works on EINs, not on addresses
     */
     modifier onlySnowflakeOwner() {
-        require(isOwner(), "Must be owner to call this function");
+        require(isEINowner(), "Must be the EIN owner to call this function");
         _;
     }
 
@@ -63,7 +63,7 @@ contract SnowflakeOwnable is Ownable {
     * @dev This works on EINs, not on addresses
     * @return true if `msg.sender` is the owner of the contract
     */
-    function isOwner() public view returns(bool) {
+    function isEINowner() public view returns(bool) {
         require(identityRegistryAddress != address(0), '1. The identity registry address is required');
         uint caller = identityRegistry.getEIN(msg.sender);
         return (caller == ownerEIN);
@@ -72,16 +72,17 @@ contract SnowflakeOwnable is Ownable {
     /**
     * @notice Set the EIN for the owner
     */
-    function updateOwnerEIN() private {
-        ownerEIN = identityRegistry.getEIN(msg.sender);
-        emit OwnershipTransferred(0, ownerEIN);
-    }
-
-    /**
-    * @notice Set the EIN for the owner
-    */
-    function setOwnerEIN() public onlyOwner {
-        updateOwnerEIN();
+    function setOwnerEIN(uint _newOwnerEIN) public {
+        uint _callerEIN = identityRegistry.getEIN(msg.sender);
+        require((ownerEIN == 0 || _callerEIN == ownerEIN), 'Owner must be zero or you must be the owner');
+        if (ownerEIN == 0) {
+            ownerEIN = _newOwnerEIN;
+            emit OwnershipTransferred(0, _newOwnerEIN);
+        } else {
+            uint _oldOwnerEIN = ownerEIN;
+            ownerEIN = _newOwnerEIN;
+            emit OwnershipTransferred(_oldOwnerEIN, _newOwnerEIN);
+        }
     }
 
     /**
