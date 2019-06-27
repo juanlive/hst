@@ -107,18 +107,11 @@ describe('Checking SnowflakeOwnable functionality', async() =>{
       {from: user.address}
     )
   })
-  
+
   it('SnowflakeOwnable get owner EIN', async () => {
-    newOwner = 2
-    console.log("Owner address", newSnowflakeOwnable.owner())
-    console.log("Running address", user.address)
-    console.log("Owner EIN", newSnowflakeOwnable.ownerEIN())
-    console.log("Running EIN", userId)
-    console.log("Will set to", newOwner)
     await newSnowflakeOwnable.getOwnerEIN(
       {from: user.address}
     )
-    console.log("Owner EIN", newSnowflakeOwnable.getOwnerEIN())
   })
 
 

@@ -64,7 +64,7 @@ describe('Checking HSTokenRegistry functionality', async() =>{
   
 
   it('HSTokenRegistry exists', async () => {
-    userId = await newTokenRegistry.Owner();
+    userId = await newTokenRegistry.address;
   })
 
 
