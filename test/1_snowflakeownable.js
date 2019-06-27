@@ -49,7 +49,7 @@ contract('Testing SnowflakeOwnable', function (accounts) {
 })
 
 
-describe('Checking SnowflakeOwnable functionality', async() =>{
+describe('Checking IdentityRegistry functionality', async() =>{
 
   // Create IdentityRegistry contract
   // it('IdentityRegistry can be created', async () => {
@@ -87,7 +87,7 @@ describe('Checking SnowflakeOwnable functionality', async() =>{
   // Create SnowflakeOwnable contract
   it('SnowflakeOwnable can be created', async () => {
     newSnowflakeOwnable = await SnowflakeOwnable.new(
-      instances.IdentityRegistry.address,
+      //instances.IdentityRegistry.address,
       {from: user.address}
     )
       console.log("SnowflakeOwnable Address", newSnowflakeOwnable.address)
@@ -95,22 +95,9 @@ describe('Checking SnowflakeOwnable functionality', async() =>{
   })
 
   it('SnowflakeOwnable exists', async () => {
-    userId = await newSnowflakeOwnable.ownerEIN({from: user.address});
+    userId = await newSnowflakeOwnable.ownerEIN({from: user.address})
     console.log("Owner EIN", userId)
     console.log("Owner address", newSnowflakeOwnable.owner())
-  })
-
-  it('SnowflakeOwnable set owner EIN', async () => {
-    newOwner = 2
-    console.log("Owner address", newSnowflakeOwnable.owner())
-    console.log("Running address", user.address)
-    console.log("Owner EIN", newSnowflakeOwnable.ownerEIN())
-    console.log("Running EIN", userId)
-    console.log("Will set to", newOwner)
-    await newSnowflakeOwnable.setOwnerEIN(
-      newOwner,
-      {from: user.address}
-    )
   })
 
   it('SnowflakeOwnable set Identity Registry', async () => {
@@ -120,6 +107,21 @@ describe('Checking SnowflakeOwnable functionality', async() =>{
       {from: user.address}
     )
   })
+  
+  it('SnowflakeOwnable get owner EIN', async () => {
+    newOwner = 2
+    console.log("Owner address", newSnowflakeOwnable.owner())
+    console.log("Running address", user.address)
+    console.log("Owner EIN", newSnowflakeOwnable.ownerEIN())
+    console.log("Running EIN", userId)
+    console.log("Will set to", newOwner)
+    await newSnowflakeOwnable.getOwnerEIN(
+      {from: user.address}
+    )
+    console.log("Owner EIN", newSnowflakeOwnable.getOwnerEIN())
+  })
+
+
 
 
 })

@@ -1,5 +1,4 @@
 const truffleAssert = require('truffle-assertions')
-const HSTFactory = artifacts.require('./HSTFactory.sol')
 const HSToken = artifacts.require('./HSToken.sol')
 
 const common = require('./common.js')

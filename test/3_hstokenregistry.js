@@ -1,5 +1,5 @@
 const truffleAssert = require('truffle-assertions')
-const HSTFactory = artifacts.require('./HSTFactory.sol')
+const HSTokenRegistry = artifacts.require('./HSTokenRegistry.sol')
 const DateTime = artifacts.require('./components/DateTime.sol')
 
 const common = require('./common.js')
@@ -7,7 +7,7 @@ const { sign, verifyIdentity, daysOn, daysToSeconds, createIdentity } = require(
 
 let instances
 let user
-contract('Testing HSTFactory', function (accounts) {
+contract('Testing HSTokenRegistry', function (accounts) {
   const owner = {
     public: accounts[0]
   }
@@ -50,23 +50,21 @@ it('Snowflake identities created for all accounts', async() => {
 })
 
 
-describe('Checking HSTFactory functionality', async() =>{
+describe('Checking HSTokenRegistry functionality', async() =>{
 
 
-  it('HSTFactory can be created', async () => {
-    newFactory = await HSTFactory.new(
-        instances.DateTime.address,
+  it('HSTokenRegistry can be created', async () => {
+    newTokenRegistry = await HSTokenRegistry.new(
         instances.IdentityRegistry.address,
-        instances.HydroToken.address,
         {from: user.address}
       )
-      console.log("HSTFactory Address", newFactory.address)
+      console.log("HSTokenRegistry Address", newTokenRegistry.address)
       console.log("User", user.address)
   })
   
 
-  it('HSTFactory exists', async () => {
-    userId = await newFactory.Owner();
+  it('HSTokenRegistry exists', async () => {
+    userId = await newTokenRegistry.Owner();
   })
 
 

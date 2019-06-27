@@ -28,17 +28,42 @@ contract HSTokenRegistry {
       bool tokenExists;
     }
 
+    struct Symbol {
+      uint256 id;
+      bool symbolExists;
+    }
+
     uint256 public lastId = 0;
+
+    IdentityRegistryInterface public IdentityRegistry;
 
     // Token name => Token data structure
     mapping(bytes32 => Token) public tokens;
 
-    // Token symbol => Token name
-    mapping(bytes32 => bytes32) public symbols;
+    // Token symbol => ID data structure
+    mapping(bytes32 => Symbol) public symbols;
 
 
-    // constructor() public {
-    // }
+    event TokenAppointedToRegistry(
+      bytes32 _tokenName,
+      bytes32 _tokenSymbol,
+      address _tokenAddress,
+      uint256 _id
+    );
+
+    event TokenAlreadyExists(
+      bytes32 _tokenName,
+      string _description
+    );
+
+    event SymbolAlreadyExists(
+      bytes32 _tokenSymbol,
+      string _description
+    );
+
+    constructor(address _identityRegistryAddress) public {
+      IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
+    }
 
  /**
     * @notice Get a Hydro Securities Token symbol
@@ -46,7 +71,7 @@ contract HSTokenRegistry {
     * @return the symbol of the Token corresponding to that name
     */
     function getSecuritiesTokenSymbol(bytes32 _tokenName) public view returns(bytes32) {
-      return tokens[_tokenName].symbol;
+      return tokens[_tokenName].tokenSymbol;
     }
 
    /**
@@ -72,8 +97,8 @@ contract HSTokenRegistry {
     * @param  _tokenName The name of the token
     * @return the description for the token corresponding to that name
     */
-    function getSecuritiesTokenDescription(bytes32 _tokenName) public view returns(memory string) {
-      return tokens[_tokenName].description;
+    function getSecuritiesTokenDescription(bytes32 _tokenName) public view returns(string memory) {
+      return tokens[_tokenName].tokenDescription;
     }
 
  /**
@@ -82,7 +107,7 @@ contract HSTokenRegistry {
     * @return the number of decimals for the token corresponding to that name
     */
     function getSecuritiesTokenDecimal(bytes32 _tokenName) public view returns(uint8) {
-      return tokens[_tokenName].decimals;
+      return tokens[_tokenName].tokenDecimals;
     }
 
     /**
@@ -93,30 +118,37 @@ contract HSTokenRegistry {
       bytes32 _tokenName,
       bytes32 _tokenSymbol,
       address _tokenAddress,
-      uint256 _ownerEIN,
-      string memory _tokenDescription;
+      string memory _tokenDescription,
       uint8 _tokenDecimals)
     public returns(bool) {
 
-      if ( tokens[_tokenName].exists ) {
+      if ( tokens[_tokenName].tokenExists ) {
         HSToken _token = HSToken(tokens[_tokenName].tokenAddress);
         if ( _token.isTokenAlive() ) {
-          emit TokenAlreadyExists(_tokenName, "Token exists and it is alive");
+          emit TokenAlreadyExists(_tokenName, "Token already exists and it is alive");
+          return false;
+        }
+        if ( symbols[_tokenSymbol].symbolExists ) {
+          emit SymbolAlreadyExists(_tokenSymbol, "Symnbol already exists");
           return false;
         }
       }
 
-      last_id++; // Prepare unique id
+      uint256 _lastID; // Unique id for Tokens
+      _lastID++;
 
-      tokens[_tokenName].id = last_id;
+      tokens[_tokenName].id = _lastID;
       tokens[_tokenName].tokenSymbol = _tokenSymbol;
-      tokens[_tokenName].tokenAddress = address(_token);
+      tokens[_tokenName].tokenAddress = address(_tokenAddress);
       tokens[_tokenName].ownerEIN = IdentityRegistry.getEIN(msg.sender);
       tokens[_tokenName].tokenDescription = _tokenDescription;
       tokens[_tokenName].tokenDecimals = _tokenDecimals;
-      tokens[_tokenName].exists = true;
+      tokens[_tokenName].tokenExists = true;
 
-      emit TokenAppointedToRegistry(_tokenName, address(_token));
+      symbols[_tokenSymbol].id = _lastID;
+      symbols[_tokenSymbol].symbolExists = true;
+
+      emit TokenAppointedToRegistry(_tokenName, _tokenSymbol, address(_tokenAddress), _lastID);
 
       return true;
     }

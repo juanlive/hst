@@ -95,7 +95,7 @@ contract SnowflakeOwnable is Ownable {
         emit IdentityRegistryWasSet(_identityRegistryAddress);
     }
 
-    function setIdentityRegistryAddress(address _identityRegistryAddress) public onlyOwner {
+    function setIdentityRegistryAddress(address _identityRegistryAddress) public {
         require(_identityRegistryAddress != address(0), '2. The identity registry address is required');
         updateIdentityRegistryAddress(_identityRegistryAddress);
     }
