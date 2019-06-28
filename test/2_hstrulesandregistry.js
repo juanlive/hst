@@ -84,7 +84,7 @@ describe('Checking HSTServiceRegistry functionality', async() =>{
   })
 
   it('HSTServiceRegistry exists', async () => {
-    userId = await newServiceRegistry.ownerEIN();
+    userId = await newServiceRegistry.address;
   })
 
 
