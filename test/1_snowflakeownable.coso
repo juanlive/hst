@@ -3,7 +3,7 @@ const IdentityRegistry = artifacts.require('./components/IdentityRegistry.sol')
 const SnowflakeOwnable = artifacts.require('./components/SnowflakeOwnable.sol')
 
 const common = require('./common.js')
-const { sign, verifyIdentity, daysOn, daysToSeconds, createIdentity } = require('./utilities')
+const { createIdentity } = require('./utilities')
 
 let instances
 let user
@@ -43,10 +43,10 @@ contract('Testing SnowflakeOwnable', function (accounts) {
   })
 
   it('Snowflake identities created for all accounts', async() => {
-  for (let i = 0; i < users.length; i++) {
-    await createIdentity(users[i], instances)
-  }
-})
+    for (let i = 0; i < users.length; i++) {
+      await createIdentity(users[i], instances)
+    }
+  })
 
 
 describe('Checking IdentityRegistry functionality', async() =>{
@@ -111,9 +111,6 @@ describe('Checking SnowflakeOwnable functionality', async() =>{
       {from: user.address}
     )
   })
-
-
-
 
 })
 
