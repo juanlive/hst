@@ -2,7 +2,7 @@ const truffleAssert = require('truffle-assertions')
 const HSToken = artifacts.require('./HSToken.sol')
 
 const common = require('./common.js')
-const { sign, verifyIdentity, daysOn, daysToSeconds, createIdentity } = require('./utilities')
+const { sign, verifyIdentity, daysOn, daysToSeconds, createIdentity, timeTravel } = require('./utilities')
 
 let instances
 let user
@@ -163,8 +163,20 @@ describe('Checking HSToken functionality', async() =>{
 
 
 
-  it('HSToken activate Launch', async () => {
-    await newToken.stageActivate({ from: user.address });
+  it('HSToken activate Presale', async () => {
+    await newToken.stagePresale({ from: user.address });
+  })
+
+  it('HSToken activate Sale', async () => {
+    await newToken.stageSale({ from: user.address });
+  })
+
+  it('HSToken activate Lock', async () => {
+    await newToken.stageLock({ from: user.address });
+  })
+
+  it('HSToken activate Market', async () => {
+    await newToken.stageMarket({ from: user.address });
   })
 
 
@@ -182,7 +194,6 @@ describe('Checking HSToken functionality', async() =>{
 
   it('HSToken buyTokens from EIN user 1', async () => {
     await newToken.buyTokens(
-        "HYDRO",
         web3.utils.toWei("12"),
         { from: user.address })
   })
@@ -198,7 +209,6 @@ describe('Checking HSToken functionality', async() =>{
   it('HSToken Reverts buy for EIN user 1', async () => {
       await truffleAssert.reverts(
         newToken.buyTokens(
-        "HYDRO",
         "10",
         { from: user.address }),
         "KYC not approved"
@@ -213,10 +223,49 @@ describe('Checking HSToken functionality', async() =>{
 
   it('HSToken buyTokens again from EIN user 1', async () => {
     await newToken.buyTokens(
-        "HYDRO",
         web3.utils.toWei("24"),
         { from: user.address })
   })
+
+
+ it('Store periods', async() => {
+
+  var now = parseInt(new Date().getTime() / 1000) + 20
+  var periods = []
+  for (i=1; i < 25; i++) {
+    // Stablish 24 periods of payment, separated 200 seconds from eachother
+    periods.push(now + i * 200)
+  }
+
+  var tx = await newToken.addPaymentPeriodBoundaries(
+      periods,
+      { from: user.address })
+  console.log("Gas:",tx.receipt.gasUsed)
+ })
+
+
+it('Read periods', async() => {
+  var getPeriods = await newToken.getPaymentPeriodBoundaries(
+        { from: user.address })
+  console.log("Periods:",getPeriods.map(period=>period.toNumber()))
+  var now = await newToken.getNow()
+  console.log("Now:", now.toNumber())
+})
+
+  it('Travelling 400 seconds ahead in time', async() => {
+    await timeTravel(400);
+  })
+
+  it('Current period could vary according to systems time', async () => {
+    var now = await newToken.getNow()
+    console.log("Now:", now.toNumber())
+    var currentPeriod = await newToken._getPeriod(
+        { from: user.address })
+
+    console.log("Current period:",currentPeriod.toNumber())
+  })
+
+
 
 
 
@@ -230,10 +279,10 @@ describe('Checking HSToken functionality', async() =>{
       web3.utils.toWei("1.2"),
       { from: user.address })
 
-    after(async()=>{
+   // after(async()=>{
       console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
       console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
-    })
+   // })
   })
 
 
@@ -251,11 +300,32 @@ describe('Checking HSToken functionality', async() =>{
         web3.utils.toWei("1.2"),
         { from: user.address })
     )
-    after(async()=>{
+   // after(async()=>{
       console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
       console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
-    })
+   // })
   })
+
+
+  it('Yield gains', async () => {
+    periods = await newToken.claimPayment.call(
+      { from: user.address });
+    console.log("Periods 1:", periods.toNumber())
+
+    timeTravel(200)
+
+    periods = await newToken.claimPayment.call(
+      { from: user.address });
+    console.log("Periods 2:", periods.toNumber())
+
+    timeTravel(200)
+
+    periods = await newToken.claimPayment.call(
+      { from: user.address });
+    console.log("Periods 3:", periods.toNumber())
+
+  })
+
 
 
 })

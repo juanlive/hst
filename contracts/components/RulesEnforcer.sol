@@ -1,7 +1,6 @@
 pragma solidity ^0.5.0;
 
 import './SnowflakeOwnable.sol';
-import '../apis/datetimeapi.sol';
 import '../components/DateTime.sol';
 
 // TODO
