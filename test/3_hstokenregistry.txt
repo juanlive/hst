@@ -1,9 +1,8 @@
 const truffleAssert = require('truffle-assertions')
 const HSTokenRegistry = artifacts.require('./HSTokenRegistry.sol')
-const DateTime = artifacts.require('./components/DateTime.sol')
 
 const common = require('./common.js')
-const { sign, verifyIdentity, daysOn, daysToSeconds, createIdentity } = require('./utilities')
+const { createIdentity } = require('./utilities')
 
 let instances
 let user
@@ -43,11 +42,11 @@ contract('Testing HSTokenRegistry', function (accounts) {
   })
 
 
-it('Snowflake identities created for all accounts', async() => {
-  for (let i = 0; i < users.length; i++) {
-    await createIdentity(users[i], instances)
-  }
-})
+  it('Snowflake identities created for all accounts', async() => {
+    for (let i = 0; i < users.length; i++) {
+      await createIdentity(users[i], instances)
+    }
+  })
 
 
 describe('Checking HSTokenRegistry functionality', async() =>{

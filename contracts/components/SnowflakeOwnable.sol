@@ -89,15 +89,11 @@ contract SnowflakeOwnable is Ownable {
     * @notice Set the address for the Identity Registry
     * @param _identityRegistryAddress The address of the IdentityRegistry contract
     */
-    function updateIdentityRegistryAddress(address _identityRegistryAddress) private {
+    function setIdentityRegistryAddress(address _identityRegistryAddress) public {
+        require(_identityRegistryAddress != address(0), '2. The identity registry address is required');
         identityRegistryAddress = _identityRegistryAddress;
         identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
         emit IdentityRegistryWasSet(_identityRegistryAddress);
-    }
-
-    function setIdentityRegistryAddress(address _identityRegistryAddress) public {
-        require(_identityRegistryAddress != address(0), '2. The identity registry address is required');
-        updateIdentityRegistryAddress(_identityRegistryAddress);
     }
 
     /**
