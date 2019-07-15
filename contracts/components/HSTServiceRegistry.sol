@@ -7,26 +7,17 @@ import '../_testing/IdentityRegistry.sol';
 //import '../zeppelin/ownership/Ownable.sol';
 
 
-// TODO
-// create modifier afterEndOfIssuance
-
-// add services for a token - afterEndOfIssuance
-// record authorizations in IdentityRegistryInterface.sol
-
-// replace services for a token - afterEndOfIssuance
-// record authorizations in IdentityRegistryInterface.sol
-
-// retrieve all services by category name (example: "KYC")
-// retrieve all services by token address
-// retrieve all tokens by service address
+// TO DO
+// review addDefaultRulesService
+// Create basic service categories ?
 
 
 /**
  * @title HSTServiceRegistry
  *
- * @notice A service registry to hold adresses of service contracts for each security token
+ * @notice A service registry to hold EINs of service providers for each security token
  *
- * @dev The Service Registry contract has an array of token address, and provides addresses of service providers for tokens, this simplifies the creation of an ecosystems of service providers.
+ * @dev The Service Registry contract has an array of token address, and holds EINs of service providers for tokens, this simplifies the creation of an ecosystem of service providers.
  *
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
@@ -44,27 +35,30 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   // token address => service category symbol => category description
   mapping(address => mapping(bytes32 => string)) serviceCategories;
 
-  // token address => service category symbol => service address
-  mapping(address => mapping(bytes32 => address)) public serviceRegistry;
+  // token address => service category symbol => service provider EIN
+  //mapping(address => mapping(bytes32 => uint)) public serviceRegistry;
+
+  // token address => service provider EIN => service category symbol
+  mapping(address => mapping(uint => bytes32)) public serviceRegistry;
+
 
   /**
    * @notice Triggered when category is added
    */
-  event AddCategory(address _tokenAddress, bytes32 _name, string _description);
+  event AddCategory(address _tokenAddress, bytes32 _categorySymbol, string _categoryDescription);
 
   /**
-   * @notice Triggered when service address is added
+   * @notice Triggered when service provider is added
    */
-  event AddService(address _token, bytes32 _category, address _service);
+  event AddService(address _tokenAddress, uint _serviceProviderEIN, bytes32 _serviceCategory);
 
   /**
-   * @notice Triggered when service address is replaced
+   * @notice Triggered when service provider is removed
    */
-  event ReplaceService(address _token, bytes32 _category, address _newService);
+  event RemoveService(address _tokenAddress, uint _oldServiceEIN);
 
   /**
    * @notice Constructor
-   * @dev    Create basic service categories
    */
   constructor(address _defaultRulesEnforcerAddress, address _identityRegistryAddress) public {
     // set default rules enforcer
@@ -77,12 +71,12 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * Credit: https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/ERC223_Token.sol#L107-L114
    * @param _addr The address of a smart contract
    */
-  modifier isContract(address _addr) {
-    uint length;
-    assembly { length := extcodesize(_addr) }
-    require(length > 0, "This is not a contract");
-    _;
-  }
+  // modifier isContract(address _addr) {
+  //   uint length;
+  //   assembly { length := extcodesize(_addr) }
+  //   require(length > 0, "This is not a contract");
+  //   _;
+  // }
 
   /**
   * @notice Throws if called by any account other than the owner
@@ -109,26 +103,33 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   /**
    * @notice Add a new service category
    * @dev    This method is only callable by the contract's owner
-   * @param _categoryName Name of the new service category
-   * @param _description Description of the new service category
+   *
+   * @param _tokenAddress Address of the token to add service to
+   * @param _categorySymbol Symbol for the new service category
+   * @param _description Description for the new service category
    */
-  function addCategory(address _tokenAddress, bytes32 _categoryName, string memory _description) public onlyTokenOwner(_tokenAddress) {
+  function addCategory(address _tokenAddress, bytes32 _categorySymbol, string memory _categoryDescription) public onlyTokenOwner(_tokenAddress) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
-    require (_categoryName.length != 0, "Category name cannot be blank");
-    serviceCategories[_tokenAddress][_categoryName] = _description;
-    emit AddCategory(_tokenAddress, _categoryName, _description);
+    require (_categorySymbol.length != 0, "Category symbol cannot be blank");
+    require (_categoryDescription.length != 0, "Category descrption cannot be blank");
+    serviceCategories[_tokenAddress][_categorySymbol] = _categoryDescription;
+    emit AddCategory(_tokenAddress, _categorySymbol, _categoryDescription);
   }
 
   /**
-   * @notice Add a new service
+   * @notice Add a new service provider
    *
-   * @param _service Address of the service to use
+   * @param _tokenAddress Address of the token to add service to
+   * @param _service EIN of the service provider to add
+   * @param _categorySymbol Symbol for the category the service provider works in
    */
-  function addService(address _tokenAddress, bytes32 _categoryName, address _service) public onlyTokenOwner(_tokenAddress) isContract(_service) {
+  function addService(address _tokenAddress, uint _serviceProviderEIN, bytes32 _categorySymbol)
+    public onlyTokenOwner(_tokenAddress) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
-    require (_categoryName.length != 0, "Category name cannot be blank");
-    serviceRegistry[_tokenAddress][_categoryName] = _service;
-    emit AddService(_tokenAddress, _categoryName, _service);
+    require (_serviceProviderEIN != 0, "Service provider EIN cannot be blank");
+    require (_categorySymbol.length != 0, "Category symbol cannot be blank");
+    serviceRegistry[_tokenAddress][_serviceProviderEIN] = _categorySymbol;
+    emit AddService(_tokenAddress, _serviceProviderEIN, _categorySymbol);
   }
 
   function addDefaultRulesService(address _tokenAddress) public onlyTokenOwner(_tokenAddress) {
@@ -136,32 +137,47 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   }
 
     /**
-   * @notice Replaces the address pointer to a service for a new address
+   * @notice Remove a service provider
    *
-   * @dev This method is only callable by the contract's owner
+   * @dev This method is only callable by the token owner
    *
-   * @param _categoryName Category name of the service
-   * @param _newService New address for the service to use
+   * @param _tokenAddress Address of the token to remove service from
+   * @param _oldServiceEIN EIN of the service provider to remove
    */
-  function replaceService(address _tokenAddress, bytes32 _categoryName, address _newService)
-    public onlyTokenOwner(_tokenAddress) isContract(_newService) {
+  function removeService(address _tokenAddress, uint _oldServiceEIN)
+    public onlyTokenOwner(_tokenAddress) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
-    require (_categoryName.length != 0, "Category name cannot be blank");
-    serviceRegistry[_tokenAddress][_categoryName] = _newService;
-    emit ReplaceService(_tokenAddress, _categoryName, _newService);
+    require (_oldServiceEIN != 0, "Old service EIN cannot be blank");
+    serviceRegistry[_tokenAddress][_oldServiceEIN] = "";
+    emit RemoveService(_tokenAddress, _oldServiceEIN);
+  }
+
+  /**
+   * @notice Get existing service address
+   *
+   * @dev if checking about "RULES" services and it is blank, fill it with default
+   *
+   * @param _service Address of the service to use
+   */
+  function getService(address _tokenAddress, uint _serviceProviderEIN)
+    public view returns(bytes32 _categorySymbol) {
+    require (_tokenAddress != address(0), "Token address cannot be blank");
+    require (_serviceProviderEIN.length != 0, "Service provider EIN cannot be blank");
+    return serviceRegistry[_tokenAddress][_serviceProviderEIN];
   }
 
   /**
    * @notice Get existing service address
    * @dev if checking about "RULES" services and it is blank, fill it with default
    *
-   * @param _service Address of the service to use
+   * @param _tokenAddress Address of the token to check service provider existence
+   * @param _service EIN of the service provider to check
    */
-  function getService(address _tokenAddress, bytes32 _categoryName)
-    public view returns(address _service) {
+  function isProvider(address _tokenAddress, uint _serviceProviderEIN)
+    public view returns(bool _isProvider) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
-    require (_categoryName.length != 0, "Category name cannot be blank");
-    return serviceRegistry[_tokenAddress][_categoryName];
+    require (_serviceProviderEIN.length != 0, "Service provider EIN cannot be blank");
+    return serviceRegistry[_tokenAddress][_serviceProviderEIN].length > 0;
   }
 
 }
