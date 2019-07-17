@@ -1,5 +1,5 @@
 const truffleAssert = require('truffle-assertions')
-const RulesEnforcer = artifacts.require('./components/RulesEnforcer.sol')
+const RulesEnforcer = artifacts.require('./components/HSTRulesEnforcer.sol')
 const ServiceRegistry = artifacts.require('./HSTServiceRegistry.sol')
 
 const common = require('./common.js')
@@ -53,16 +53,16 @@ it('Snowflake identities created for all accounts', async() => {
 describe('Checking RulesEnforcer functionality', async() =>{
 
 
-  it('RulesEnforcer can be created', async () => {
+  it('HSTRulesEnforcer can be created', async () => {
     newRulesEnforcer = await RulesEnforcer.new(
         instances.DateTime.address,
         {from: user.address}
       )
-      console.log("RulesEnforcer Address", newRulesEnforcer.address)
+      console.log("HSTRulesEnforcer Address", newRulesEnforcer.address)
       console.log("User", user.address)
   })
 
-  it('RulesEnforcer exists', async () => {
+  it('HSTRulesEnforcer exists', async () => {
     userId = await newRulesEnforcer.ownerEIN();
   })
 

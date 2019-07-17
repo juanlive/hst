@@ -90,6 +90,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   /**
   * @notice Check if caller is owner
   * @dev This works on EINs, not on addresses
+  *
   * @return true if `msg.sender` is the owner of the contract
   */
   function isTokenOwner(address _tokenAddress) public returns(bool) {
@@ -106,12 +107,13 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    *
    * @param _tokenAddress Address of the token to add service to
    * @param _categorySymbol Symbol for the new service category
-   * @param _description Description for the new service category
+   * @param _categoryDescription Description for the new service category
    */
   function addCategory(address _tokenAddress, bytes32 _categorySymbol, string memory _categoryDescription) public onlyTokenOwner(_tokenAddress) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
     require (_categorySymbol.length != 0, "Category symbol cannot be blank");
-    require (_categoryDescription.length != 0, "Category descrption cannot be blank");
+    bytes memory _categoryDescriptionTest = bytes(_categoryDescription);
+    require (_categoryDescriptionTest.length != 0, "Category descrption cannot be blank");
     serviceCategories[_tokenAddress][_categorySymbol] = _categoryDescription;
     emit AddCategory(_tokenAddress, _categorySymbol, _categoryDescription);
   }
@@ -120,7 +122,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @notice Add a new service provider
    *
    * @param _tokenAddress Address of the token to add service to
-   * @param _service EIN of the service provider to add
+   * @param _serviceProviderEIN EIN of the service provider to add
    * @param _categorySymbol Symbol for the category the service provider works in
    */
   function addService(address _tokenAddress, uint _serviceProviderEIN, bytes32 _categorySymbol)
@@ -132,9 +134,9 @@ contract HSTServiceRegistry is SnowflakeOwnable {
     emit AddService(_tokenAddress, _serviceProviderEIN, _categorySymbol);
   }
 
-  function addDefaultRulesService(address _tokenAddress) public onlyTokenOwner(_tokenAddress) {
-      serviceRegistry[_tokenAddress]["RULES"] = defaultRulesEnforcerAddress;
-  }
+  // function addDefaultRulesService(address _tokenAddress) public onlyTokenOwner(_tokenAddress) {
+  //     serviceRegistry[_tokenAddress]["RULES"] = defaultRulesEnforcerAddress;
+  // }
 
     /**
    * @notice Remove a service provider
@@ -157,12 +159,14 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    *
    * @dev if checking about "RULES" services and it is blank, fill it with default
    *
-   * @param _service Address of the service to use
+   * @param _tokenAddress Address of the token to get service from
+   * @param _serviceProviderEIN EIN of the service provider to get
+   * @return _categorySymbol Symbol of the category the service provider works in
    */
   function getService(address _tokenAddress, uint _serviceProviderEIN)
     public view returns(bytes32 _categorySymbol) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
-    require (_serviceProviderEIN.length != 0, "Service provider EIN cannot be blank");
+    require (_serviceProviderEIN != 0, "Service provider EIN cannot be zero");
     return serviceRegistry[_tokenAddress][_serviceProviderEIN];
   }
 
@@ -171,12 +175,13 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @dev if checking about "RULES" services and it is blank, fill it with default
    *
    * @param _tokenAddress Address of the token to check service provider existence
-   * @param _service EIN of the service provider to check
+   * @param _serviceProviderEIN EIN of the service provider to check
+   * @return _isProvider The EIN sent belongs to a provider or not
    */
   function isProvider(address _tokenAddress, uint _serviceProviderEIN)
     public view returns(bool _isProvider) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
-    require (_serviceProviderEIN.length != 0, "Service provider EIN cannot be blank");
+    require (_serviceProviderEIN != 0, "Service provider EIN cannot be zero");
     return serviceRegistry[_tokenAddress][_serviceProviderEIN].length > 0;
   }
 

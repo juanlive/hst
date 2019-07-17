@@ -38,8 +38,8 @@ async function initialize (owner, users) {
 
   instances.KYCResolver = await KYCResolver.new( {from: owner })
   
-  console.log("KYC Resolver", instances.KYCResolver.address)
-  console.log("Identity Registry", instances.IdentityRegistry.address)
+  console.log("    KYC Resolver", instances.KYCResolver.address)
+  console.log("    Identity Registry", instances.IdentityRegistry.address)
   
   return instances
 }
