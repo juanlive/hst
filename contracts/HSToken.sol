@@ -145,6 +145,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests {
     uint256 hydrosReleased; // Quantity of Hydros released by owner
     mapping(uint256 => uint256) issuedTokensAt;
     mapping(uint256 => uint256) hydroPriceAt;
+    mapping(uint256 => uint256) results;
 
  	// Links to Modules
 	// address public RegistryRules;
@@ -635,24 +636,37 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests {
 
     // Case A: Shares
     function claimPayment()
-        public
+        public view
         returns(uint256)
     {
     	uint256 _ein = IdentityRegistry.getEIN(msg.sender);
     	uint256 _period = _getPeriod();
-    	uint256 _periodToPay = investors[ein].lastPeriodPayed + 1;
+    	uint256 _periodToPay = investors[_ein].lastPeriodPayed + 1;
     	require(_periodToPay <= _period, "There is no period to pay yet");
 
-    	investors[_ein].lastPeriodPayed = _periodToPay;
-    	uint256 _participationRate = balanceAt[_ein][_periodToPay] * 1 ether / totalSupplyAt[_periodToPay];
-    	uint256 _percentForInvestor = yield[_periodToPay] / _participationRate;
-        return _percentForInvestor;
+    	//investors[_ein].lastPeriodPayed = _periodToPay;
+
+        // If there was no movements in certain period, it takes value from previous one
+        if (balanceAt[_periodToPay][msg.sender] == 0) {
+            balanceAt[_periodToPay][msg.sender] == balanceAt[_periodToPay-1][msg.sender];
+        }
+
+    	uint256 _participationRate = balanceAt[_period-2][msg.sender] * 1 ether / issuedTokens;
+
+        //return (balanceAt[0][msg.sender], balanceAt[_period-2][msg.sender], issuedTokens, results[_period]);
+
+    	uint256 _paymentForInvestor = results[_period] * _participationRate / 1 ether;
+
+        //require(HydroToken.transfer(msg.sender, _paymentForInvestor), "Error while releasing Tokens");
+        return _paymentForInvestor;
     }
 
-    function setYieldForPeriod(uint256 _yield) public {
-    	uint256 _period = _getPeriod();
-    	require(_yield > 0, "Yield has to be greater than zero");
-    	yield[_period] = _yield;
+    function notifyPeriodResults(uint256 _results) public {
+        require(msg.sender == hydroOracle, "Only registered oracle can notifyPeriodResults results");
+    	require(_results > 0, "Results has to be greater than zero");
+        uint256 _period = _getPeriod();
+        require(results[_period] == 0, "Period already notified");
+    	results[_period] = _results;
     }
 
 
@@ -765,7 +779,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests {
 
      function _doSell(address _to, uint256 _amount) private {
         issuedTokens = issuedTokens.add(_amount);
+        issuedTokensAt[0] = issuedTokens;
         balance[_to] = balance[_to].add(_amount);
+        balanceAt[0][_to] = balance[_to];
     }
 
     function _doTransfer(address _from, address _to, uint256 _amount) private {

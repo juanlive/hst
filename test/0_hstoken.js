@@ -281,15 +281,12 @@ contract('Testing HSToken', function (accounts) {
     })
 
 
-    await timeTravel(200)
     it('KYCResolver reject EIN identity 2', async () => {
       await instances.KYCResolver.rejectEin(
         "2",
         { from: user.address });
     })
 
-
-    await timeTravel(200)
     it('HSToken reverts transfer 1.2 HSTokens to Account 2', async () => {
       await truffleAssert.reverts(
         newToken.transfer(
@@ -304,23 +301,42 @@ contract('Testing HSToken', function (accounts) {
     })
 
 
-    it('Yield gains', async () => {
-      periods = await newToken.claimPayment.call(
+    it('Checking periods', async () => {
+      periods = await newToken._getPeriod(
         { from: user.address });
       console.log("Periods 1:", periods.toNumber())
 
       timeTravel(200)
 
-      periods = await newToken.claimPayment.call(
+      periods = await newToken._getPeriod(
         { from: user.address });
       console.log("Periods 2:", periods.toNumber())
 
       timeTravel(200)
 
-      periods = await newToken.claimPayment.call(
+      periods = await newToken._getPeriod(
         { from: user.address });
       console.log("Periods 3:", periods.toNumber())
 
+    })
+
+
+    it('Setting oracle address', async() => {
+      await newToken.addHydroOracle(
+        users[2].address,
+        { from: user.address })
+    })
+
+    it('Oracle notifies results of 5 Hydros for this period', async() => {
+      await newToken.notifyPeriodResults(
+        web3.utils.toWei("5"),
+        { from: users[2].address })
+    })
+
+    it('User claims payment', async() => {
+      var payment = await newToken.claimPayment(
+        { from: user.address })
+      console.log("Payment received:", web3.utils.fromWei(payment))
     })
 
   })
