@@ -143,6 +143,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests {
     uint256 public ethReceived;
     uint256 public investorsQuantity;
     uint256 hydrosReleased; // Quantity of Hydros released by owner
+    mapping(uint256 => uint256) issuedTokensAt;
+    mapping(uint256 => uint256) hydroPriceAt;
 
  	// Links to Modules
 	// address public RegistryRules;
@@ -631,21 +633,27 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests {
         return true;
     }
 
-
+    // Case A: Shares
     function claimPayment()
         public
         returns(uint256)
     {
     	uint256 _ein = IdentityRegistry.getEIN(msg.sender);
     	uint256 _period = _getPeriod();
-    	require(investors[_ein].lastPeriodPayed < _period, "There is no period to pay yet");
+    	uint256 _periodToPay = investors[ein].lastPeriodPayed + 1;
+    	require(_periodToPay <= _period, "There is no period to pay yet");
 
-    	investors[_ein].lastPeriodPayed = _period;
-
-
-        return _period;
+    	investors[_ein].lastPeriodPayed = _periodToPay;
+    	uint256 _participationRate = balanceAt[_ein][_periodToPay] * 1 ether / totalSupplyAt[_periodToPay];
+    	uint256 _percentForInvestor = yield[_periodToPay] / _participationRate;
+        return _percentForInvestor;
     }
 
+    function setYieldForPeriod(uint256 _yield) public {
+    	uint256 _period = _getPeriod();
+    	require(_yield > 0, "Yield has to be greater than zero");
+    	yield[_period] = _yield;
+    }
 
 
     // Token ERC-20 wrapper -----------------------------------------------------------
@@ -747,8 +755,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests {
     // ONLY FOR ORACLES
 
     function updateHydroPrice(uint256 _newPrice) external {
-    	require(msg.sender == hydroOracle, "This can only be executed by the Oracle");
+    	require(msg.sender == hydroOracle, "This can only be executed by the registered Oracle");
+    	uint256 _period = _getPeriod();
     	hydroPrice = _newPrice;
+    	hydroPriceAt[_period] = _newPrice;
     }
 
     // PRIVATE FUNCTIONS ----------------------------------------------------------

@@ -312,13 +312,13 @@ it('Read periods', async() => {
       { from: user.address });
     console.log("Periods 1:", periods.toNumber())
 
-    timeTravel(200)
+    await timeTravel(200)
 
     periods = await newToken.claimPayment.call(
       { from: user.address });
     console.log("Periods 2:", periods.toNumber())
 
-    timeTravel(200)
+    await timeTravel(200)
 
     periods = await newToken.claimPayment.call(
       { from: user.address });
