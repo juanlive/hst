@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import './HSToken.sol';
 import './interfaces/IdentityRegistryInterface.sol';
+import './components/HSTServiceRegistry.sol';
 
 // TO DO
 
@@ -25,6 +26,7 @@ contract HSTokenRegistry {
       uint256 ownerEIN;
       string tokenDescription;
       uint8 tokenDecimals;
+      bool tokenHasLegalApproval;
       bool tokenExists;
     }
 
@@ -36,6 +38,7 @@ contract HSTokenRegistry {
     uint256 public lastId = 0;
 
     IdentityRegistryInterface public IdentityRegistry;
+    HSTServiceRegistry public ServiceRegistry;
 
     // Token name => Token data structure
     mapping(bytes32 => Token) public tokens;
@@ -60,6 +63,16 @@ contract HSTokenRegistry {
       bytes32 _tokenSymbol,
       string _description
     );
+
+    event TokenHasLegalApproval(
+      bytes32 _tokenName,
+      uint _MainLegalAdvisorEIN
+    );
+
+    // constructor(address _identityRegistryAddress, address _serviceRegistryAddress) public {
+    //   IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
+    //   ServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
+    // }
 
     constructor(address _identityRegistryAddress) public {
       IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
@@ -106,7 +119,7 @@ contract HSTokenRegistry {
     * @param  _tokenName The name of the token
     * @return the number of decimals for the token corresponding to that name
     */
-    function getSecuritiesTokenDecimal(bytes32 _tokenName) public view returns(uint8) {
+    function getSecuritiesTokenDecimals(bytes32 _tokenName) public view returns(uint8) {
       return tokens[_tokenName].tokenDecimals;
     }
 
@@ -121,6 +134,13 @@ contract HSTokenRegistry {
       string memory _tokenDescription,
       uint8 _tokenDecimals)
     public returns(bool) {
+
+      require (_tokenName.length != 0, "Token name cannot be blank");
+      require (_tokenSymbol.length != 0, "Token symbol cannot be blank");
+      require(_tokenAddress != address(0), 'Token address is required');
+      bytes memory _tokenDescriptionTest = bytes(_tokenDescription);
+      require (_tokenDescriptionTest.length != 0, "Token description cannot be blank");
+      require (_tokenDecimals != 0, "Token decimals cannot be zero");
 
       if ( tokens[_tokenName].tokenExists ) {
         HSToken _token = HSToken(tokens[_tokenName].tokenAddress);
@@ -143,6 +163,7 @@ contract HSTokenRegistry {
       tokens[_tokenName].ownerEIN = IdentityRegistry.getEIN(msg.sender);
       tokens[_tokenName].tokenDescription = _tokenDescription;
       tokens[_tokenName].tokenDecimals = _tokenDecimals;
+      tokens[_tokenName].tokenHasLegalApproval = false;
       tokens[_tokenName].tokenExists = true;
 
       symbols[_tokenSymbol].id = _lastID;
@@ -151,6 +172,22 @@ contract HSTokenRegistry {
       emit TokenAppointedToRegistry(_tokenName, _tokenSymbol, address(_tokenAddress), _lastID);
 
       return true;
+    }
+
+    function grantLegalApproval(bytes32 _tokenName) public returns(bool) {
+      // get caller EIN
+      uint _callerEIN = IdentityRegistry.getEIN(msg.sender);
+      // check that caller is the Legal Advisor for this token
+      require(ServiceRegistry.getService(tokens[_tokenName].tokenAddress, _callerEIN) == "MLA",
+        "Only main legal advisor can grant legal approval");
+      // approve
+      tokens[_tokenName].tokenHasLegalApproval = true;
+      emit TokenHasLegalApproval(_tokenName, _callerEIN);
+      return true;
+    }
+
+    function checkLegalApproval(bytes32 _tokenName) public view returns(bool) {
+      return tokens[_tokenName].tokenHasLegalApproval;
     }
 
 }

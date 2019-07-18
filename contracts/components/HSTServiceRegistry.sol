@@ -9,7 +9,7 @@ import '../_testing/IdentityRegistry.sol';
 
 // TO DO
 // review addDefaultRulesService
-// Create basic service categories ?
+// Create basic service categories
 
 
 /**
@@ -48,6 +48,11 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   event AddCategory(address _tokenAddress, bytes32 _categorySymbol, string _categoryDescription);
 
   /**
+   * @notice Triggered when token is added
+   */
+  event AddDefaultCategories(address _tokenAddress);
+
+  /**
    * @notice Triggered when service provider is added
    */
   event AddService(address _tokenAddress, uint _serviceProviderEIN, bytes32 _serviceCategory);
@@ -64,6 +69,8 @@ contract HSTServiceRegistry is SnowflakeOwnable {
     // set default rules enforcer
     defaultRulesEnforcerAddress = _defaultRulesEnforcerAddress;
     identityRegistryAddress = _identityRegistryAddress;
+    // Create basic service categories
+    
   }
 
   /**
@@ -116,6 +123,21 @@ contract HSTServiceRegistry is SnowflakeOwnable {
     require (_categoryDescriptionTest.length != 0, "Category descrption cannot be blank");
     serviceCategories[_tokenAddress][_categorySymbol] = _categoryDescription;
     emit AddCategory(_tokenAddress, _categorySymbol, _categoryDescription);
+  }
+
+  /**
+   * @notice Add default service categories
+   * @dev    This method is only callable by the contract's owner
+   *
+   * @param _tokenAddress Address of the token to add service to
+   */
+  function addDefaultCategories(address _tokenAddress) public {
+    require (_tokenAddress != address(0), "Token address cannot be blank");
+    serviceCategories[_tokenAddress]["MLA"] = "Main Legal Advisors";
+    serviceCategories[_tokenAddress]["KYC"] = "Know Your Customers";
+    serviceCategories[_tokenAddress]["AML"] = "Anti Money Laundering";
+    serviceCategories[_tokenAddress]["CFT"] = "Counter Financing of Terrorism";
+    emit AddDefaultCategories(_tokenAddress);
   }
 
   /**
