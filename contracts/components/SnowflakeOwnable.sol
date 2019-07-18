@@ -16,7 +16,9 @@ import '../zeppelin/ownership/Ownable.sol';
 /**
  * @title SnowflakeOwnable
  * @notice Snowflake-based authorizations
- * @dev The SnowflakeOwnable contract has an owner EIN, and provides basic authorization control functions, not based on an address as it is usual, but based on an EIN. This simplifies the implementation of "user permissions" when using Snowflakes.
+ *
+ * @dev The SnowflakeOwnable contract stores the EIN of the owner of a contract, and provides basic authorization control functions, not based on an address as it is usual, but based on an EIN. This simplifies the implementation of "user permissions" when using Snowflakes.
+ *
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
 contract SnowflakeOwnable is Ownable {
@@ -33,6 +35,12 @@ contract SnowflakeOwnable is Ownable {
     * @param  _identityRegistryAddress The address of the Identity Registry
     */
     event IdentityRegistryWasSet(address _identityRegistryAddress);
+
+    /**
+    * @notice Emit when setting EIN for the first time or from status owner EIN = 0
+    * @param  _owner The EIN of the owner
+    */
+    event OwnerWasSet(uint _owner);
 
     /**
     * @notice Emit when transferring ownership
@@ -61,6 +69,7 @@ contract SnowflakeOwnable is Ownable {
     /**
     * @notice Check if caller is owner
     * @dev This works on EINs, not on addresses
+    *
     * @return true if `msg.sender` is the owner of the contract
     */
     function isEINowner() public view returns(bool) {
@@ -71,13 +80,17 @@ contract SnowflakeOwnable is Ownable {
 
     /**
     * @notice Set the EIN for the owner
+    *
+    * @param _newOwnerEIN The EIN for the new owner
     */
-    function setOwnerEIN(uint _newOwnerEIN) public {
+    function setOwnerEIN(uint _newOwnerEIN) public onlySnowflakeOwner {
+        require(identityRegistryAddress != address(0), '1. The identity registry address is required');
+        require(identityRegistry.identityExists(_newOwnerEIN), "New owner identity must exist");
         uint _callerEIN = identityRegistry.getEIN(msg.sender);
-        require((ownerEIN == 0 || _callerEIN == ownerEIN), 'Owner must be zero or you must be the owner');
+        require((ownerEIN == 0 || (_callerEIN == ownerEIN)), 'Owner must be zero or you must be the owner');
         if (ownerEIN == 0) {
             ownerEIN = _newOwnerEIN;
-            emit OwnershipTransferred(0, _newOwnerEIN);
+            emit OwnerWasSet(_newOwnerEIN);
         } else {
             uint _oldOwnerEIN = ownerEIN;
             ownerEIN = _newOwnerEIN;
@@ -87,13 +100,23 @@ contract SnowflakeOwnable is Ownable {
 
     /**
     * @notice Set the address for the Identity Registry
+    * @dev Also set the EIN of the owner
+    *
     * @param _identityRegistryAddress The address of the IdentityRegistry contract
     */
-    function setIdentityRegistryAddress(address _identityRegistryAddress) public {
+    function setIdentityRegistryAddress(address _identityRegistryAddress) public onlyOwner {
+        // check required data
         require(_identityRegistryAddress != address(0), '2. The identity registry address is required');
+        IdentityRegistryInterface _identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
+        uint _ownerEIN = _identityRegistry.getEIN(msg.sender);
+        require(_ownerEIN != 0, 'The caller must have an EIN');
+        // set data
         identityRegistryAddress = _identityRegistryAddress;
-        identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
+        identityRegistry = _identityRegistry;
+        ownerEIN = _ownerEIN;
+        // emit events
         emit IdentityRegistryWasSet(_identityRegistryAddress);
+        emit OwnerWasSet(ownerEIN);
     }
 
     /**
@@ -107,6 +130,7 @@ contract SnowflakeOwnable is Ownable {
     /**
     * @notice Get EIN of the current owner
     * @dev This contracts allows you to set ownership based on EIN instead of address
+    *
     * @return the address of the owner
     */
     function getOwnerEIN() public view returns(uint) {
@@ -116,7 +140,7 @@ contract SnowflakeOwnable is Ownable {
 
     /**
     * @notice Allows the current owner to relinquish control of the contract
-    * @dev Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions with the `onlyOwner modifier anymore.
+    * @dev Renouncing to ownership will leave the contract without an owner. It will not be possible to call the functions which use the 'onlyOwner' modifier anymore
     */
     function renounceOwnership() public onlySnowflakeOwner {
         emit OwnershipTransferred(ownerEIN, 0);
@@ -126,22 +150,24 @@ contract SnowflakeOwnable is Ownable {
     /**
     * @notice Allows the current owner to transfer control of the contract to a newOwner
     * @dev This works on EINs, not on addresses
+    *
     * @param _newOwner EIN to transfer ownership to
     */
-    function transferOwnership(uint _newOwner) public onlySnowflakeOwner {
-        _transferOwnership(_newOwner);
-    }
+    // function transferOwnership(uint _newOwner) public onlySnowflakeOwner {
+    //     _transferOwnership(_newOwner);
+    // }
 
     /**
     * @notice Transfers control of the contract to a newOwner
     * @dev This works on EINs, not on addresses
+    *
     * @param _newOwner EIN to transfer ownership to
     */
-    function _transferOwnership(uint _newOwner) internal onlySnowflakeOwner {
-        require(identityRegistryAddress != address(0), '4. The identity registry address is required');
-        require(identityRegistry.identityExists(_newOwner), "Owner must exist");
-        require(_newOwner != 0, "Owner must exist");
-        emit OwnershipTransferred(ownerEIN, _newOwner);
-        ownerEIN = _newOwner;
-    }
+    // function _transferOwnership(uint _newOwner) internal onlySnowflakeOwner {
+    //     require(identityRegistryAddress != address(0), '4. The identity registry address is required');
+    //     require(identityRegistry.identityExists(_newOwner), "Owner must exist");
+    //     require(_newOwner != 0, "Owner must exist");
+    //     emit OwnershipTransferred(ownerEIN, _newOwner);
+    //     ownerEIN = _newOwner;
+    // }
 }
