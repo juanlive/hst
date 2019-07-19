@@ -150,7 +150,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     uint256 hydrosReleased; // Quantity of Hydros released by owner
     mapping(uint256 => uint256) issuedTokensAt;
     mapping(uint256 => uint256) hydroPriceAt;
-    mapping(uint256 => uint256) results;
+    // mapping(uint256 => uint256) results; // It is in the payment module
 
  	// Links to Modules
 	// address public RegistryRules;
@@ -178,7 +178,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     // Balances
     mapping(address => uint256) public balance;
-    mapping(uint256 => mapping(address => uint256)) public balanceAt;
+    // mapping(uint256 => mapping(address => uint256)) public balanceAt; // It is at the payment module
 
     // Escrow contract's address => security number
     // mapping(address => uint256) public escrowContracts;
@@ -639,24 +639,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         return true;
     }
 
-
-    // Getters to be accesed by modules
-
-    function _balanceAt(uint256 _period, address _address) private view returns(uint256) {
-        for (uint256 i = _period; i > 0; i--) {
-            if (balanceAt[i][_address] > 0) {
-                return balanceAt[i][_address];
-            }
-        }
-        return 0;
-    }
-
+    // To be accesed by modules
     function _getEIN(address _address) private view returns(uint256) {
         return IdentityRegistry.getEIN(_address);
-    }
-
-    function _issuedTokens() internal view returns(uint256) {
-        return issuedTokens;
     }
 
     // Token ERC-20 wrapper -----------------------------------------------------------
@@ -759,9 +744,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     function updateHydroPrice(uint256 _newPrice) external {
     	require(msg.sender == hydroOracle, "This can only be executed by the registered Oracle");
-    	uint256 _period = _getPeriod();
     	hydroPrice = _newPrice;
-    	hydroPriceAt[_period] = _newPrice;
     }
 
     // PRIVATE FUNCTIONS ----------------------------------------------------------

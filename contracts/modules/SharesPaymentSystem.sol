@@ -9,7 +9,7 @@ contract SharesPaymentSystem {
         uint256 lastPeriodPayed;
     }
 
-    mapping(address => uint256) public balance;
+    // mapping(address => uint256) public balance;
     mapping(uint256 => mapping(address => uint256)) public balanceAt;
     mapping(uint256 => uint256) issuedTokensAt;
     mapping(uint256 => uint256) results;
@@ -21,7 +21,7 @@ contract SharesPaymentSystem {
     // Case A: Shares
     function claimPayment()
         public view
-        returns(uint256, uint256, uint256)
+        returns(uint256)
     {
         //return uint(address(IdentityRegistry));
         uint256 _ein = _getEIN(msg.sender);
@@ -31,16 +31,16 @@ contract SharesPaymentSystem {
 
         //investors[_ein].lastPeriodPayed = _periodToPay;
         //return _balanceAt(_periodToPay, msg.sender);
-        return (_balanceAt(_period, msg.sender), issuedTokens, results[_period]);
+        //return (_balanceAt(_period, msg.sender), issuedTokens, results[_period]);
 
-        uint256 _participationRate = _balanceAt(_periodToPay, msg.sender) * 1 ether / issuedTokensAt[0];
+        uint256 _participationRate = _balanceAt(_period, msg.sender) * 1 ether / issuedTokens;
 
         //return (_balanceAt(_periodToPay, msg.sender), issuedTokens, results[_period]);
 
         uint256 _paymentForInvestor = results[_period] * _participationRate / 1 ether;
 
         //require(HydroToken.transfer(msg.sender, _paymentForInvestor), "Error while releasing Tokens");
-       // return _paymentForInvestor;
+        return _paymentForInvestor;
     }
 
     function notifyPeriodResults(uint256 _results) public {
@@ -52,9 +52,18 @@ contract SharesPaymentSystem {
     }
 
 
+    function _balanceAt(uint256 _period, address _address) private view returns(uint256) {
+        for (uint256 i = _period; i > 0; i--) {
+            if (balanceAt[i][_address] > 0) {
+                return balanceAt[i][_address];
+            }
+        }
+        return 0;
+    }
+
+
     // Dummy functions (to be overwritten by main contract)
     function _getPeriod() public view returns(uint256) {}
-    function _balanceAt(uint256 _period, address _address) private view returns(uint256) {}
     function _getEIN(address _address) private view returns(uint256) {}
     function _issuedTokens() internal view returns(uint256) {}
 
