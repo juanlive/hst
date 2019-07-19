@@ -1,16 +1,20 @@
 pragma solidity ^0.5.0;
 
 
-import './components/SnowflakeOwnable.sol';
+//import './components/SnowflakeOwnable.sol';
 //import './components/TokenWithDates.sol';
-import './components/HSTServiceRegistry.sol';
+//import './components/HSTServiceRegistry.sol';
 import './interfaces/HydroInterface.sol';
 import './interfaces/ResolverInterface.sol';
 import './interfaces/IdentityRegistryInterface.sol';
 //import './interfaces/SnowflakeViaInterface.sol';
 import './zeppelin/math/SafeMath.sol';
 import './zeppelin/ownership/Ownable.sol';
+import './modules/SharesPaymentSystem.sol';
 
+//interface IdentityRegistryInterface {
+//    function getEIN(address _address) external view returns (uint ein);
+//}
 
 // For testing
 
@@ -97,7 +101,7 @@ contract STO_Interests {
 }
 
 
-contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests {
+contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPaymentSystem {
 
     using SafeMath for uint256;
 
@@ -112,11 +116,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests {
         uint age; // Creation of the batch (timestamp)
     }
 
-    struct Investor {
-        bool exists;
-        uint256 hydroSent;
-        uint256 lastPeriodPayed;
-    }
+// This is already declared in SharesPaymentSystem
+//    struct Investor {
+//        bool exists;
+//        uint256 hydroSent;
+//        uint256 lastPeriodPayed;
+//    }
 
     // Basic states
     bool public exists; // Flag to deactivate it
@@ -634,41 +639,25 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests {
         return true;
     }
 
-    // Case A: Shares
-    function claimPayment()
-        public view
-        returns(uint256)
-    {
-    	uint256 _ein = IdentityRegistry.getEIN(msg.sender);
-    	uint256 _period = _getPeriod();
-    	uint256 _periodToPay = investors[_ein].lastPeriodPayed + 1;
-    	require(_periodToPay <= _period, "There is no period to pay yet");
 
-    	//investors[_ein].lastPeriodPayed = _periodToPay;
+    // Getters to be accesed by modules
 
-        // If there was no movements in certain period, it takes value from previous one
-        if (balanceAt[_periodToPay][msg.sender] == 0) {
-            balanceAt[_periodToPay][msg.sender] == balanceAt[_periodToPay-1][msg.sender];
+    function _balanceAt(uint256 _period, address _address) private view returns(uint256) {
+        for (uint256 i = _period; i > 0; i--) {
+            if (balanceAt[i][_address] > 0) {
+                return balanceAt[i][_address];
+            }
         }
-
-    	uint256 _participationRate = balanceAt[_period-2][msg.sender] * 1 ether / issuedTokens;
-
-        //return (balanceAt[0][msg.sender], balanceAt[_period-2][msg.sender], issuedTokens, results[_period]);
-
-    	uint256 _paymentForInvestor = results[_period] * _participationRate / 1 ether;
-
-        //require(HydroToken.transfer(msg.sender, _paymentForInvestor), "Error while releasing Tokens");
-        return _paymentForInvestor;
+        return 0;
     }
 
-    function notifyPeriodResults(uint256 _results) public {
-        require(msg.sender == hydroOracle, "Only registered oracle can notifyPeriodResults results");
-    	require(_results > 0, "Results has to be greater than zero");
-        uint256 _period = _getPeriod();
-        require(results[_period] == 0, "Period already notified");
-    	results[_period] = _results;
+    function _getEIN(address _address) private view returns(uint256) {
+        return IdentityRegistry.getEIN(_address);
     }
 
+    function _issuedTokens() internal view returns(uint256) {
+        return issuedTokens;
+    }
 
     // Token ERC-20 wrapper -----------------------------------------------------------
 

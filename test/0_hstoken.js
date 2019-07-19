@@ -336,7 +336,7 @@ contract('Testing HSToken', function (accounts) {
     it('User claims payment', async() => {
       var payment = await newToken.claimPayment(
         { from: user.address })
-      console.log("Payment received:", web3.utils.fromWei(payment))
+      console.log("Payment received:", payment)
     })
 
   })
