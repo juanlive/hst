@@ -6,6 +6,8 @@ const { createIdentity } = require('./utilities')
 
 let instances
 let user
+let newTokenRegistry
+let tokenDummyAddress
 
 contract('Testing HSTokenRegistry', function (accounts) {
   const owner = {
@@ -77,28 +79,52 @@ contract('Testing HSTokenRegistry', function (accounts) {
         web3.utils.fromAscii('TEST'),
         tokenDummyAddress,
         'just a test',
-        10,
+        '10',
         {from: user.address}
       );
       //console.log("      Token was created", result);
     })
 
-    // it('Get token symbol', async () => {
-    //   tokenSymbol = await web3.utils.toAscii(
-    //     newTokenRegistry.getSecuritiesTokenSymbol(
-    //       tokenDummyAddress,
-    //       {from: user.address}
-    //     )
-    //   );
-    //   console.log("      Token symbol", tokenSymbol);
-    // })
-
     it('Get token symbol', async () => {
-      tokenSymbol = await newTokenRegistry.getSecuritiesTokenSymbol(
-        tokenDummyAddress,
+      _tokenSymbol = web3.utils.toAscii( await
+        newTokenRegistry.getSecuritiesTokenSymbol(
+          web3.utils.fromAscii('TestToken'),
+          {from: user.address}
+        )
+      );
+      console.log("      Token symbol", _tokenSymbol);
+    })
+
+    it('Get token address', async () => {
+      _tokenAddress = await newTokenRegistry.getSecuritiesTokenAddress(
+        web3.utils.fromAscii('TestToken'),
         {from: user.address}
       );
-      console.log("      Token symbol", tokenSymbol);
+      console.log("      Token address", _tokenAddress);
+    })
+
+    it('Get token owner EIN', async () => {
+      _tokenOwnerEIN = await newTokenRegistry.getSecuritiesTokenOwnerEIN(
+        web3.utils.fromAscii('TestToken'),
+        {from: user.address}
+      );
+      console.log("      Token owner EIN", _tokenOwnerEIN);
+    })
+
+    it('Get token owner EIN', async () => {
+      _tokenOwnerDescription = await newTokenRegistry.getSecuritiesTokenDescription(
+        web3.utils.fromAscii('TestToken'),
+        {from: user.address}
+      );
+      console.log("      Token description", _tokenOwnerDescription);
+    })
+
+    it('Get token decimals', async () => {
+      _tokenOwnerDecimals = await newTokenRegistry.getSecuritiesTokenDecimals(
+        web3.utils.fromAscii('TestToken'),
+        {from: user.address}
+      );
+      console.log("      Token decimals", _tokenOwnerDecimals.toNumber());
     })
 
   })
