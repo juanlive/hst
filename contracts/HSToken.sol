@@ -142,7 +142,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     // State Memory
     Stage public stage; // SETUP, PRELAUNCH, PRESALE, SALE, LOCK, MARKET, FINALIZED
     bool public legalApproved;
-    uint256 public issuedTokens;
+    // uint256 public issuedTokens; // It is in the payment modules
     uint256 public burnedTokens;
     uint256 public hydroReceived;
     uint256 public ethReceived;

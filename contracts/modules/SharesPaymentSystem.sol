@@ -31,7 +31,7 @@ contract SharesPaymentSystem {
 
         //investors[_ein].lastPeriodPayed = _periodToPay;
         //return _balanceAt(_periodToPay, msg.sender);
-        return (_balanceAt(_period, msg.sender), _issuedTokens(), results[_period]);
+        return (_balanceAt(_period, msg.sender), issuedTokens, results[_period]);
 
         uint256 _participationRate = _balanceAt(_periodToPay, msg.sender) * 1 ether / issuedTokensAt[0];
 
@@ -44,7 +44,7 @@ contract SharesPaymentSystem {
     }
 
     function notifyPeriodResults(uint256 _results) public {
-        require(msg.sender == hydroOracle, "Only registered oracle can notifyPeriodResults results");
+        require(msg.sender == hydroOracle, "Only registered oracle can notify results");
         require(_results > 0, "Results has to be greater than zero");
         uint256 _period = _getPeriod();
         require(results[_period] == 0, "Period already notified");
