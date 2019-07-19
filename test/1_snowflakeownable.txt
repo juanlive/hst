@@ -6,10 +6,12 @@ const common = require('./common.js')
 const { sign, verifyIdentity, daysOn, daysToSeconds, createIdentity } = require('./utilities')
 
 let instances
+let newSnowflakeOwnable
 let user0
 let user1
 let ein0
 let ein1
+let ownerEIN
 
 contract('Testing SnowflakeOwnable', function (accounts) {
   const owner = {
@@ -113,10 +115,10 @@ contract('Testing SnowflakeOwnable', function (accounts) {
     })
 
     it('SnowflakeOwnable get Identity Registry Address', async () => {
-      snowIDaddress = await newSnowflakeOwnable.getIdentityRegistryAddress(
+      _snowIDaddress = await newSnowflakeOwnable.getIdentityRegistryAddress(
         {from: user0.address}
       )
-      console.log('      snowflake ownable identity registry address', snowIDaddress)
+      console.log('      snowflake ownable identity registry address', _snowIDaddress)
     })
 
     it('SnowflakeOwnable get owner EIN', async () => {

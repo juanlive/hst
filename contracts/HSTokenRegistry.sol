@@ -35,7 +35,7 @@ contract HSTokenRegistry {
       bool symbolExists;
     }
 
-    uint256 public lastId = 0;
+    uint256 public lastID = 0;
 
     IdentityRegistryInterface public IdentityRegistry;
     HSTServiceRegistry public ServiceRegistry;
@@ -43,7 +43,7 @@ contract HSTokenRegistry {
     // Token name => Token data structure
     mapping(bytes32 => Token) public tokens;
 
-    // Token symbol => ID data structure
+    // Token symbol => Symbol data structure
     mapping(bytes32 => Symbol) public symbols;
 
 
@@ -154,10 +154,9 @@ contract HSTokenRegistry {
         }
       }
 
-      uint256 _lastID; // Unique id for Tokens
-      _lastID++;
+      lastID++;
 
-      tokens[_tokenName].id = _lastID;
+      tokens[_tokenName].id = lastID;
       tokens[_tokenName].tokenSymbol = _tokenSymbol;
       tokens[_tokenName].tokenAddress = address(_tokenAddress);
       tokens[_tokenName].ownerEIN = IdentityRegistry.getEIN(msg.sender);
@@ -166,10 +165,10 @@ contract HSTokenRegistry {
       tokens[_tokenName].tokenHasLegalApproval = false;
       tokens[_tokenName].tokenExists = true;
 
-      symbols[_tokenSymbol].id = _lastID;
+      symbols[_tokenSymbol].id = lastID;
       symbols[_tokenSymbol].symbolExists = true;
 
-      emit TokenAppointedToRegistry(_tokenName, _tokenSymbol, address(_tokenAddress), _lastID);
+      emit TokenAppointedToRegistry(_tokenName, _tokenSymbol, address(_tokenAddress), lastID);
 
       return true;
     }
