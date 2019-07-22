@@ -229,12 +229,18 @@ contract('Testing HSToken', function (accounts) {
 
     it('Store periods', async() => {
 
-      var now = parseInt(new Date().getTime() / 1000) + 20
+      // var now = parseInt(new Date().getTime() / 1000) + 20
+      // Get now from blockchain (to avoid errors from previous timetravels)
+      var nowReceived = await newToken.getNow()
+      var now = parseInt(nowReceived.toNumber())
+      console.log("NOW: ", now)
       var periods = []
       for (i=1; i < 25; i++) {
         // Stablish 24 periods of payment, separated 200 seconds from eachother
         periods.push(now + i * 200)
       }
+
+      await timeTravel(200)
 
       var tx = await newToken.addPaymentPeriodBoundaries(
           periods,
@@ -249,18 +255,9 @@ contract('Testing HSToken', function (accounts) {
       console.log("Periods:",getPeriods.map(period=>period.toNumber()))
       var now = await newToken.getNow()
       console.log("Now:", now.toNumber())
-    })
 
-    it('Travelling 400 seconds ahead in time', async() => {
-      await timeTravel(400);
-    })
-
-    it('Current period could vary according to systems time', async () => {
-      var now = await newToken.getNow()
-      console.log("Now:", now.toNumber())
-      var currentPeriod = await newToken._getPeriod(
-          { from: user.address })
-
+      currentPeriod = await newToken._getPeriod(
+        { from: user.address });
       console.log("Current period:",currentPeriod.toNumber())
     })
 
@@ -275,10 +272,10 @@ contract('Testing HSToken', function (accounts) {
         web3.utils.toWei("1.2"),
         { from: user.address })
 
-    await after(async()=>{
-        console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
-        console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
-    })
+      //after(async()=>{
+          console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
+          console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
+      //})
     })
 
 
@@ -295,30 +292,10 @@ contract('Testing HSToken', function (accounts) {
           web3.utils.toWei("1.2"),
           { from: user.address })
       )
-    // after(async()=>{
-        console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
-        console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
-    // })
-    })
-
-
-    it('Checking periods', async () => {
-      period = await newToken._getPeriod(
-        { from: user.address });
-      console.log("Current Period:", period.toNumber())
-
-      await timeTravel(200)
-
-      period = await newToken._getPeriod(
-        { from: user.address });
-      console.log("Current Period:", period.toNumber())
-
-      await timeTravel(200)
-
-      period = await newToken._getPeriod(
-        { from: user.address });
-      console.log("Current Period:", period.toNumber())
-
+      //after(async()=>{
+          console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
+          console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
+      //})
     })
 
 
@@ -368,7 +345,59 @@ contract('Testing HSToken', function (accounts) {
 
     })
 
+    it('Advancing periods', async () => {
+      period = await newToken._getPeriod(
+        { from: user.address });
+      console.log("Current Period:", period.toNumber())
+
+      await timeTravel(600)
+
+      period = await newToken._getPeriod(
+        { from: user.address });
+      console.log("Current Period:", period.toNumber())
+
+    })
+
+
+    it('Oracle notifies results of 6 Hydros for this period', async() => {
+      await newToken.notifyPeriodResults(
+        web3.utils.toWei("6"),
+        { from: users[2].address })
+    })
+
+
+    it('User claims payment 1 but there is nothing, once', async() => {
+      var payment = await newToken.claimPayment(
+        { from: user.address })
+      console.log("Period payed:", payment.logs[0].args.periodToPay.toNumber())
+      console.log("Participation rate:", web3.utils.fromWei(payment.logs[0].args.investorParticipationRate))
+      console.log("Period results:", web3.utils.fromWei(payment.logs[0].args.periodResults))
+      console.log("Amount payed:", web3.utils.fromWei(payment.logs[0].args.paymentForInvestor))
+    })
+
+
+    it('User claims payment 1 but there is nothing twice', async() => {
+      var payment = await newToken.claimPayment(
+        { from: user.address })
+      console.log("Period payed:", payment.logs[0].args.periodToPay.toNumber())
+      console.log("Participation rate:", web3.utils.fromWei(payment.logs[0].args.investorParticipationRate))
+      console.log("Period results:", web3.utils.fromWei(payment.logs[0].args.periodResults))
+      console.log("Amount payed:", web3.utils.fromWei(payment.logs[0].args.paymentForInvestor))
+    })
+
+    it('User claims payment 1 and now it works', async() => {
+      var payment = await newToken.claimPayment(
+        { from: user.address })
+      console.log("PP:",JSON.stringify(payment.receipt.logs));
+      return;
+      console.log("Period payed:", payment.logs[0].args.periodToPay.toNumber())
+      console.log("Participation rate:", web3.utils.fromWei(payment.logs[0].args.investorParticipationRate))
+      console.log("Period results:", web3.utils.fromWei(payment.logs[0].args.periodResults))
+      console.log("Amount payed:", web3.utils.fromWei(payment.logs[0].args.paymentForInvestor))
+      console.log("Amount from transfer log:", web3.utils.fromWei(payment.logs[0].args._amount))
+      console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(user.address)))
+
+    })
+
   })
-
-
 })

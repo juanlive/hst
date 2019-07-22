@@ -21,7 +21,7 @@ contract SharesPaymentSystem {
     uint256 issuedTokens;
 
 
-    event PaymentPayed(
+    event SharesPayed(
         uint256 indexed investorEin, 
         uint256 periodToPay, 
         uint256 periodResults, 
@@ -45,9 +45,10 @@ contract SharesPaymentSystem {
         uint256 _participationRate = _balanceAt(_periodToPay, msg.sender) * 1 ether / issuedTokens;
         uint256 _paymentForInvestor = results[_periodToPay] * _participationRate / 1 ether;
 
-        if (_paymentForInvestor > 0) require(_transferHydroToken(msg.sender, _paymentForInvestor), "Error while releasing Tokens");
-        
-        emit PaymentPayed(_ein, _periodToPay, results[_periodToPay], _participationRate, _paymentForInvestor);
+        if (_paymentForInvestor > 0) {
+            require(_transferHydroToken(msg.sender, _paymentForInvestor), "Error while releasing Tokens");
+            }
+        emit SharesPayed(_ein, _periodToPay, results[_periodToPay], _participationRate, _paymentForInvestor);
     }
 
     function notifyPeriodResults(uint256 _results) public {

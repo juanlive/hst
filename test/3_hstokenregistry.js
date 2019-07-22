@@ -1,4 +1,4 @@
-// return;
+return;
 const truffleAssert = require('truffle-assertions')
 const HSTokenRegistry = artifacts.require('./HSTokenRegistry.sol')
 
