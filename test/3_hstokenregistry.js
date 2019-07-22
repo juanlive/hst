@@ -128,8 +128,6 @@ contract('Testing HSTokenRegistry', function (accounts) {
   })
 
 
-
-
   describe('Checking RulesEnforcer functionality', async() =>{
 
     it('HSTRulesEnforcer can be created', async () => {
@@ -145,25 +143,26 @@ contract('Testing HSTokenRegistry', function (accounts) {
       userId = await newRulesEnforcer.ownerEIN();
     })
 
-
-    describe('Checking HSTServiceRegistry functionality', async() =>{
-
-      it('HSTServiceRegistry can be created', async () => {
-        newServiceRegistry = await HSTServiceRegistry.new(
-            newRulesEnforcer.address,
-            instances.IdentityRegistry.address,
-            {from: user.address}
-          )
-          console.log("HSTServiceRegistry Address", newServiceRegistry.address)
-          console.log("User", user.address)
-      })
-    
-      it('HSTServiceRegistry exists', async () => {
-        userId = await newServiceRegistry.address;
-      })
-    
-    
-    })
   })
+
+
+  describe('Checking HSTServiceRegistry functionality', async() =>{
+
+    it('HSTServiceRegistry can be created', async () => {
+      newServiceRegistry = await HSTServiceRegistry.new(
+          newRulesEnforcer.address,
+          instances.IdentityRegistry.address,
+          {from: user.address}
+        )
+        console.log("HSTServiceRegistry Address", newServiceRegistry.address)
+        console.log("User", user.address)
+    })
+  
+    it('HSTServiceRegistry exists', async () => {
+      userId = await newServiceRegistry.address;
+    })
+        
+  })
+
 
 })
