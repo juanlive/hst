@@ -1,3 +1,4 @@
+// return;
 const truffleAssert = require('truffle-assertions')
 const IdentityRegistry = artifacts.require('./components/IdentityRegistry.sol')
 const SnowflakeOwnable = artifacts.require('./components/SnowflakeOwnable.sol')

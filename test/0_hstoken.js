@@ -1,3 +1,4 @@
+// return;
 const truffleAssert = require('truffle-assertions')
 const HSToken = artifacts.require('./HSToken.sol')
 
@@ -274,10 +275,10 @@ contract('Testing HSToken', function (accounts) {
         web3.utils.toWei("1.2"),
         { from: user.address })
 
-    // after(async()=>{
+    await after(async()=>{
         console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
         console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
-    // })
+    })
     })
 
 
@@ -302,21 +303,21 @@ contract('Testing HSToken', function (accounts) {
 
 
     it('Checking periods', async () => {
-      periods = await newToken._getPeriod(
+      period = await newToken._getPeriod(
         { from: user.address });
-      console.log("Periods 1:", periods.toNumber())
+      console.log("Current Period:", period.toNumber())
 
-      timeTravel(200)
+      await timeTravel(200)
 
-      periods = await newToken._getPeriod(
+      period = await newToken._getPeriod(
         { from: user.address });
-      console.log("Periods 2:", periods.toNumber())
+      console.log("Current Period:", period.toNumber())
 
-      timeTravel(200)
+      await timeTravel(200)
 
-      periods = await newToken._getPeriod(
+      period = await newToken._getPeriod(
         { from: user.address });
-      console.log("Periods 3:", periods.toNumber())
+      console.log("Current Period:", period.toNumber())
 
     })
 
@@ -333,12 +334,41 @@ contract('Testing HSToken', function (accounts) {
         { from: users[2].address })
     })
 
-    it('User claims payment', async() => {
+    it('User claims payment 1', async() => {
+      console.log("HydroToken Balance user 1 BEFORE:", web3.utils.fromWei(await instances.HydroToken.balanceOf(user.address)))
+
       var payment = await newToken.claimPayment(
         { from: user.address })
-      console.log("Payment received:", payment)
+
+      console.log("Payment received. Tx hash:", payment.receipt.transactionHash)
+      console.log("Amount from transfer log:", web3.utils.fromWei(payment.logs[0].args._amount))
+      console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(user.address)))
+
+    })
+
+    it('Go to next period', async() => {
+      await timeTravel(200)
+      period = await newToken._getPeriod(
+        { from: user.address });
+      console.log("Current Period:", period.toNumber())
+    })
+
+    it('Oracle notifies results of 4 Hydros for this period', async() => {
+      await newToken.notifyPeriodResults(
+        web3.utils.toWei("4"),
+        { from: users[2].address })
+    })
+
+    it('User claims payment 1', async() => {
+      var payment = await newToken.claimPayment(
+        { from: user.address })
+      console.log("Payment received. Tx hash:", payment.receipt.transactionHash)
+      console.log("Amount from transfer log:", web3.utils.fromWei(payment.logs[0].args._amount))
+      console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(user.address)))
+
     })
 
   })
+
 
 })

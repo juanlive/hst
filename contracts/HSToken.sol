@@ -644,6 +644,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         return IdentityRegistry.getEIN(_address);
     }
 
+    function _transferHydroToken(address _address, uint256 _payment) private returns(bool) {
+        return HydroToken.transfer(_address, _payment);
+    }
+
+
     // Token ERC-20 wrapper -----------------------------------------------------------
 
     // Feature #11

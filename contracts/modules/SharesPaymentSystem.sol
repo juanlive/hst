@@ -1,6 +1,9 @@
 pragma solidity ^0.5.0;
 
 
+import '../interfaces/HydroInterface.sol';
+
+
 contract SharesPaymentSystem {
 
     struct Investor {
@@ -18,10 +21,18 @@ contract SharesPaymentSystem {
     uint256 issuedTokens;
 
 
+    event PaymentPayed(
+        uint256 indexed investorEin, 
+        uint256 periodToPay, 
+        uint256 periodResults, 
+        uint256 investorParticipationRate,
+        uint256 paymentForInvestor
+        );
+
+
     // Case A: Shares
     function claimPayment()
-        public view
-        returns(uint256)
+        public
     {
         //return uint(address(IdentityRegistry));
         uint256 _ein = _getEIN(msg.sender);
@@ -29,18 +40,14 @@ contract SharesPaymentSystem {
         uint256 _periodToPay = investors[_ein].lastPeriodPayed + 1;
         require(_periodToPay <= _period, "There is no period to pay yet");
 
-        //investors[_ein].lastPeriodPayed = _periodToPay;
-        //return _balanceAt(_periodToPay, msg.sender);
-        //return (_balanceAt(_period, msg.sender), issuedTokens, results[_period]);
+        investors[_ein].lastPeriodPayed = _periodToPay;
 
-        uint256 _participationRate = _balanceAt(_period, msg.sender) * 1 ether / issuedTokens;
+        uint256 _participationRate = _balanceAt(_periodToPay, msg.sender) * 1 ether / issuedTokens;
+        uint256 _paymentForInvestor = results[_periodToPay] * _participationRate / 1 ether;
 
-        //return (_balanceAt(_periodToPay, msg.sender), issuedTokens, results[_period]);
-
-        uint256 _paymentForInvestor = results[_period] * _participationRate / 1 ether;
-
-        //require(HydroToken.transfer(msg.sender, _paymentForInvestor), "Error while releasing Tokens");
-        return _paymentForInvestor;
+        if (_paymentForInvestor > 0) require(_transferHydroToken(msg.sender, _paymentForInvestor), "Error while releasing Tokens");
+        
+        emit PaymentPayed(_ein, _periodToPay, results[_periodToPay], _participationRate, _paymentForInvestor);
     }
 
     function notifyPeriodResults(uint256 _results) public {
@@ -64,7 +71,8 @@ contract SharesPaymentSystem {
 
     // Dummy functions (to be overwritten by main contract)
     function _getPeriod() public view returns(uint256) {}
-    function _getEIN(address _address) private view returns(uint256) {}
-    function _issuedTokens() internal view returns(uint256) {}
+    function _getEIN(address) private view returns(uint256) {}
+//    function _issuedTokens() internal view returns(uint256);
+    function _transferHydroToken(address, uint256) private returns(bool);
 
 }
