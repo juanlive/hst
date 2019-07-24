@@ -78,6 +78,10 @@ contract HSTokenRegistry {
       IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
     }
 
+    function setServiceRegistryAddress(address _serviceRegistryAddress) public {
+      ServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
+    }
+
  /**
     * @notice Get a Hydro Securities Token symbol
     * @param  _tokenName The name of the Token
@@ -167,6 +171,8 @@ contract HSTokenRegistry {
 
       symbols[_tokenSymbol].id = lastID;
       symbols[_tokenSymbol].symbolExists = true;
+
+      ServiceRegistry.addDefaultCategories(_tokenAddress);
 
       emit TokenAppointedToRegistry(_tokenName, _tokenSymbol, address(_tokenAddress), lastID);
 

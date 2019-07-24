@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import './SnowflakeOwnable.sol';
 import '../components/DateTime.sol';
+import '../components/HSTServiceRegistry.sol';
 
 // TODO
 
@@ -49,8 +50,6 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
 
     // buyer rules data
 
-    DateTime dateTime;
-
     struct buyerData {
         string  firstName;
         string  lastName;
@@ -76,9 +75,10 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
     mapping(uint => mapping(address => buyerServicesDetail)) public serviceDetailForBuyers;
 
 
-    // SnowflakeOwnable data
+    // external
 
-    address _identityRegistryAddress;
+    DateTime dateTime;
+    HSTServiceRegistry hstServiceRegistry;
 
 
     // rules events
@@ -145,20 +145,141 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
         dateTime = DateTime(_dateTimeAddress);
     }
 
-    // functions for buyer's registry
+
+    // functions for token rules update
+
+    /**
+    * @notice Assign rule values for each token
+    *
+    * @dev This method is only callable by the contract's owner
+    *
+    * @param _tokenAddress Address for the Token
+    * @param _minimumAge Required minimum age to buy this Token
+    * @param _minimumNetWorth Required minimum net work to buy this Token
+    * @param _minimumSalary Required minimum salary to buy this Token
+    * @param _accreditedInvestorStatusRequired Determines if buyer must be an accredited investor to buy this Token
+    */
+    function assignTokenValues(
+        address _tokenAddress,
+        uint _minimumAge,
+        uint64 _minimumNetWorth,
+        uint32 _minimumSalary,
+        bool _accreditedInvestorStatusRequired)
+    public {
+        tokenData[_tokenAddress].minimumAge = _minimumAge;
+        tokenData[_tokenAddress].minimumNetWorth = _minimumNetWorth;
+        tokenData[_tokenAddress].minimumSalary = _minimumSalary;
+        tokenData[_tokenAddress].accreditedInvestorStatusRequired = _accreditedInvestorStatusRequired;
+        emit TokenValuesAssigned(_tokenAddress);
+    }
+
+    /**
+    * @notice get token rules data
+    *
+    * @param _tokenAddress Address for the Token
+    * @return minimum age required to buy this token
+    */
+    function getTokenMinimumAge(address _tokenAddress) public view returns (uint) {
+        return tokenData[_tokenAddress].minimumAge;
+    }
+
+    /**
+    * @notice get token rules data
+    *
+    * @param _tokenAddress Address for the Token
+    * @return minimum net worth required to buy this token
+    */
+    function getTokenMinimumNetWorth(address _tokenAddress) public view returns (uint64) {
+        return tokenData[_tokenAddress].minimumNetWorth;
+    }
+
+    /**
+    * @notice get token rules data
+    *
+    * @param _tokenAddress Address for the Token
+    * @return minimum salary required to buy this token
+    */
+    function getTokenMinimumSalary(address _tokenAddress) public view returns (uint32) {
+        return tokenData[_tokenAddress].minimumSalary;
+    }
+
+    /**
+    * @notice get token rules data
+    *
+    * @param _tokenAddress Address for the Token
+    * @return is accredited investor status required to buy this token?
+    */
+    function getTokenInvestorStatusRequired(address _tokenAddress) public view returns (bool) {
+        return tokenData[_tokenAddress].accreditedInvestorStatusRequired;
+    }
+
+
+    // country ban functions
+
+    /**
+    * @notice ban a country for participation
+    *
+    * @dev This method is only callable by the contract's owner
+    *
+    * @param _tokenAddress Address for the Token
+    * @param _isoCountryCode Country to be banned for this Token
+    */
+    function addCountryBan(
+        address _tokenAddress,
+        bytes32 _isoCountryCode)
+    public {
+        bannedCountries[_tokenAddress][_isoCountryCode] = true;
+        emit AddCountryBan(_tokenAddress, _isoCountryCode);
+    }
+
+    /**
+    * @notice get token rules data
+    *
+    * @param _tokenAddress Address for the Token
+    * @param _isoCountryCode Country to find out status
+    *
+    * @return country status
+    */
+    function getCountryBan(
+        address _tokenAddress,
+        bytes32 _isoCountryCode)
+        public view returns (bool) {
+        return bannedCountries[_tokenAddress][_isoCountryCode];
+    }
+
+    /**
+    * @notice lift a country ban for participation
+    *
+    * @dev This method is only callable by the contract's owner
+    *
+    * @param _tokenAddress Address for the Token
+    * @param _isoCountryCode Country to be unbanned for this Token
+    */
+    function liftCountryBan(
+        address _tokenAddress,
+        bytes32 _isoCountryCode)
+    public {
+        bannedCountries[_tokenAddress][_isoCountryCode] = false;
+        emit LiftCountryBan(_tokenAddress, _isoCountryCode);
+    }
+
+
+    // functions for buyer's registry - user data
 
     /**
     * @notice Add a new buyer
     * @dev    This method is only callable by the contract's owner
+    *
+    * @param _buyerEIN EIN for the buyer
     * @param _firstName First name of the buyer
     * @param _lastName Last name of the buyer
-    * @param _isoCountryCode ISO country code of the buyer
+    * @param _isoCountryCode ISO country code for the buyer
     * @param _yearOfBirth Year of birth of the buyer
     * @param _monthOfBirth Month of birth of the buyer
     * @param _dayOfBirth Day of birth of the buyer
     * @param _netWorth Net worth declared by the buyer
     * @param _salary Salary declared by the buyer
-    }   */
+    */
     function addBuyer(
         uint _buyerEIN,
         string memory _firstName,
@@ -180,6 +301,112 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
         buyerRegistry[_buyerEIN] = _bd;
         emit AddBuyer(_buyerEIN, _firstName, _lastName);
     }
+
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return _firstName First name of the buyer
+    */
+    function getBuyerFirstName(uint _buyerEIN) public view returns (string memory) {
+        return buyerRegistry[_buyerEIN].firstName;
+    }
+
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return _lastName Last name of the buyer
+    */
+    function getBuyerLastName(uint _buyerEIN) public view returns (string memory) {
+        return buyerRegistry[_buyerEIN].lastName;
+    }
+
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return _isoCountryCode ISO country code for the buyer
+    */
+    function getBuyerIsoCountryCode(uint _buyerEIN) public view returns (bytes32) {
+        return buyerRegistry[_buyerEIN].isoCountryCode;
+    }
+    
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return birthTimestamp Timestamp for birthday of the buyer
+    */
+    function getBuyerBirthTimestamp(uint _buyerEIN) public view returns (uint) {
+        return buyerRegistry[_buyerEIN].birthTimestamp;
+    }
+
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return _netWorth Net worth declared by the buyer
+    */
+    function getBuyerNetWorth(uint _buyerEIN) public view returns (uint64) {
+        return buyerRegistry[_buyerEIN].netWorth;
+    }
+
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return _salary Salary declared by the buyer
+    */
+    function getBuyerSalary(uint _buyerEIN) public view returns (uint32) {
+        return buyerRegistry[_buyerEIN].salary;
+    }
+
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return _accreditedInvestorStatus Investor status for the buyer
+    */
+    function getBuyerInvestorStatus(uint _buyerEIN) public view returns (bool) {
+        return buyerRegistry[_buyerEIN].accreditedInvestorStatus;
+    }
+
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return _kycWhitelisted KYC status for the buyer
+    */
+    function getBuyerKycStatus(uint _buyerEIN) public view returns (bool) {
+        return buyerRegistry[_buyerEIN].kycWhitelisted;
+    }
+
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return _amlWhitelisted KYC status for the buyer
+    */
+    function getBuyerAmlStatus(uint _buyerEIN) public view returns (bool) {
+        return buyerRegistry[_buyerEIN].amlWhitelisted;
+    }
+
+        bool    amlWhitelisted;
+
+    /**
+    * @notice get buyer data
+    *
+    * @param _buyerEIN EIN for the buyer
+    * @return _cftWhitelisted KYC status for the buyer
+    */
+    function getBuyerCftStatus(uint _buyerEIN) public view returns (bool) {
+        return buyerRegistry[_buyerEIN].cftWhitelisted;
+    }
+
+
+    // functions for buyer's registry - manage services for a buyer
+    // TO DO - only registered providers can modify this data
 
     /**
     * @notice Add a new KYC service for a buyer
@@ -257,64 +484,8 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
         emit ReplaceAMLServiceForBuyer(_EIN, _tokenFor, _serviceCategory);
     }
 
-    // functions for rules enforcement
 
-    /**
-    * @notice Assign rule values for each token
-    *
-    * @dev This method is only callable by the contract's owner
-    *
-    * @param _tokenAddress Address for the Token
-    * @param _minimumAge Required minimum age to buy this Token
-    * @param _minimumNetWorth Required minimum net work to buy this Token
-    * @param _minimumSalary Required minimum salary to buy this Token
-    * @param _accreditedInvestorStatusRequired Determines if buyer must be an accredited investor to buy this Token
-    */
-    function assignTokenValues(
-        address _tokenAddress,
-        uint _minimumAge,
-        uint64 _minimumNetWorth,
-        uint32 _minimumSalary,
-        bool _accreditedInvestorStatusRequired)
-    public {
-        tokenData[_tokenAddress].minimumAge = _minimumAge;
-        tokenData[_tokenAddress].minimumNetWorth = _minimumNetWorth;
-        tokenData[_tokenAddress].minimumSalary = _minimumSalary;
-        tokenData[_tokenAddress].accreditedInvestorStatusRequired = _accreditedInvestorStatusRequired;
-        emit TokenValuesAssigned(_tokenAddress);
-    }
-
-    /**
-    * @notice TO DO
-    *
-    * @dev This method is only callable by the contract's owner
-    *
-    * @param _tokenAddress Address for the Token
-    * @param _isoCountryCode Country to be banned for this Token
-    */
-    function addCountryBan(
-        address _tokenAddress,
-        bytes32 _isoCountryCode)
-    public {
-        bannedCountries[_tokenAddress][_isoCountryCode] = true;
-        emit AddCountryBan(_tokenAddress, _isoCountryCode);
-    }
-
-    /**
-    * @notice TO DO
-    *
-    * @dev This method is only callable by the contract's owner
-    *
-    * @param _tokenAddress Address for the Token
-    * @param _isoCountryCode Country to be unbanned for this Token
-    */
-    function liftCountryBan(
-        address _tokenAddress,
-        bytes32 _isoCountryCode)
-    public {
-        bannedCountries[_tokenAddress][_isoCountryCode] = false;
-        emit LiftCountryBan(_tokenAddress, _isoCountryCode);
-    }
+    // functions to enforce investor rules
 
     /**
     * @notice Enforce rules for the investor
