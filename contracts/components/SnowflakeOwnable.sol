@@ -73,7 +73,7 @@ contract SnowflakeOwnable is Ownable {
     * @return true if `msg.sender` is the owner of the contract
     */
     function isEINowner() public view returns(bool) {
-        require(identityRegistryAddress != address(0), '1. The identity registry address is required');
+        require(identityRegistryAddress != address(0), '0. The identity registry address is required');
         uint caller = identityRegistry.getEIN(msg.sender);
         return (caller == ownerEIN);
     }

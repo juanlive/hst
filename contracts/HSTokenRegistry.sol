@@ -74,15 +74,23 @@ contract HSTokenRegistry {
     //   ServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
     // }
 
+  /**
+    * @param  _identityRegistryAddress The address for the identity registry
+    */
     constructor(address _identityRegistryAddress) public {
       IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
     }
 
+  /**
+    * @notice Set the address for the service registry
+
+    * @param _serviceRegistryAddress The address for the service registry
+    */
     function setServiceRegistryAddress(address _serviceRegistryAddress) public {
       ServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
     }
 
- /**
+  /**
     * @notice Get a Hydro Securities Token symbol
     * @param  _tokenName The name of the Token
     * @return the symbol of the Token corresponding to that name

@@ -1,7 +1,7 @@
 const truffleAssert = require('truffle-assertions')
 const HSTokenRegistry = artifacts.require('./HSTokenRegistry.sol')
-const HSTServiceRegistry = artifacts.require('./HSTServiceRegistry.sol')
-const HSTRulesEnforcer = artifacts.require('./HSTRulesEnforcer.sol')
+const HSTServiceRegistry = artifacts.require('./components/HSTServiceRegistry.sol')
+const HSTRulesEnforcer = artifacts.require('./components/HSTRulesEnforcer.sol')
 
 const common = require('./common.js')
 const { createIdentity } = require('./utilities')
@@ -76,30 +76,10 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
   })
 
 
-  describe('Checking RulesEnforcer functionality - basic', async() => {
-
-    it('HSTRulesEnforcer can be created', async () => {
-      newRulesEnforcer = await HSTRulesEnforcer.new(
-          instances.DateTime.address,
-          {from: user0.address}
-        )
-        console.log("      HSTRulesEnforcer Address", newRulesEnforcer.address)
-        console.log("      User 0", user0.address)
-    })
-  
-    it('      HSTRulesEnforcer exists', async () => {
-      _rulesOwner = await newRulesEnforcer.ownerEIN();
-      console.log("      HSTRulesEnforcer owner", _rulesOwner)
-    })
-
-  })
-
-
   describe('Checking HSTServiceRegistry functionality - basic', async() => {
 
     it('HSTServiceRegistry can be created', async () => {
       newServiceRegistry = await HSTServiceRegistry.new(
-          newRulesEnforcer.address,
           instances.IdentityRegistry.address,
           newTokenRegistry.address,
           {from: user0.address}
@@ -113,6 +93,41 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
       console.log("      HSTServiceRegistry address", _serviceRegistryAddress)
     })
         
+  })
+
+
+  describe('Checking HSTRulesEnforcer functionality - basic', async() => {
+
+    it('HSTRulesEnforcer can be created', async () => {
+      newRulesEnforcer = await HSTRulesEnforcer.new(
+          instances.DateTime.address,
+          {from: user0.address}
+        )
+        console.log("      HSTRulesEnforcer Address", newRulesEnforcer.address)
+        console.log("      User 0", user0.address)
+    })
+  
+    it('HSTRulesEnforcer set registries addresses', async () => {
+      await newRulesEnforcer.setAddresses(
+        newTokenRegistry.address,
+        newServiceRegistry.address,
+        {from: user0.address}
+      )
+    })
+
+    it('HSTServiceRegistry set default rules enforcer address', async () => {
+      await newServiceRegistry.setDefaultRulesEnforcer(
+        newRulesEnforcer.address,
+        {from: user0.address}
+      )
+    })
+
+    // TO DO
+    // it('      HSTRulesEnforcer exists', async () => {
+    //   _rulesOwner = await newRulesEnforcer.ownerEIN();
+    //   console.log("      HSTRulesEnforcer owner", _rulesOwner)
+    // })
+
   })
 
 
@@ -356,11 +371,11 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
   })
 
 
-  describe('Checking HSTRulesEnforcer functionality - users', async() => {
+  describe('Checking HSTRulesEnforcer functionality - buyers', async() => {
 
-    it('HSTRulesEnforcer - add user', async () => {
+    it('HSTRulesEnforcer - add buyer', async () => {
       await newRulesEnforcer.addBuyer(
-        21,
+        '21',
         'Test first name',
         'Test last name',
         web3.utils.fromAscii('GMB'),
@@ -373,14 +388,13 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
       )
     })
 
-    // it('HSTRulesEnforcer - get user data - ?????', async () => {
-    //   _countryBanStatus = await newRulesEnforcer.getCountryBan(
-    //     tokenDummyAddress,
-    //     web3.utils.fromAscii('GMB'),
-    //     {from: user0.address}
-    //   )
-    //   console.log("      HSTRulesEnforcer country ban status", _countryBanStatus)
-    // })
+    it('HSTRulesEnforcer - get buyer data - first name', async () => {
+      _userFirstName = await newRulesEnforcer.getBuyerFirstName(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer get first name", _userFirstName)
+    })
 
   })
 

@@ -63,17 +63,6 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    */
   event RemoveService(address _tokenAddress, uint _oldServiceEIN);
 
-  /**
-   * @notice Constructor
-   */
-  constructor(address _defaultRulesEnforcerAddress,
-              address _identityRegistryAddress,
-              address _tokenRegistryAddress) public {
-    // set default rules enforcer
-    defaultRulesEnforcerAddress = _defaultRulesEnforcerAddress;
-    identityRegistryAddress = _identityRegistryAddress;
-    tokenRegistryAddress = _tokenRegistryAddress;
-  }
 
   /**
    * @dev Validate that a contract exists in an address received as such
@@ -95,6 +84,34 @@ contract HSTServiceRegistry is SnowflakeOwnable {
       require(isTokenOwner(_tokenAddress), "Must be owner to call this function");
       _;
   }
+
+
+  /**
+   * @notice Constructor
+   *
+   * @param _identityRegistryAddress The address for the identity registry
+   * @param _tokenRegistryAddress The address for the token registry
+   */
+  constructor(address _identityRegistryAddress,
+              address _tokenRegistryAddress) public {
+    identityRegistryAddress = _identityRegistryAddress;
+    tokenRegistryAddress = _tokenRegistryAddress;
+  }
+
+
+  /**
+   * @notice Set address for the default rules enforcer
+   *
+   * @param _defaultRulesEnforcerAddress The address for the default rules enforcer
+   */
+    // set default rules enforcer
+  function setDefaultRulesEnforcer(address _defaultRulesEnforcerAddress) public {
+    defaultRulesEnforcerAddress = _defaultRulesEnforcerAddress;
+  }
+
+  // function addDefaultRulesService(address _tokenAddress) public onlyTokenOwner(_tokenAddress) {
+  //     serviceRegistry[_tokenAddress]["RULES"] = defaultRulesEnforcerAddress;
+  // }
 
   /**
   * @notice Check if caller is owner
@@ -176,10 +193,6 @@ contract HSTServiceRegistry is SnowflakeOwnable {
     serviceRegistry[_tokenAddress][_serviceProviderEIN] = _categorySymbol;
     emit AddService(_tokenAddress, _serviceProviderEIN, _categorySymbol);
   }
-
-  // function addDefaultRulesService(address _tokenAddress) public onlyTokenOwner(_tokenAddress) {
-  //     serviceRegistry[_tokenAddress]["RULES"] = defaultRulesEnforcerAddress;
-  // }
 
     /**
    * @notice Remove a service provider

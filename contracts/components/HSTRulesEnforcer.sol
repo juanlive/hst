@@ -3,6 +3,8 @@ pragma solidity ^0.5.0;
 import './SnowflakeOwnable.sol';
 import '../components/DateTime.sol';
 import '../components/HSTServiceRegistry.sol';
+import '../HSTokenRegistry.sol';
+
 
 // TODO
 
@@ -27,7 +29,8 @@ import '../components/HSTServiceRegistry.sol';
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
 
-contract HSTRulesEnforcer is SnowflakeOwnable {
+contract HSTRulesEnforcer {
+// is SnowflakeOwnable {
 
 
     // token rules data
@@ -79,6 +82,7 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
 
     DateTime dateTime;
     HSTServiceRegistry hstServiceRegistry;
+    HSTokenRegistry hstokenRegistry;
 
 
     // rules events
@@ -140,9 +144,39 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
 
     /**
     * @notice Constructor
+    *
+    * @param _dateTimeAddress address for the date time contract
     */
     constructor(address _dateTimeAddress) public {
         dateTime = DateTime(_dateTimeAddress);
+    }
+
+
+    // functions for contract configuration
+
+    /**
+    * @notice configure this contract
+    * @dev this contract need to communicate with token and service registries
+    *
+    * @param _tokenRegistryAddress The address for the token registry
+    * @param _serviceRegistryAddress The address for the service registry
+    *
+    */
+    function setAddresses(address _tokenRegistryAddress, address _serviceRegistryAddress) public {
+        hstokenRegistry = HSTokenRegistry(_tokenRegistryAddress);
+        hstServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
+    }
+
+
+    // functions for checking other registries
+    // TO DO
+
+    function registeredToken() internal pure returns(bool) {
+        return true;
+    }
+
+    function registeredProvider() internal pure returns(bool) {
+        return true;
     }
 
 
@@ -290,7 +324,8 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
         uint8 _dayOfBirth,
         uint64 _netWorth,
         uint32 _salary)
-    public onlySnowflakeOwner {
+    //public onlySnowflakeOwner {
+    public {
         buyerData memory _bd;
         _bd.firstName = _firstName;
         _bd.lastName = _lastName;
@@ -331,7 +366,7 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
     function getBuyerIsoCountryCode(uint _buyerEIN) public view returns (bytes32) {
         return buyerRegistry[_buyerEIN].isoCountryCode;
     }
-    
+
     /**
     * @notice get buyer data
     *
@@ -421,6 +456,8 @@ contract HSTRulesEnforcer is SnowflakeOwnable {
         bytes32 _serviceCategory)
     public isContract(_tokenFor) {
         bytes32 _emptyStringTest = _serviceCategory;
+        require (registeredToken() == true, "Token must be registered in Token Registry");
+        require (registeredProvider() == true, "Caller must be a registered provider in Service Registry");
         require (_emptyStringTest.length != 0, "Service category cannot be blank");
         serviceDetailForBuyers[_EIN][_tokenFor].kycProvider = _serviceCategory;
         emit AddKYCServiceToBuyer(_EIN, _tokenFor, _serviceCategory);

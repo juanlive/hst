@@ -39,8 +39,8 @@ library AddressSet {
     /// @return true if the element is in the set, false otherwise.
     function contains(Set storage self, address other) public view returns (bool) {
         return ( // solium-disable-line operator-whitespace
-            self.memberIndices[other] > 0 && 
-            self.members.length >= self.memberIndices[other] && 
+            self.memberIndices[other] > 0 &&
+            self.members.length >= self.memberIndices[other] &&
             self.members[self.memberIndices[other] - 1] == other
         );
     }
