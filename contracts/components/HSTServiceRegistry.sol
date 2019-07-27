@@ -1,11 +1,9 @@
 pragma solidity ^0.5.0;
 
-//import '../interfaces/HSTControlService.sol';
-import './SnowflakeOwnable.sol';
 import '../HSToken.sol';
+import './SnowflakeOwnable.sol';
+import './HSTokenRegistry.sol';
 import '../_testing/IdentityRegistry.sol';
-import '../HSTokenRegistry.sol';
-//import '../zeppelin/ownership/Ownable.sol';
 
 
 // TO DO

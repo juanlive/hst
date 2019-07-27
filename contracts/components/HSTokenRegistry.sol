@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
-import './HSToken.sol';
-import './interfaces/IdentityRegistryInterface.sol';
-import './components/HSTServiceRegistry.sol';
+import '../HSToken.sol';
+import '../interfaces/IdentityRegistryInterface.sol';
+import './HSTServiceRegistry.sol';
 
 // TO DO
 

@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
 import './SnowflakeOwnable.sol';
-import '../HSTokenRegistry.sol';
-import '../components/DateTime.sol';
-import '../components/HSTServiceRegistry.sol';
+import './HSTokenRegistry.sol';
+import './DateTime.sol';
+import './HSTServiceRegistry.sol';
 import '../interfaces/IdentityRegistryInterface.sol';
 
 
