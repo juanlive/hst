@@ -2,17 +2,28 @@ const truffleAssert = require('truffle-assertions')
 const HSTokenRegistry = artifacts.require('./HSTokenRegistry.sol')
 const HSTServiceRegistry = artifacts.require('./components/HSTServiceRegistry.sol')
 const HSTRulesEnforcer = artifacts.require('./components/HSTRulesEnforcer.sol')
+const IdentityRegistry = artifacts.require('./components/IdentityRegistry.sol')
 
 const common = require('./common.js')
 const { createIdentity } = require('./utilities')
 
 let instances
+
+// system owner
 let user0
-let user1
 let ein0
+
+// token owner
+let user1
 let ein1
 
+// kyc/aml/cft provider
+let user2
+let ein2
+
+
 contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', function (accounts) {
+
   const owner = {
     public: accounts[0]
   }
@@ -43,17 +54,47 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
 
   user0 = users[0]
   user1 = users[1]
+  user2 = users[2]
 
 
-  it('common contracts deployed', async () => {
-    instances = await common.initialize(owner.public, users);
-  })
+  describe('Preparing infrastructure', async() => {
 
+    it('Common contracts deployed', async () => {
+      instances = await common.initialize(owner.public, users);
+    })
 
-  it('Snowflake identities created for all accounts', async() => {
-    for (let i = 0; i < users.length; i++) {
-      await createIdentity(users[i], instances)
-    }
+    it('Snowflake identities created for all accounts', async() => {
+      for (let i = 0; i < users.length; i++) {
+        await createIdentity(users[i], instances)
+      }
+    })
+
+    // Retrieve EINs for all Identities from IdentityRegistry
+
+    it('IdentityRegistry retrieve EIN - first', async () => {
+      ein0 = await instances.IdentityRegistry.getEIN(
+        user0.address,
+        {from: user0.address}
+      )
+      console.log("      User 0 => EIN 0 => value 1", ein0);
+    })
+
+    it('IdentityRegistry retrieve EIN - second', async () => {
+      ein1 = await instances.IdentityRegistry.getEIN(
+        user1.address,
+        {from: user1.address}
+      )
+      console.log("      User 1 => EIN 1 => value 2", ein1);
+    })
+
+    it('IdentityRegistry retrieve EIN - third', async () => {
+      ein2 = await instances.IdentityRegistry.getEIN(
+        user2.address,
+        {from: user2.address}
+      )
+      console.log("      User 2 => EIN 2 => value 3", ein2);
+    })
+
   })
 
 
@@ -93,6 +134,14 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
       console.log("      HSTServiceRegistry address", _serviceRegistryAddress)
     })
         
+    it('HSTServiceRegistry set Identity Registry', async () => {
+      console.log('      Identity Registry Address', instances.IdentityRegistry.address)
+      await newServiceRegistry.setIdentityRegistryAddress(
+        instances.IdentityRegistry.address,
+        {from: user0.address}
+      )
+    })
+
   })
 
 
@@ -109,6 +158,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
   
     it('HSTRulesEnforcer set registries addresses', async () => {
       await newRulesEnforcer.setAddresses(
+        instances.IdentityRegistry.address,
         newTokenRegistry.address,
         newServiceRegistry.address,
         {from: user0.address}
@@ -145,48 +195,48 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
     })
 
     it('Appoint a new token', async () => {
-      result = await newTokenRegistry.appointToken(
-        web3.utils.fromAscii('TestToken'),
-        web3.utils.fromAscii('TEST'),
+      await newTokenRegistry.appointToken(
         tokenDummyAddress,
+        web3.utils.fromAscii('TEST'),
+        web3.utils.fromAscii('TestToken'),
         'just-a-test',
         10,
-        {from: user0.address}
+        {from: user1.address}
       );
       //console.log("      Token was created", result);
     })
 
+    it('Get token owner EIN', async () => {
+      _tokenOwnerEIN = await newTokenRegistry.getSecuritiesTokenOwnerEIN(
+        tokenDummyAddress
+      );
+      console.log("      Token owner EIN", _tokenOwnerEIN.toNumber());
+    })
+
     it('Get token symbol', async () => {
       _tokenSymbol = await newTokenRegistry.getSecuritiesTokenSymbol(
-        web3.utils.fromAscii('TestToken')
+        tokenDummyAddress
       );
       console.log("      Token symbol", web3.utils.toAscii(_tokenSymbol));
     })
 
-    it('Get token address', async () => {
-      _tokenAddress = await newTokenRegistry.getSecuritiesTokenAddress(
-        web3.utils.fromAscii('TestToken')
+    it('Get token name', async () => {
+      _tokenName = await newTokenRegistry.getSecuritiesTokenName(
+        tokenDummyAddress
       );
-      console.log("      Token address", _tokenAddress);
-    })
-
-    it('Get token owner EIN', async () => {
-      _tokenOwnerEIN = await newTokenRegistry.getSecuritiesTokenOwnerEIN(
-        web3.utils.fromAscii('TestToken'),
-      );
-      console.log("      Token owner EIN", _tokenOwnerEIN);
+      console.log("      Token address", web3.utils.toAscii(_tokenName));
     })
 
     it('Get token description', async () => {
       _tokenDescription = await newTokenRegistry.getSecuritiesTokenDescription(
-        web3.utils.fromAscii('TestToken')
+        tokenDummyAddress
       );
       console.log("      Token description", _tokenDescription);
     })
 
     it('Get token decimals', async () => {
       _tokenDecimals = await newTokenRegistry.getSecuritiesTokenDecimals(
-        web3.utils.fromAscii('TestToken')
+        tokenDummyAddress
       );
       console.log("      Token decimals", _tokenDecimals.toNumber());
     })
@@ -217,8 +267,8 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
         tokenDummyAddress,
         web3.utils.fromAscii("TEST"),
         'just-a-test-category',
-        {from: user0.address}
-        )
+        {from: user1.address}
+      )
     })
   
     it('HSTServiceRegistry - get category', async () => {
@@ -233,16 +283,16 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
     it('HSTServiceRegistry - add service', async () => {
       await newServiceRegistry.addService(
         tokenDummyAddress,
-        19,
-        web3.utils.fromAscii("TEST"),
-        {from: user0.address}
+        '3',
+        web3.utils.fromAscii("KYC"),
+        {from: user1.address}
         )
     })
 
     it('HSTServiceRegistry - get service', async () => {
       _serviceCategory = await newServiceRegistry.getService(
         tokenDummyAddress,
-        19,
+        '3',
         {from: user0.address}
       )    
       console.log("      HSTServiceRegistry service category", web3.utils.toAscii(_serviceCategory))
@@ -251,7 +301,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
     it('HSTServiceRegistry - is provider true', async () => {
       await newServiceRegistry.isProvider(
         tokenDummyAddress,
-        19,
+        '3',
         {from: user0.address}
       )    
     })
@@ -259,15 +309,15 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
     it('HSTServiceRegistry - remove service', async () => {
       await newServiceRegistry.removeService(
         tokenDummyAddress,
-        19,
-        {from: user0.address}
+        '3',
+        {from: user1.address}
       )    
     })
 
     it('HSTServiceRegistry - get service after removal', async () => {
       _serviceCategory = await newServiceRegistry.getService(
         tokenDummyAddress,
-        19,
+        '3',
         {from: user0.address}
       )    
       console.log("      HSTServiceRegistry service category", web3.utils.toAscii(_serviceCategory))
@@ -276,7 +326,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
     it('HSTServiceRegistry - is provider false', async () => {
       await newServiceRegistry.isProvider(
         tokenDummyAddress,
-        19,
+        '3',
         {from: user0.address}
       )    
     })
@@ -371,7 +421,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
   })
 
 
-  describe('Checking HSTRulesEnforcer functionality - buyers', async() => {
+  describe('Checking HSTRulesEnforcer functionality - buyer data', async() => {
 
     it('HSTRulesEnforcer - add buyer', async () => {
       await newRulesEnforcer.addBuyer(
@@ -383,20 +433,177 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
         '12',
         '12',
         '100000',
-        '5000',
+        '50000',
         {from: user0.address}
       )
     })
 
     it('HSTRulesEnforcer - get buyer data - first name', async () => {
-      _userFirstName = await newRulesEnforcer.getBuyerFirstName(
+      _buyerFirstName = await newRulesEnforcer.getBuyerFirstName(
         '21',
         {from: user0.address}
       )
-      console.log("      HSTRulesEnforcer get first name", _userFirstName)
+      console.log("      HSTRulesEnforcer get first name", _buyerFirstName)
+    })
+
+    it('HSTRulesEnforcer - get buyer data - last name', async () => {
+      _buyerLastName = await newRulesEnforcer.getBuyerLastName(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer get last name", _buyerLastName)
+    })
+
+    it('HSTRulesEnforcer - get buyer data - iso country code', async () => {
+      _buyerCountryCode = await newRulesEnforcer.getBuyerIsoCountryCode(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer get country code", web3.utils.toAscii(_buyerCountryCode))
+    })
+
+    it('HSTRulesEnforcer - get buyer data - birthday', async () => {
+      _buyerBirthday = await newRulesEnforcer.getBuyerBirthTimestamp(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer get birthday", _buyerBirthday.toNumber())
+    })
+
+    it('HSTRulesEnforcer - get buyer data - net worth', async () => {
+      _buyerNetWorth = await newRulesEnforcer.getBuyerNetWorth(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer get net worth", _buyerNetWorth.toNumber())
+    })
+
+    it('HSTRulesEnforcer - get buyer data - salary', async () => {
+      _buyerSalary = await newRulesEnforcer.getBuyerSalary(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer get salary", _buyerSalary.toNumber()) 
+    })
+
+    it('HSTRulesEnforcer - get buyer data - accredited investor status', async () => {
+      _buyerInvestorStatus = await newRulesEnforcer.getBuyerInvestorStatus(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer get accredited investor status", _buyerInvestorStatus)
+    })
+
+    it('HSTRulesEnforcer - get buyer data - kyc status', async () => {
+      _buyerKycStatus = await newRulesEnforcer.getBuyerKycStatus(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer kyc status", _buyerKycStatus)
+    })
+
+    it('HSTRulesEnforcer - get buyer data - aml status', async () => {
+      _buyerAmlStatus = await newRulesEnforcer.getBuyerAmlStatus(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer aml status", _buyerAmlStatus)
+    })
+
+    it('HSTRulesEnforcer - get buyer data - cft status', async () => {
+      _buyerCftStatus = await newRulesEnforcer.getBuyerCftStatus(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer cft status", _buyerCftStatus)
     })
 
   })
 
+
+  describe('Checking HSTRulesEnforcer functionality - change buyer status', async() => {
+
+    it('HSTServiceRegistry - add service', async () => {
+      await newServiceRegistry.addService(
+        tokenDummyAddress,
+        '3',
+        web3.utils.fromAscii("KYC"),
+        {from: user1.address}
+        )
+    })
+
+    it('HSTRulesEnforcer - add kyc for buyer', async () => {
+      await newRulesEnforcer.addKycServiceToBuyer(
+        '21',
+        tokenDummyAddress,
+        '3',
+        {from: user1.address}
+      )
+    })
+
+    it('HSTServiceRegistry - add service', async () => {
+      await newServiceRegistry.addService(
+        tokenDummyAddress,
+        '3',
+        web3.utils.fromAscii("AML"),
+        {from: user1.address}
+        )
+    })
+
+    it('HSTRulesEnforcer - add aml for buyer', async () => {
+      await newRulesEnforcer.addAmlServiceToBuyer(
+        '21',
+        tokenDummyAddress,
+        '3',
+        {from: user1.address}
+      )
+    })
+
+    it('HSTServiceRegistry - add service', async () => {
+      await newServiceRegistry.addService(
+        tokenDummyAddress,
+        '3',
+        web3.utils.fromAscii("CFT"),
+        {from: user1.address}
+        )
+    })
+
+    it('HSTRulesEnforcer - add cft for buyer', async () => {
+      await newRulesEnforcer.addCftServiceToBuyer(
+        '21',
+        tokenDummyAddress,
+        '3',
+        {from: user1.address}
+      )
+    })
+
+
+
+
+    it('HSTRulesEnforcer - get buyer data - kyc status', async () => {
+      _buyerKycStatus = await newRulesEnforcer.getBuyerKycStatus(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer kyc status", _buyerKycStatus)
+    })
+
+    it('HSTRulesEnforcer - get buyer data - aml status', async () => {
+      _buyerAmlStatus = await newRulesEnforcer.getBuyerAmlStatus(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer aml status", _buyerAmlStatus)
+    })
+
+    it('HSTRulesEnforcer - get buyer data - cft status', async () => {
+      _buyerCftStatus = await newRulesEnforcer.getBuyerCftStatus(
+        '21',
+        {from: user0.address}
+      )
+      console.log("      HSTRulesEnforcer cft status", _buyerCftStatus)
+    })
+
+  })
 
 })

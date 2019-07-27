@@ -4,6 +4,7 @@ pragma solidity ^0.5.0;
 import './SnowflakeOwnable.sol';
 import '../HSToken.sol';
 import '../_testing/IdentityRegistry.sol';
+import '../HSTokenRegistry.sol';
 //import '../zeppelin/ownership/Ownable.sol';
 
 
@@ -30,6 +31,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   address tokenRegistryAddress;
 
   IdentityRegistry identityRegistry;
+  HSTokenRegistry tokenRegistry;
   HSToken token;
   uint tokenEINOwner;
 
@@ -95,7 +97,9 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   constructor(address _identityRegistryAddress,
               address _tokenRegistryAddress) public {
     identityRegistryAddress = _identityRegistryAddress;
+    identityRegistry = IdentityRegistry(identityRegistryAddress);
     tokenRegistryAddress = _tokenRegistryAddress;
+    tokenRegistry = HSTokenRegistry(tokenRegistryAddress);
   }
 
 
@@ -119,12 +123,13 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   *
   * @return true if `msg.sender` is the owner of the contract
   */
-  function isTokenOwner(address _tokenAddress) public returns(bool) {
-      token = HSToken(_tokenAddress);
-      tokenEINOwner = token.getTokenEINOwner();
-      identityRegistry = IdentityRegistry(identityRegistryAddress);
+  function isTokenOwner(address _tokenAddress) public view returns(bool) {
+      // find out owner EIN
+      uint _tokenEINOwner = tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenAddress);
+      // find out caller EIN
       uint _senderEIN = identityRegistry.getEIN(msg.sender);
-      return (_senderEIN == tokenEINOwner);
+      // compare them
+      return (_senderEIN == _tokenEINOwner);
   }
 
   /**
@@ -135,9 +140,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _categorySymbol Symbol for the new service category
    * @param _categoryDescription Description for the new service category
    */
-  function addCategory(address _tokenAddress, bytes32 _categorySymbol, string memory _categoryDescription) public
-  // onlyTokenOwner(_tokenAddress) {
-  {
+  function addCategory(address _tokenAddress, bytes32 _categorySymbol, string memory _categoryDescription) public onlyTokenOwner(_tokenAddress) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
     require (_categorySymbol.length != 0, "Category symbol cannot be blank");
     bytes memory _categoryDescriptionTest = bytes(_categoryDescription);
@@ -184,9 +187,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _categorySymbol Symbol for the category the service provider works in
    */
   function addService(address _tokenAddress, uint _serviceProviderEIN, bytes32 _categorySymbol)
-    public
-    // onlyTokenOwner(_tokenAddress) {
-  {
+    public onlyTokenOwner(_tokenAddress) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
     require (_serviceProviderEIN != 0, "Service provider EIN cannot be blank");
     require (_categorySymbol.length != 0, "Category symbol cannot be blank");
@@ -203,9 +204,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _oldServiceEIN EIN of the service provider to remove
    */
   function removeService(address _tokenAddress, uint _oldServiceEIN)
-    public
-    // onlyTokenOwner(_tokenAddress) {
-  {
+    public onlyTokenOwner(_tokenAddress) {
     require (_tokenAddress != address(0), "Token address cannot be blank");
     require (_oldServiceEIN != 0, "Old service EIN cannot be blank");
     serviceRegistry[_tokenAddress][_oldServiceEIN] = "";

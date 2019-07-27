@@ -1,9 +1,10 @@
 pragma solidity ^0.5.0;
 
 import './SnowflakeOwnable.sol';
+import '../HSTokenRegistry.sol';
 import '../components/DateTime.sol';
 import '../components/HSTServiceRegistry.sol';
-import '../HSTokenRegistry.sol';
+import '../interfaces/IdentityRegistryInterface.sol';
 
 
 // TODO
@@ -66,14 +67,17 @@ contract HSTRulesEnforcer {
         bool    cftWhitelisted;
     }
 
+    // EIN of each provider for buyers
     struct buyerServicesDetail {
-        bytes32  kycProvider;
-        bytes32  amlProvider;
+        uint  kycProvider;
+        uint  amlProvider;
+        uint  cftProvider;
     }
 
     // buyer EIN => buyer data
     mapping(uint => buyerData) public buyerRegistry;
 
+    // TO DO
     // buyer EIN => token address => service details for buyer
     mapping(uint => mapping(address => buyerServicesDetail)) public serviceDetailForBuyers;
 
@@ -81,8 +85,9 @@ contract HSTRulesEnforcer {
     // external
 
     DateTime dateTime;
-    HSTServiceRegistry hstServiceRegistry;
-    HSTokenRegistry hstokenRegistry;
+    HSTServiceRegistry serviceRegistry;
+    HSTokenRegistry tokenRegistry;
+    IdentityRegistryInterface identityRegistry;
 
 
     // rules events
@@ -112,35 +117,68 @@ contract HSTRulesEnforcer {
     /**
     * @notice Triggered when KYC service is added
     */
-    event AddKYCServiceToBuyer(uint _buyerEIN, address _token, bytes32 _serviceCategory);
+    event AddKycServiceToBuyer(uint _buyerEIN, address _tokenAddress, uint _providerEIN);
 
     /**
     * @notice Triggered when AML service is added
     */
-    event AddAMLServiceToBuyer(uint _buyerEIN, address _token, bytes32 _serviceCategory);
+    event AddAmlServiceToBuyer(uint _buyerEIN, address _tokenAddress, uint _providerEIN);
+
+    /**
+    * @notice Triggered when CFT service is added
+    */
+    event AddCftServiceToBuyer(uint _buyerEIN, address _tokenAddress, uint _providerEIN);
 
     /**
     * @notice Triggered when KYC service is replaced
     */
-    event ReplaceKYCServiceForBuyer(uint _buyerEIN, address _token, bytes32 _serviceCategory);
+    event ReplaceKycServiceForBuyer(uint _buyerEIN, address _tokenAddress, uint _providerEIN);
 
     /**
     * @notice Triggered when AML service is replaced
     */
-    event ReplaceAMLServiceForBuyer(uint _buyerEIN, address _token, bytes32 _serviceCategory);
+    event ReplaceAmlServiceForBuyer(uint _buyerEIN, address _tokenAddress, uint _providerEIN);
 
+    /**
+    * @notice Triggered when CFT service is replaced
+    */
+    event ReplaceCftServiceForBuyer(uint _buyerEIN, address _tokenAddress, uint _providerEIN);
+
+
+    // modifiers
 
     /**
     * @dev Validate that a contract exists in an address received as such
     * Credit: https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/ERC223_Token.sol#L107-L114
     * @param _addr The address of a smart contract
     */
+    // modifier isContract(address _addr) {
+    //     uint length;
+    //     assembly { length := extcodesize(_addr) }
+    //     require(length > 0, "Address cannot be blank");
+    //     _;
+    // }
+    // TO DO: back to previous version
     modifier isContract(address _addr) {
-        uint length;
-        assembly { length := extcodesize(_addr) }
-        require(length > 0, "Address cannot be blank");
         _;
     }
+
+   /**
+    * @dev Validate that a token exists in token registry
+    */
+    modifier isRegisteredToken(address _tokenAddress) {
+        require(tokenRegistry.isRegisteredToken(_tokenAddress) == true, "Token must be registered in Token Registry");
+        _;
+    }
+
+   /**
+    * @dev Validate that an EIN exists as provider for a token
+    */
+    modifier isRegisteredProvider(address _tokenAddress, uint _providerEIN) {
+        require(serviceRegistry.isProvider(_tokenAddress, _providerEIN) == true, "Provider must be registered in Service Registry");
+        _;
+    }
+
 
     /**
     * @notice Constructor
@@ -158,25 +196,19 @@ contract HSTRulesEnforcer {
     * @notice configure this contract
     * @dev this contract need to communicate with token and service registries
     *
+    * @param _identityRegistryAddress The address for the identity registry
     * @param _tokenRegistryAddress The address for the token registry
     * @param _serviceRegistryAddress The address for the service registry
     *
     */
-    function setAddresses(address _tokenRegistryAddress, address _serviceRegistryAddress) public {
-        hstokenRegistry = HSTokenRegistry(_tokenRegistryAddress);
-        hstServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
-    }
-
-
-    // functions for checking other registries
-    // TO DO
-
-    function registeredToken() internal pure returns(bool) {
-        return true;
-    }
-
-    function registeredProvider() internal pure returns(bool) {
-        return true;
+    function setAddresses(
+        address _identityRegistryAddress,
+        address _tokenRegistryAddress,
+        address _serviceRegistryAddress)
+    public {
+        identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
+        tokenRegistry = HSTokenRegistry(_tokenRegistryAddress);
+        serviceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
     }
 
 
@@ -446,79 +478,79 @@ contract HSTRulesEnforcer {
     /**
     * @notice Add a new KYC service for a buyer
     *
-    * @param _EIN EIN of the buyer
+    * @param _buyerEIN EIN of the buyer
     * @param _tokenFor Token that uses this service
-    * @param _serviceCategory For this buyer and this token, the service category to use for KYC
     */
-    function addKYCServiceToBuyer(
-        uint _EIN,
+    function addKycServiceToBuyer(
+        uint _buyerEIN,
         address _tokenFor,
-        bytes32 _serviceCategory)
-    public isContract(_tokenFor) {
-        bytes32 _emptyStringTest = _serviceCategory;
-        require (registeredToken() == true, "Token must be registered in Token Registry");
-        require (registeredProvider() == true, "Caller must be a registered provider in Service Registry");
-        require (_emptyStringTest.length != 0, "Service category cannot be blank");
-        serviceDetailForBuyers[_EIN][_tokenFor].kycProvider = _serviceCategory;
-        emit AddKYCServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
+        uint _serviceProviderEIN)
+    public isContract(_tokenFor)
+           isRegisteredToken(_tokenFor)
+           isRegisteredProvider(_tokenFor, _serviceProviderEIN) {
+        // control buyer
+        require(_buyerEIN != 0, "Buyer EIN cannot be blank");
+        // control that caller is owner
+        uint _callerEIN = identityRegistry.getEIN(msg.sender);
+        require(_callerEIN == tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenFor),
+            "Caller must be the token owner");
+        // control that service provider is registered
+        require(serviceRegistry.getService(_tokenFor, _serviceProviderEIN) == "KYC",
+            "Service provider must be a registered provider for KYC in Service Registry");
+        serviceDetailForBuyers[_buyerEIN][_tokenFor].kycProvider = _serviceProviderEIN;
+        emit AddKycServiceToBuyer(_buyerEIN, _tokenFor, _serviceProviderEIN);
     }
 
     /**
     * @notice Add a new AML service for a buyer
     *
-    * @param _EIN EIN of the buyer
+    * @param _buyerEIN EIN of the buyer
     * @param _tokenFor Token that uses this service
-    * @param _serviceCategory For this buyer and this token, the service category to use for AML
     */
-    function addAMLServiceToBuyer(
-        uint _EIN,
+    function addAmlServiceToBuyer(
+        uint _buyerEIN,
         address _tokenFor,
-        bytes32 _serviceCategory)
-    public isContract(_tokenFor) {
-        bytes32 _emptyStringTest = _serviceCategory;
-        require (_emptyStringTest.length != 0, "Service category cannot be blank");
-        serviceDetailForBuyers[_EIN][_tokenFor].amlProvider = _serviceCategory;
-        emit AddAMLServiceToBuyer(_EIN, _tokenFor, _serviceCategory);
+        uint _serviceProviderEIN)
+    public isContract(_tokenFor)
+           isRegisteredToken(_tokenFor)
+           isRegisteredProvider(_tokenFor, _serviceProviderEIN) {
+        // control buyer
+        require(_buyerEIN != 0, "Buyer EIN cannot be blank");
+        // control that caller is owner
+        uint _callerEIN = identityRegistry.getEIN(msg.sender);
+        require(_callerEIN == tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenFor),
+            "Caller must be the token owner");
+        // control that service provider is registered
+        require(serviceRegistry.getService(_tokenFor, _serviceProviderEIN) == "AML",
+            "Service provider must be a registered provider for AML in Service Registry");
+        serviceDetailForBuyers[_buyerEIN][_tokenFor].amlProvider = _serviceProviderEIN;
+        emit AddAmlServiceToBuyer(_buyerEIN, _tokenFor, _serviceProviderEIN);
     }
 
     /**
-    * @notice Replaces an existing KYC service for a buyer
+    * @notice Add a new CFT service for a buyer
     *
-    * @dev This method is only callable by the contract's owner
-    *
-    * @param _EIN EIN of the buyer
+    * @param _buyerEIN EIN of the buyer
     * @param _tokenFor Token that uses this service
-    * @param _serviceCategory For this buyer and this token, the service category to use for KYC
     */
-    function replaceKYCServiceForBuyer(
-        uint _EIN,
+    function addCftServiceToBuyer(
+        uint _buyerEIN,
         address _tokenFor,
-        bytes32 _serviceCategory)
-    public isContract(_tokenFor) {
-        bytes32 _emptyStringTest = _serviceCategory;
-        require (_emptyStringTest.length != 0, "Service category cannot be blank");
-        serviceDetailForBuyers[_EIN][_tokenFor].kycProvider = _serviceCategory;
-        emit ReplaceKYCServiceForBuyer(_EIN, _tokenFor, _serviceCategory);
-    }
-
-    /**
-    * @notice Replaces an existing AML service for a buyer
-    *
-    * @dev This method is only callable by the contract's owner
-    *
-    * @param _EIN EIN of the buyer
-    * @param _tokenFor Token that uses this service
-    * @param _serviceCategory For this buyer and this token, the service category to use for KYC
-    */
-    function replaceAMLServiceForBuyer(
-        uint _EIN,
-        address _tokenFor,
-        bytes32 _serviceCategory)
-    public isContract(_tokenFor) {
-        bytes32 _emptyStringTest = _serviceCategory;
-        require (_emptyStringTest.length != 0, "Service category cannot be blank");
-        serviceDetailForBuyers[_EIN][_tokenFor].amlProvider = _serviceCategory;
-        emit ReplaceAMLServiceForBuyer(_EIN, _tokenFor, _serviceCategory);
+        uint _serviceProviderEIN)
+    public isContract(_tokenFor)
+           isRegisteredToken(_tokenFor)
+           isRegisteredProvider(_tokenFor, _serviceProviderEIN) {
+        // control buyer
+        require(_buyerEIN != 0, "Buyer EIN cannot be blank");
+        // control that caller is owner
+        uint _callerEIN = identityRegistry.getEIN(msg.sender);
+        require(_callerEIN == tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenFor),
+            "Caller must be the token owner");
+        // control that service provider is registered
+        require(serviceRegistry.getService(_tokenFor, _serviceProviderEIN) == "CFT",
+            "Service provider must be a registered provider for CFT in Service Registry");
+        serviceDetailForBuyers[_buyerEIN][_tokenFor].cftProvider = _serviceProviderEIN;
+        emit AddCftServiceToBuyer(_buyerEIN, _tokenFor, _serviceProviderEIN);
     }
 
 

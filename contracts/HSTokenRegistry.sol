@@ -19,188 +19,265 @@ import './components/HSTServiceRegistry.sol';
  */
 contract HSTokenRegistry {
 
-    struct Token {
-      uint256 id;
-      bytes32 tokenSymbol;
-      address tokenAddress;
-      uint256 ownerEIN;
-      string tokenDescription;
-      uint8 tokenDecimals;
-      bool tokenHasLegalApproval;
-      bool tokenExists;
-    }
+  struct TokenData {
+    uint id;
+    bytes32 tokenSymbol;
+    bytes32 tokenName;
+    uint ownerEIN;
+    string tokenDescription;
+    uint8 tokenDecimals;
+    bool tokenHasLegalApproval;
+    bool tokenExists;
+  }
 
-    struct Symbol {
-      uint256 id;
-      bool symbolExists;
-    }
+  struct SymbolData {
+    uint256 id;
+    bool symbolExists;
+    address tokenAddress;
+  }
 
-    uint256 public lastID = 0;
+  struct NameData {
+    uint256 id;
+    bool nameExists;
+    address tokenAddress;
+  }
 
-    IdentityRegistryInterface public IdentityRegistry;
-    HSTServiceRegistry public ServiceRegistry;
+  uint256 public lastID = 0;
 
-    // Token name => Token data structure
-    mapping(bytes32 => Token) public tokens;
+  IdentityRegistryInterface public identityRegistry;
+  HSTServiceRegistry public serviceRegistry;
 
-    // Token symbol => Symbol data structure
-    mapping(bytes32 => Symbol) public symbols;
+  // Token address => Token data structure
+  mapping(address => TokenData) public tokens;
+
+  // Token symbol => Symbol data structure
+  mapping(bytes32 => SymbolData) public symbols;
+
+  // Token name => Name data structure
+  mapping(bytes32 => NameData) public names;
 
 
-    event TokenAppointedToRegistry(
-      bytes32 _tokenName,
-      bytes32 _tokenSymbol,
-      address _tokenAddress,
-      uint256 _id
-    );
+  event TokenAppointedToRegistry(
+    address _tokenAddress,
+    bytes32 _tokenSymbol,
+    bytes32 _tokenName,
+    uint256 _id
+  );
 
-    event TokenAlreadyExists(
-      bytes32 _tokenName,
-      string _description
-    );
+  event TokenAlreadyExists(
+    address _tokenAddress,
+    string _description
+  );
 
-    event SymbolAlreadyExists(
-      bytes32 _tokenSymbol,
-      string _description
-    );
+  event SymbolAlreadyExists(
+    bytes32 _tokenSymbol,
+    string _description
+  );
 
-    event TokenHasLegalApproval(
-      bytes32 _tokenName,
-      uint _MainLegalAdvisorEIN
-    );
+  event NameAlreadyExists(
+    bytes32 _tokenName,
+    string _description
+  );
 
-    // constructor(address _identityRegistryAddress, address _serviceRegistryAddress) public {
-    //   IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
-    //   ServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
-    // }
+  event TokenHasLegalApproval(
+    address _tokenAddress,
+    bytes32 _tokenSymbol,
+    bytes32 _tokenName,
+    uint _MainLegalAdvisorEIN
+  );
+
+  // constructor(address _identityRegistryAddress, address _serviceRegistryAddress) public {
+  //   IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
+  //   ServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
+  // }
 
   /**
-    * @param  _identityRegistryAddress The address for the identity registry
-    */
-    constructor(address _identityRegistryAddress) public {
-      IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
-    }
+  * @param  _identityRegistryAddress The address for the identity registry
+  */
+  constructor(address _identityRegistryAddress) public {
+    identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
+  }
 
   /**
-    * @notice Set the address for the service registry
+  * @notice Set the address for the service registry
+  *
+  * @param _serviceRegistryAddress The address for the service registry
+  */
+  function setServiceRegistryAddress(address _serviceRegistryAddress) public {
+    serviceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
+  }
 
-    * @param _serviceRegistryAddress The address for the service registry
-    */
-    function setServiceRegistryAddress(address _serviceRegistryAddress) public {
-      ServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
-    }
-
-  /**
-    * @notice Get a Hydro Securities Token symbol
-    * @param  _tokenName The name of the Token
-    * @return the symbol of the Token corresponding to that name
-    */
-    function getSecuritiesTokenSymbol(bytes32 _tokenName) public view returns(bytes32) {
-      return tokens[_tokenName].tokenSymbol;
-    }
 
    /**
-    * @notice Get a Hydro Securities Token contract deployed address
-    * @param  _tokenName The name of the token
-    * @return the address of the token contract corresponding to that name
-    */
-    function getSecuritiesTokenAddress(bytes32 _tokenName) public view returns(address) {
-      return tokens[_tokenName].tokenAddress;
-    }
+  * @notice Get a Hydro Securities Token contract deployed address
+  * @param  _tokenSymbol The symbol of the token
+  * @return the address of the token contract corresponding to that name
+  */
+  function getSecuritiesTokenAddressBySymbol(bytes32 _tokenSymbol) public view returns(address) {
+    return symbols[_tokenSymbol].tokenAddress;
+  }
 
- /**
-    * @notice Get a Hydro Securities token owner EIN
-    * @param  _tokenName The name of the token
-    * @return the owner EIN of the token contract corresponding to that name
-    */
-    function getSecuritiesTokenOwnerEIN(bytes32 _tokenName) public view returns(uint256) {
-      return tokens[_tokenName].ownerEIN;
-    }
+  /**
+  * @notice Get a Hydro Securities Token contract deployed address
+  * @param  _tokenName The name of the token
+  * @return the address of the token contract corresponding to that name
+  */
+  function getSecuritiesTokenAddressByName(bytes32 _tokenName) public view returns(address) {
+    return names[_tokenName].tokenAddress;
+  }
 
- /**
-    * @notice Get a Hydro Securities token description
-    * @param  _tokenName The name of the token
-    * @return the description for the token corresponding to that name
-    */
-    function getSecuritiesTokenDescription(bytes32 _tokenName) public view returns(string memory) {
-      return tokens[_tokenName].tokenDescription;
-    }
 
- /**
-    * @notice Get a Hydro Securities token decimals
-    * @param  _tokenName The name of the token
-    * @return the number of decimals for the token corresponding to that name
-    */
-    function getSecuritiesTokenDecimals(bytes32 _tokenName) public view returns(uint8) {
-      return tokens[_tokenName].tokenDecimals;
-    }
+  /**
+  * @notice Appoint a new Token to the registry if token exists
+  * @param  _tokenName The name of the token contract set to be deployed
+  * @return true if token is created
+  */
+  function appointToken(
+    address _tokenAddress,
+    bytes32 _tokenSymbol,
+    bytes32 _tokenName,
+    string memory _tokenDescription,
+    uint8 _tokenDecimals)
+  public returns(bool) {
+    require(_tokenAddress != address(0), 'Token address is required');
+    require (_tokenSymbol.length != 0, "Token symbol cannot be blank");
+    require (_tokenName.length != 0, "Token name cannot be blank");
+    bytes memory _tokenDescriptionTest = bytes(_tokenDescription);
+    require (_tokenDescriptionTest.length != 0, "Token description cannot be blank");
+    require (_tokenDecimals != 0, "Token decimals cannot be zero");
 
-    /**
-    * @notice Appoint a new Token to the registry if token exists
-    * @param  _tokenName The name of the token contract set to be deployed
-    */
-    function appointToken(
-      bytes32 _tokenName,
-      bytes32 _tokenSymbol,
-      address _tokenAddress,
-      string memory _tokenDescription,
-      uint8 _tokenDecimals)
-    public returns(bool) {
+    HSToken _token = HSToken(_tokenAddress);
 
-      require (_tokenName.length != 0, "Token name cannot be blank");
-      require (_tokenSymbol.length != 0, "Token symbol cannot be blank");
-      require(_tokenAddress != address(0), 'Token address is required');
-      bytes memory _tokenDescriptionTest = bytes(_tokenDescription);
-      require (_tokenDescriptionTest.length != 0, "Token description cannot be blank");
-      require (_tokenDecimals != 0, "Token decimals cannot be zero");
-
-      if ( tokens[_tokenName].tokenExists ) {
-        HSToken _token = HSToken(tokens[_tokenName].tokenAddress);
-        if ( _token.isTokenAlive() ) {
-          emit TokenAlreadyExists(_tokenName, "Token already exists and it is alive");
-          return false;
-        }
-        if ( symbols[_tokenSymbol].symbolExists ) {
-          emit SymbolAlreadyExists(_tokenSymbol, "Symnbol already exists");
-          return false;
-        }
+    if ( tokens[_tokenAddress].tokenExists == true ) {
+      if ( _token.isTokenAlive() ) {
+        emit TokenAlreadyExists(_tokenAddress, "Token already exists and it is alive");
+        return false;
       }
-
-      lastID++;
-
-      tokens[_tokenName].id = lastID;
-      tokens[_tokenName].tokenSymbol = _tokenSymbol;
-      tokens[_tokenName].tokenAddress = address(_tokenAddress);
-      tokens[_tokenName].ownerEIN = IdentityRegistry.getEIN(msg.sender);
-      tokens[_tokenName].tokenDescription = _tokenDescription;
-      tokens[_tokenName].tokenDecimals = _tokenDecimals;
-      tokens[_tokenName].tokenHasLegalApproval = false;
-      tokens[_tokenName].tokenExists = true;
-
-      symbols[_tokenSymbol].id = lastID;
-      symbols[_tokenSymbol].symbolExists = true;
-
-      ServiceRegistry.addDefaultCategories(_tokenAddress);
-
-      emit TokenAppointedToRegistry(_tokenName, _tokenSymbol, address(_tokenAddress), lastID);
-
-      return true;
     }
 
-    function grantLegalApproval(bytes32 _tokenName) public returns(bool) {
-      // get caller EIN
-      uint _callerEIN = IdentityRegistry.getEIN(msg.sender);
-      // check that caller is the Legal Advisor for this token
-      require(ServiceRegistry.getService(tokens[_tokenName].tokenAddress, _callerEIN) == "MLA",
-        "Only main legal advisor can grant legal approval");
-      // approve
-      tokens[_tokenName].tokenHasLegalApproval = true;
-      emit TokenHasLegalApproval(_tokenName, _callerEIN);
-      return true;
+    if ( names[_tokenName].nameExists ) {
+      if ( _token.isTokenAlive() ) {
+        emit NameAlreadyExists(_tokenName, "Token already exists and it is alive");
+        return false;
+      }
     }
 
-    function checkLegalApproval(bytes32 _tokenName) public view returns(bool) {
-      return tokens[_tokenName].tokenHasLegalApproval;
+    if ( symbols[_tokenSymbol].symbolExists ) {
+      if ( _token.isTokenAlive() ) {
+        emit SymbolAlreadyExists(_tokenSymbol, "Symnbol already exists");
+        return false;
+      }
     }
+
+    lastID++;
+
+    tokens[_tokenAddress].id = lastID;
+    tokens[_tokenAddress].tokenSymbol = _tokenSymbol;
+    tokens[_tokenAddress].tokenName = _tokenName;
+    tokens[_tokenAddress].ownerEIN = identityRegistry.getEIN(msg.sender);
+    tokens[_tokenAddress].tokenDescription = _tokenDescription;
+    tokens[_tokenAddress].tokenDecimals = _tokenDecimals;
+    tokens[_tokenAddress].tokenHasLegalApproval = false;
+    tokens[_tokenAddress].tokenExists = true;
+
+    symbols[_tokenSymbol].id = lastID;
+    symbols[_tokenSymbol].symbolExists = true;
+    symbols[_tokenSymbol].tokenAddress = _tokenAddress;
+
+    names[_tokenName].id = lastID;
+    names[_tokenName].nameExists = true;
+    names[_tokenName].tokenAddress = _tokenAddress;
+
+    serviceRegistry.addDefaultCategories(_tokenAddress);
+
+    emit TokenAppointedToRegistry(_tokenAddress,_tokenName, _tokenSymbol, lastID);
+
+    return true;
+  }
+
+  /**
+  * @notice Find out if token is registered
+  * @param  _tokenAddress The address of the Token
+  * @return true if the token is registered
+  */
+  function isRegisteredToken(address _tokenAddress) public view returns(bool) {
+    return tokens[_tokenAddress].tokenExists;
+  }
+
+  /**
+  * @notice Get a Hydro Securities Token symbol
+  * @param  _tokenAddress The address of the Token
+  * @return the symbol of the Token
+  */
+  function getSecuritiesTokenSymbol(address _tokenAddress) public view returns(bytes32) {
+    return tokens[_tokenAddress].tokenSymbol;
+  }
+
+  /**
+  * @notice Get a Hydro Securities Token name
+  * @param  _tokenAddress The name of the Token
+  * @return the name of the Token
+  */
+  function getSecuritiesTokenName(address _tokenAddress) public view returns(bytes32) {
+    return tokens[_tokenAddress].tokenName;
+  }
+
+ /**
+  * @notice Get a Hydro Securities token owner EIN
+  * @param  _tokenAddress The address of the token
+  * @return the owner EIN of the token
+  */
+  function getSecuritiesTokenOwnerEIN(address _tokenAddress) public view returns(uint) {
+    return tokens[_tokenAddress].ownerEIN;
+  }
+
+ /**
+  * @notice Get a Hydro Securities token description
+  * @param  _tokenAddress The address of the token
+  * @return the description for the token]
+  */
+  function getSecuritiesTokenDescription(address _tokenAddress) public view returns(string memory) {
+    return tokens[_tokenAddress].tokenDescription;
+  }
+
+ /**
+  * @notice Get a Hydro Securities token decimals
+  * @param  _tokenAddress The address of the token
+  * @return the number of decimals for the token corresponding to that name
+  */
+  function getSecuritiesTokenDecimals(address _tokenAddress) public view returns(uint8) {
+    return tokens[_tokenAddress].tokenDecimals;
+  }
+
+  /**
+  * @notice Grant legal approval for a security token
+  * @param  _tokenAddress The address of the Token
+  * @return true if approval is granted
+  */
+  function grantLegalApproval(address _tokenAddress) public returns(bool) {
+    // get caller EIN
+    uint _callerEIN = identityRegistry.getEIN(msg.sender);
+    // check that caller is the Legal Advisor for this token
+    require(serviceRegistry.getService(_tokenAddress, _callerEIN) == "MLA",
+      "Only main legal advisor can grant legal approval");
+    // approve
+    tokens[_tokenAddress].tokenHasLegalApproval = true;
+    emit TokenHasLegalApproval(
+      _tokenAddress,
+      tokens[_tokenAddress].tokenSymbol,
+      tokens[_tokenAddress].tokenName,
+      _callerEIN
+    );
+    return true;
+  }
+
+  /**
+  * @notice Get legal approval for a security token
+  * @param  _tokenAddress The address of the Token
+  * @return true if the token has legal approval
+  */
+  function checkLegalApproval(address _tokenAddress) public view returns(bool) {
+    return tokens[_tokenAddress].tokenHasLegalApproval;
+  }
 
 }
