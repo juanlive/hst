@@ -16,7 +16,7 @@ import '../interfaces/IdentityRegistryInterface.sol';
 
 
 /**
- * @title HSTRulesEnforcer
+ * @title HSTBuyerRegistry
  *
  * @notice Rules enforcement and registry of buyers
  *
@@ -30,8 +30,7 @@ import '../interfaces/IdentityRegistryInterface.sol';
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
 
-contract HSTRulesEnforcer {
-// is SnowflakeOwnable {
+contract HSTBuyerRegistry is SnowflakeOwnable {
 
 
     // token rules data
@@ -206,6 +205,7 @@ contract HSTRulesEnforcer {
         address _tokenRegistryAddress,
         address _serviceRegistryAddress)
     public {
+        setIdentityRegistryAddress(_identityRegistryAddress);
         identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
         tokenRegistry = HSTokenRegistry(_tokenRegistryAddress);
         serviceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
