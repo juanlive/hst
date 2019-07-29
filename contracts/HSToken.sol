@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 
 //import './components/SnowflakeOwnable.sol';
 //import './components/TokenWithDates.sol';
-//import './components/HSTServiceRegistry.sol';
+import './components/HSTBuyerRegistry.sol';
 import './interfaces/HydroInterface.sol';
 import './interfaces/ResolverInterface.sol';
 import './interfaces/IdentityRegistryInterface.sol';
@@ -156,17 +156,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 	// address public RegistryRules;
     address public raindropAddress;
 
-	// Links to Registries
-    address[3] public KYCResolverArray;
-    address[3] public AMLResolverArray;
-    address[3] public LegalResolverArray;
-    uint8 KYCResolverQ;
-    uint8 AMLResolverQ;
-    uint8 LegalResolverQ;
-    mapping(address => uint8) KYCResolver;
-    mapping(address => uint8) AMLResolver;
-    mapping(address => uint8) LegalResolver;
-
     // address InterestSolver;
 
     // Mappings
@@ -187,7 +176,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     // Declaring interfaces
     IdentityRegistryInterface public IdentityRegistry;
     HydroInterface public HydroToken;
-    // HSTServiceRegistry public serviceRegistry;
+    HSTBuyerRegistry public BuyerRegistry;
     // SnowflakeViaInterface public snowflakeVia;
     // TokenWithDates private tokenWithDates;
 
@@ -267,6 +256,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         uint8 _decimals,
         address _hydroToken,
         address _identityRegistry,
+        address _buyerRegistry,
         address payable _owner
         // address _RaindropAddress
     )
@@ -293,7 +283,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
         HydroToken = HydroInterface(_hydroToken); // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
         IdentityRegistry = IdentityRegistryInterface(_identityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
-        // serviceRegistry = new HSTServiceRegistry();
+        BuyerRegistry = HSTBuyerRegistry(_buyerRegistry);
         // raindropAddress = _RaindropAddress;
 
         Owner = _owner;
@@ -478,6 +468,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     }
 
 
+    function changeBuyerRegistry(address _newBuyerRegistry) public onlyAdmin {
+    	require(stage == Stage.SETUP, "Stage should be Setup to change this");
+		BuyerRegistry = HSTBuyerRegistry(_newBuyerRegistry);
+    }
+
     function lock() public onlyAdmin {
         locked = true;
     }
@@ -550,25 +545,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     	hydroOracle = _newAddress;
     }
 
-
-    // Adding and removing resolvers
-
-    // Feature #3
-    function addKYCResolver(address _address) public onlyAdmin onlyAtPreLaunch {
-        require(KYCResolverQ < 2, "There are already 3 resolvers for KYC");
-        KYCResolverArray[KYCResolverQ] = _address;
-        KYCResolverQ ++;
-          //serviceRegistry.addService(address(this), bytes32("KYC"), _address);
-    }
-
-   // function addAMLResolver(address _address) public onlyAdmin onlyAtPreLaunch {
-    //    require(AMLResolverQ < 2, "There are already 3 resolvers for AML");
-    //    AMLResolverArray[AMLResolverQ] = _address;
-    //    AMLResolverQ ++;
-          //serviceRegistry.addService(address(this), bytes32("AML"), _address);
-
-    //}
-
     // Release gains. Only after escrow is released
 
     // Retrieve tokens and ethers
@@ -607,8 +583,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         }
 
         // Check with KYC and AML providers
-        if (KYC_RESTRICTED && KYCResolverQ > 0) _checkKYC(msg.sender, _amount);
-        if (AML_RESTRICTED && AMLResolverQ > 0) _checkAML(msg.sender, _amount);
+        BuyerRegistry.checkRules(_ein);
 
         // Check with whitelist and blacklist
         if (WHITELIST_RESTRICTED) _checkWhitelist(msg.sender);
@@ -656,9 +631,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         public isUnlocked isUnfreezed(msg.sender, _to)
         returns(bool success)
     {
-        if (KYC_RESTRICTED) _checkKYC(_to, _amount);
-        if (AML_RESTRICTED) _checkAML(_to, _amount);
-        // _updateBatches(msg.sender, _to, _amount);
+        BuyerRegistry.checkRules(IdentityRegistry.getEIN(_to));
+
         _doTransfer(msg.sender, _to, _amount);
         return true;
     }
@@ -669,9 +643,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         returns(bool success)
     {
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
-        if (KYC_RESTRICTED) _checkKYC(_to, _amount);
-        if (AML_RESTRICTED) _checkAML(_to, _amount);
-        // _updateBatches(_from, _to, _amount);
+
+        BuyerRegistry.checkRules(IdentityRegistry.getEIN(_to));
+
         _doTransfer(_from, _to, _amount);
         return true;
     }
@@ -776,33 +750,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
           if (periods[i] > now) return i-1;
         }
      	return 0;
-    }
-
-
-    // Permissions checking
-
-    // Feature #8
-    function _checkKYC(address _to, uint256 _amount) private view {
-        uint256 einTo = IdentityRegistry.getEIN(_to);
-        for (uint8 i = 0; i < KYCResolverQ; i++) {
-            ResolverInterface resolver = ResolverInterface(KYCResolverArray[i]);
-            require(resolver.isApproved(einTo, _amount), "KYC not approved");
-        }
-    }
-    function _checkAML(address _to, uint256 _amount) private view {
-        uint256 einTo = IdentityRegistry.getEIN(_to);
-        for (uint8 i = 0; i < AMLResolverQ; i++) {
-            ResolverInterface resolver = ResolverInterface(AMLResolverArray[i]);
-            require(resolver.isApproved(einTo, _amount), "Resolver is not approved");
-        }
-    }
-
-    function _checkLegaL(address _to, uint256 _amount) private view {
-        uint256 einTo = IdentityRegistry.getEIN(_to);
-        for (uint8 i = 0; i < LegalResolverQ; i++) {
-            ResolverInterface resolver = ResolverInterface(LegalResolverArray[i]);
-            require(resolver.isApproved(einTo, _amount), "Resolver is not approved");
-        }
     }
 
     function _checkWhitelist(address _user) private view {
