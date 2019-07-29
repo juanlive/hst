@@ -96,6 +96,7 @@ contract HSTokenRegistry is SnowflakeOwnable {
   * @param  _identityRegistryAddress The address for the identity registry
   */
   constructor(address _identityRegistryAddress) public {
+    setIdentityRegistryAddress(_identityRegistryAddress);
     identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
   }
 
@@ -127,6 +128,14 @@ contract HSTokenRegistry is SnowflakeOwnable {
     return names[_tokenName].tokenAddress;
   }
 
+  /**
+  * @notice Get last registered token ID
+  * @return the last ID generated for a token
+  */
+  function getLastTokenID() public view returns(uint) {
+    return lastID;
+  }
+
 
   /**
   * @notice Appoint a new Token to the registry if token exists
@@ -143,20 +152,18 @@ contract HSTokenRegistry is SnowflakeOwnable {
     require(_tokenAddress != address(0), 'Token address is required');
     require (_tokenSymbol.length != 0, "Token symbol cannot be blank");
     require (_tokenName.length != 0, "Token name cannot be blank");
-    bytes memory _tokenDescriptionTest = bytes(_tokenDescription);
-    require (_tokenDescriptionTest.length != 0, "Token description cannot be blank");
+    require (bytes(_tokenDescription).length != 0, "Token description cannot be blank");
     require (_tokenDecimals != 0, "Token decimals cannot be zero");
 
-    HSToken _token = HSToken(_tokenAddress);
+    HSToken _token;
 
     if ( tokens[_tokenAddress].tokenExists == true ) {
-      if ( _token.isTokenAlive() ) {
-        emit TokenAlreadyExists(_tokenAddress, "Token already exists and it is alive");
-        return false;
-      }
+      emit TokenAlreadyExists(_tokenAddress, "Token already exists");
+      return false;
     }
 
     if ( names[_tokenName].nameExists ) {
+      _token = HSToken(names[_tokenName].tokenAddress);
       if ( _token.isTokenAlive() ) {
         emit NameAlreadyExists(_tokenName, "Token already exists and it is alive");
         return false;
@@ -164,8 +171,9 @@ contract HSTokenRegistry is SnowflakeOwnable {
     }
 
     if ( symbols[_tokenSymbol].symbolExists ) {
+      _token = HSToken(symbols[_tokenSymbol].tokenAddress);
       if ( _token.isTokenAlive() ) {
-        emit SymbolAlreadyExists(_tokenSymbol, "Symnbol already exists");
+        emit SymbolAlreadyExists(_tokenSymbol, "Symbol already exists");
         return false;
       }
     }
