@@ -24,7 +24,7 @@ import '../_testing/IdentityRegistry.sol';
 contract HSTServiceRegistry is SnowflakeOwnable {
 
   // existing contracts to call
-  address defaultBuyerRegistryAddress;
+  address buyerRegistryAddress;
   address identityRegistryAddress;
   address tokenRegistryAddress;
 
@@ -102,13 +102,13 @@ contract HSTServiceRegistry is SnowflakeOwnable {
 
 
   /**
-   * @notice Set address for the default rules enforcer
+   * @notice Set address for the rules enforcer
    *
-   * @param _defaultBuyerRegistryAddress The address for the default rules enforcer
+   * @param _BuyerRegistryAddress The address for the rules enforcer
    */
-    // set default rules enforcer
-  function setDefaultBuyerRegistry(address _defaultBuyerRegistryAddress) public {
-    defaultBuyerRegistryAddress = _defaultBuyerRegistryAddress;
+    // set rules enforcer
+  function setBuyerRegistry(address _buyerRegistryAddress) public {
+    buyerRegistryAddress = _buyerRegistryAddress;
   }
 
   // function addDefaultRulesService(address _tokenAddress) public onlyTokenOwner(_tokenAddress) {
