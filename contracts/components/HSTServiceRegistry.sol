@@ -104,7 +104,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   /**
    * @notice Set address for the rules enforcer
    *
-   * @param _BuyerRegistryAddress The address for the rules enforcer
+   * @param _buyerRegistryAddress The address for the rules enforcer
    */
     // set rules enforcer
   function setBuyerRegistry(address _buyerRegistryAddress) public {
