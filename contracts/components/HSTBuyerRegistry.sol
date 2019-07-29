@@ -571,7 +571,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
             (tokenData[msg.sender].minimumSalary == 0)) {
             _designatedDefaultValues = false;
             }
-        require(_designatedDefaultValues == true, "Token must designated default values");
+        require(_designatedDefaultValues == true, "Token must have designated default values");
 
         // KYC restriction (not optional)
         require (buyerRegistry[_buyerEIN].kycWhitelisted == true, "Buyer must be approved for KYC");

@@ -585,9 +585,6 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
       )
     })
 
-
-
-
     it('HSTBuyerRegistry - get buyer data - kyc status', async () => {
       _buyerKycStatus = await newBuyerRegistry.getBuyerKycStatus(
         '21',
