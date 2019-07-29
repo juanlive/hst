@@ -85,7 +85,7 @@ contract('Testing HSToken', function (accounts) {
           1,
           web3.utils.stringToHex("HydroSecurityToken"),
           "Hydro Security",
-          "HTST",
+          web3.utils.fromAscii("HTST"),
           18,
           instances.HydroToken.address, 
           instances.IdentityRegistry.address,

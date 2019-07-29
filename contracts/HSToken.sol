@@ -133,7 +133,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 	uint256 public id; // Unique HSToken id
 	bytes32 public name;
 	string public description;
-	string public symbol;
+	bytes32 public symbol;
     uint8 public decimals;
     address payable public Owner;
     uint256 public einOwner;
@@ -194,7 +194,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     event HydroSTCreated(
         uint256 indexed id,
         bytes32 name,
-        string symbol,
+        bytes32 symbol,
         uint8 decimals,
         uint256 einOwner
         );
@@ -263,7 +263,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         uint256 _id,
         bytes32 _name,
         string memory _description,
-        string memory _symbol,
+        bytes32 _symbol,
         uint8 _decimals,
         address _hydroToken,
         address _identityRegistry,
