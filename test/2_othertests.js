@@ -114,6 +114,14 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTRulesEnforcer', fun
       console.log("      Token Registry address", registryAddress);
     })
     
+    it('HSTokenRegistry set Identity Registry', async () => {
+      console.log('      Identity Registry Address', instances.IdentityRegistry.address)
+      await newTokenRegistry.setIdentityRegistryAddress(
+        instances.IdentityRegistry.address,
+        {from: user0.address}
+      )
+    })
+
   })
 
 

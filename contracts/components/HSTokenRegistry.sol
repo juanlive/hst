@@ -3,6 +3,7 @@ pragma solidity ^0.5.0;
 import '../HSToken.sol';
 import '../interfaces/IdentityRegistryInterface.sol';
 import './HSTServiceRegistry.sol';
+import './SnowflakeOwnable.sol';
 
 // TO DO
 
@@ -17,7 +18,7 @@ import './HSTServiceRegistry.sol';
  * @notice Perform deployment of contracts for the issuance of Hydro Securities
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
-contract HSTokenRegistry {
+contract HSTokenRegistry is SnowflakeOwnable {
 
   struct TokenData {
     uint id;
