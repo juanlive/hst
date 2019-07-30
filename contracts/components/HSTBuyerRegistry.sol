@@ -205,7 +205,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         address _tokenRegistryAddress,
         address _serviceRegistryAddress)
     public {
-        setIdentityRegistryAddress(_identityRegistryAddress);
+        //setIdentityRegistryAddress(_identityRegistryAddress);
         identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
         tokenRegistry = HSTokenRegistry(_tokenRegistryAddress);
         serviceRegistry = HSTServiceRegistry(_serviceRegistryAddress);

@@ -59,16 +59,24 @@ async function initialize (owner, users) {
   // )
   // console.log("    common - Token Registry", instances.TokenRegistry.address)
 
-  instances.ServiceRegistry = await HSTServiceRegistry.new(
-    instances.IdentityRegistry.address, instances.TokenRegistry.address, { from: owner }
-  )
+  // instances.ServiceRegistry = await HSTServiceRegistry.new(
+  //   instances.IdentityRegistry.address, instances.TokenRegistry.address, { from: owner }
+  // )
   // instances.TokenRegistry.setServiceRegistryAddress(
   //   instances.ServiceRegistry.address, { from: owner }
   // )
-  console.log("    common - Service Registry", instances.ServiceRegistry.address)
+  // console.log("    common - Service Registry", instances.ServiceRegistry.address)
   
+  // await instances.BuyerRegistry.setAddresses(
+  //   instances.IdentityRegistry.address,
+  //   newTokenRegistry.address,
+  //   newServiceRegistry.address,
+  //   {from: user0.address}
+  // )
+
   return instances
 }
+
 
 module.exports = {
   initialize: initialize

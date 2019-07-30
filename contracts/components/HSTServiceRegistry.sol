@@ -24,11 +24,8 @@ import '../_testing/IdentityRegistry.sol';
 contract HSTServiceRegistry is SnowflakeOwnable {
 
   // existing contracts to call
-  address buyerRegistryAddress;
-  address identityRegistryAddress;
-  address tokenRegistryAddress;
-
   IdentityRegistry identityRegistry;
+  address tokenRegistryAddress;
   HSTokenRegistry tokenRegistry;
   HSToken token;
   uint tokenEINOwner;
@@ -86,34 +83,30 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   }
 
 
+  // /**
+  //  * @notice Constructor
+  //  *
+  //  * @param _identityRegistryAddress The address for the identity registry
+  //  * @param _tokenRegistryAddress The address for the token registry
+  //  */
+  // constructor() public {
+  // }
+
+
   /**
-   * @notice Constructor
+   * @notice Set addresses for the registries
    *
    * @param _identityRegistryAddress The address for the identity registry
    * @param _tokenRegistryAddress The address for the token registry
    */
-  constructor(address _identityRegistryAddress,
-              address _tokenRegistryAddress) public {
-    identityRegistryAddress = _identityRegistryAddress;
-    identityRegistry = IdentityRegistry(identityRegistryAddress);
-    tokenRegistryAddress = _tokenRegistryAddress;
-    tokenRegistry = HSTokenRegistry(tokenRegistryAddress);
-  }
-
-
-  /**
-   * @notice Set address for the rules enforcer
-   *
-   * @param _buyerRegistryAddress The address for the rules enforcer
-   */
     // set rules enforcer
-  function setBuyerRegistry(address _buyerRegistryAddress) public {
-    buyerRegistryAddress = _buyerRegistryAddress;
+  function setAddresses(
+    address _identityRegistryAddress,
+    address _tokenRegistryAddress) public {
+    identityRegistry = IdentityRegistry(_identityRegistryAddress);
+    tokenRegistryAddress = _tokenRegistryAddress;
+    tokenRegistry = HSTokenRegistry(_tokenRegistryAddress);
   }
-
-  // function addDefaultRulesService(address _tokenAddress) public onlyTokenOwner(_tokenAddress) {
-  //     serviceRegistry[_tokenAddress]["RULES"] = defaultBuyerRegistryAddress;
-  // }
 
   /**
   * @notice Check if caller is owner
