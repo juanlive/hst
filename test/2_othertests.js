@@ -65,7 +65,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
 
     it('Snowflake identities created for all accounts', async() => {
       for (let i = 0; i < users.length; i++) {
-        await createIdentity(users[i], instances)
+        await createIdentity(users[i], instances);
       }
     })
 
