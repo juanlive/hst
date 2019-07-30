@@ -7,11 +7,6 @@ import './SnowflakeOwnable.sol';
 
 // TO DO
 
-// check if token exists, then check if it is active
-// allow new deployment if any of both is false, if both are true reject deployment
-
-// add mainnet addresses
-// add a parameter to choose deployment network
 
 /**
  * @title HSTokenRegistry

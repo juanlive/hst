@@ -1,7 +1,7 @@
 const truffleAssert = require('truffle-assertions')
-const HSTokenRegistry = artifacts.require('./HSTokenRegistry.sol')
 const HSTServiceRegistry = artifacts.require('./components/HSTServiceRegistry.sol')
 const HSTBuyerRegistry = artifacts.require('./components/HSTBuyerRegistry.sol')
+const HSTokenRegistry = artifacts.require('./components/HSTokenRegistry.sol')
 const IdentityRegistry = artifacts.require('./components/IdentityRegistry.sol')
 
 const common = require('./common.js')
