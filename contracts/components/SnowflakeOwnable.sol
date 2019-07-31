@@ -17,7 +17,7 @@ import '../zeppelin/ownership/Ownable.sol';
  * @title SnowflakeOwnable
  * @notice Snowflake-based authorizations
  *
- * @dev The SnowflakeOwnable contract stores the EIN of the owner of a contract, and provides basic authorization control functions, not based on an address as it is usual, but based on an EIN. This simplifies the implementation of "user permissions" when using Snowflakes.
+ * @dev The SnowflakeOwnable contract stores the EIN of the owner of a contract, and provides basic authorization functions, not based on an address as it is usual (think of "Ownable") but based on an EIN. This simplifies the implementation of "user permissions" when using Snowflakes.
  *
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
@@ -58,45 +58,6 @@ contract SnowflakeOwnable is Ownable {
         _;
     }
 
-    /**
-    * @notice Constructor
-    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-    * account
-    */
-    //constructor() public {
-    //}
-
-    /**
-    * @notice Check if caller is owner
-    * @dev This works on EINs, not on addresses
-    *
-    * @return true if `msg.sender` is the owner of the contract
-    */
-    function isEINowner() public view returns(bool) {
-        require(identityRegistryAddress != address(0), '0. The identity registry address is required');
-        uint caller = identityRegistry.getEIN(msg.sender);
-        return (caller == ownerEIN);
-    }
-
-    /**
-    * @notice Set the EIN for the owner
-    *
-    * @param _newOwnerEIN The EIN for the new owner
-    */
-    function setOwnerEIN(uint _newOwnerEIN) public onlySnowflakeOwner {
-        require(identityRegistryAddress != address(0), '1. The identity registry address is required');
-        require(identityRegistry.identityExists(_newOwnerEIN), "New owner identity must exist");
-        uint _callerEIN = identityRegistry.getEIN(msg.sender);
-        require((ownerEIN == 0 || (_callerEIN == ownerEIN)), 'Owner must be zero or you must be the owner');
-        if (ownerEIN == 0) {
-            ownerEIN = _newOwnerEIN;
-            emit OwnerWasSet(_newOwnerEIN);
-        } else {
-            uint _oldOwnerEIN = ownerEIN;
-            ownerEIN = _newOwnerEIN;
-            emit OwnershipTransferred(_oldOwnerEIN, _newOwnerEIN);
-        }
-    }
 
     /**
     * @notice Set the address for the Identity Registry
@@ -128,6 +89,26 @@ contract SnowflakeOwnable is Ownable {
     }
 
     /**
+    * @notice Set the EIN for the owner
+    *
+    * @param _newOwnerEIN The EIN for the new owner
+    */
+    function setOwnerEIN(uint _newOwnerEIN) public onlySnowflakeOwner {
+        require(identityRegistryAddress != address(0), '1. The identity registry address is required');
+        require(identityRegistry.identityExists(_newOwnerEIN), "New owner identity must exist");
+        uint _callerEIN = identityRegistry.getEIN(msg.sender);
+        require((ownerEIN == 0 || (_callerEIN == ownerEIN)), 'Owner must be zero or you must be the owner');
+        if (ownerEIN == 0) {
+            ownerEIN = _newOwnerEIN;
+            emit OwnerWasSet(_newOwnerEIN);
+        } else {
+            uint _oldOwnerEIN = ownerEIN;
+            ownerEIN = _newOwnerEIN;
+            emit OwnershipTransferred(_oldOwnerEIN, _newOwnerEIN);
+        }
+    }
+
+    /**
     * @notice Get EIN of the current owner
     * @dev This contracts allows you to set ownership based on EIN instead of address
     *
@@ -136,6 +117,18 @@ contract SnowflakeOwnable is Ownable {
     function getOwnerEIN() public view returns(uint) {
         require(identityRegistryAddress != address(0), '3. The identity registry address is required');
         return ownerEIN;
+    }
+
+    /**
+    * @notice Check if caller is owner
+    * @dev This works on EINs, not on addresses
+    *
+    * @return true if `msg.sender` is the owner of the contract
+    */
+    function isEINowner() public view returns(bool) {
+        require(identityRegistryAddress != address(0), '0. The identity registry address is required');
+        uint caller = identityRegistry.getEIN(msg.sender);
+        return (caller == ownerEIN);
     }
 
     /**

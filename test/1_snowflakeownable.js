@@ -1,5 +1,4 @@
 const truffleAssert = require('truffle-assertions')
-const IdentityRegistry = artifacts.require('./components/IdentityRegistry.sol')
 const SnowflakeOwnable = artifacts.require('./components/SnowflakeOwnable.sol')
 
 const common = require('./common.js')
@@ -52,18 +51,11 @@ contract('Testing SnowflakeOwnable', function (accounts) {
   for (let i = 0; i < users.length; i++) {
     await createIdentity(users[i], instances)
   }
+
 })
 
 
   describe('Checking IdentityRegistry functionality', async() =>{
-
-    // Create IdentityRegistry contract
-    // it('IdentityRegistry can be created', async () => {
-    //   newIdentityRegistry = await IdentityRegistry.new()
-    //     console.log('IdentityRegistry Address', newIdentityRegistry.address)
-    //     console.log('User', user0.address)
-    // })
-
 
     // Try to create duplicate identity
     it('IdentityRegistry create Identity (exists, should revert)', async () => {
@@ -94,7 +86,6 @@ contract('Testing SnowflakeOwnable', function (accounts) {
     // Create SnowflakeOwnable contract
     it('SnowflakeOwnable can be created', async () => {
       newSnowflakeOwnable = await SnowflakeOwnable.new(
-        //instances.IdentityRegistry.address,
         {from: user0.address}
       )
         console.log('      SnowflakeOwnable Address', newSnowflakeOwnable.address)

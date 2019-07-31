@@ -10,7 +10,7 @@ import './SnowflakeOwnable.sol';
 
 /**
  * @title HSTokenRegistry
- * @notice Perform deployment of contracts for the issuance of Hydro Securities
+ * @notice Keep track of contracts for the issuance of Hydro Securities
  * @author Fatima Castiglione Maldonado <castiglionemaldonado@gmail.com>
  */
 contract HSTokenRegistry is SnowflakeOwnable {
@@ -82,27 +82,16 @@ contract HSTokenRegistry is SnowflakeOwnable {
     uint _MainLegalAdvisorEIN
   );
 
-  // constructor(address _identityRegistryAddress, address _serviceRegistryAddress) public {
-  //   IdentityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
-  //   ServiceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
-  // }
-
-  // /**
-  // * @param  _identityRegistryAddress The address for the identity registry
-  // */
-  // constructor() public {
-
-  // }
 
   /**
-  * @notice Set the address for the service registry
+  * @notice Set the address for the registries
   *
   * @param _identityRegistryAddress The address for the identity registry
   * @param _serviceRegistryAddress The address for the service registry
   */
-  function setAddresses(
+  function setAddresses (
     address _identityRegistryAddress,
-    address _serviceRegistryAddress) public {
+    address _serviceRegistryAddress) public onlySnowflakeOwner {
     //setIdentityRegistryAddress(_identityRegistryAddress);
     identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
     serviceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
