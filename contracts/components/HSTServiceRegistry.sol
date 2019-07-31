@@ -83,16 +83,6 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   }
 
 
-  // /**
-  //  * @notice Constructor
-  //  *
-  //  * @param _identityRegistryAddress The address for the identity registry
-  //  * @param _tokenRegistryAddress The address for the token registry
-  //  */
-  // constructor() public {
-  // }
-
-
   /**
    * @notice Set addresses for the registries
    *

@@ -141,27 +141,4 @@ contract SnowflakeOwnable is Ownable {
         ownerEIN = 0;
     }
 
-    /**
-    * @notice Allows the current owner to transfer control of the contract to a newOwner
-    * @dev This works on EINs, not on addresses
-    *
-    * @param _newOwner EIN to transfer ownership to
-    */
-    // function transferOwnership(uint _newOwner) public onlySnowflakeOwner {
-    //     _transferOwnership(_newOwner);
-    // }
-
-    /**
-    * @notice Transfers control of the contract to a newOwner
-    * @dev This works on EINs, not on addresses
-    *
-    * @param _newOwner EIN to transfer ownership to
-    */
-    // function _transferOwnership(uint _newOwner) internal onlySnowflakeOwner {
-    //     require(identityRegistryAddress != address(0), '4. The identity registry address is required');
-    //     require(identityRegistry.identityExists(_newOwner), "Owner must exist");
-    //     require(_newOwner != 0, "Owner must exist");
-    //     emit OwnershipTransferred(ownerEIN, _newOwner);
-    //     ownerEIN = _newOwner;
-    // }
 }

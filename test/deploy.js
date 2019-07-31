@@ -9,6 +9,8 @@ const KYCResolver = artifacts.require('./samples/KYCResolver.sol')
 const OldClientRaindrop = artifacts.require('./_testing/OldClientRaindrop.sol')
 const Snowflake = artifacts.require('./Snowflake.sol')
 
+// TO DO
+// decide what to do about addresses/networks (main vs. rinkeby)
 
 async function initialize (owner, users) {
   const instances = {}

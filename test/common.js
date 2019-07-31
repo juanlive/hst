@@ -57,15 +57,29 @@ async function initialize (owner, users) {
   instances.TokenRegistry = await HSTokenRegistry.new( { from: owner } )
   console.log("    common - Token Registry", instances.TokenRegistry.address)
 
-  instances.ServiceRegistry = await HSTServiceRegistry.new(
-    instances.IdentityRegistry.address, instances.TokenRegistry.address, { from: owner }
+  instances.ServiceRegistry = await HSTServiceRegistry.new( { from: owner } )
+  console.log("    common - Service Registry", instances.ServiceRegistry.address)
+
+
+  await instances.ServiceRegistry.setAddresses(
+    instances.IdentityRegistry.address,
+    instances.TokenRegistry.address,
+    { from: owner }
   )
-  instances.TokenRegistry.setAddresses(
+  // await instances.ServiceRegistry.setIdentityRegistryAddress(
+  //   instances.IdentityRegistry.address,
+  //   { from: owner }
+  // )
+
+  await instances.TokenRegistry.setAddresses(
     instances.IdentityRegistry.address,
     instances.ServiceRegistry.address,
     { from: owner }
   )
-  console.log("    common - Service Registry", instances.ServiceRegistry.address)
+  // await instances.TokenRegistry.setIdentityRegistryAddress(
+  //   instances.IdentityRegistry.address,
+  //   { from: owner }
+  // )
   
   await instances.BuyerRegistry.setAddresses(
     instances.IdentityRegistry.address,
@@ -73,6 +87,10 @@ async function initialize (owner, users) {
     instances.ServiceRegistry.address,
     { from: owner }
   )
+  // await instances.BuyerRegistry.setIdentityRegistryAddress(
+  //   instances.IdentityRegistry.address,
+  //   { from: owner }
+  // )
 
   console.log("    common - finishing and returning instances")
 
