@@ -103,7 +103,7 @@ contract HSTokenRegistry is SnowflakeOwnable {
   function setAddresses(
     address _identityRegistryAddress,
     address _serviceRegistryAddress) public {
-    setIdentityRegistryAddress(_identityRegistryAddress);
+    //setIdentityRegistryAddress(_identityRegistryAddress);
     identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
     serviceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
   }

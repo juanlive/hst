@@ -1,8 +1,8 @@
 const truffleAssert = require('truffle-assertions')
-const HSTServiceRegistry = artifacts.require('./components/HSTServiceRegistry.sol')
+//const HSTServiceRegistry = artifacts.require('./components/HSTServiceRegistry.sol')
 //const HSTBuyerRegistry = artifacts.require('./components/HSTBuyerRegistry.sol')
-const HSTokenRegistry = artifacts.require('./components/HSTokenRegistry.sol')
-const IdentityRegistry = artifacts.require('./components/IdentityRegistry.sol')
+//const HSTokenRegistry = artifacts.require('./components/HSTokenRegistry.sol')
+//const IdentityRegistry = artifacts.require('./components/IdentityRegistry.sol')
 
 const common = require('./common.js')
 const { createIdentity } = require('./utilities')
@@ -100,14 +100,14 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
 
   describe('Checking HSTokenRegistry functionality - basic', async() => {
 
-    it('HSTokenRegistry can be created', async () => {
-      console.log("      Identity Registry Address", instances.IdentityRegistry.address);
-      console.log("      User 0", user0.address);
-      newTokenRegistry = await HSTokenRegistry.new( {from: user0.address} );
-    })
+    // it('HSTokenRegistry can be created', async () => {
+    //   console.log("      Identity Registry Address", instances.IdentityRegistry.address);
+    //   console.log("      User 0", user0.address);
+    //   newTokenRegistry = await HSTokenRegistry.new( {from: user0.address} );
+    // })
     
     it('HSTokenRegistry exists', async () => {
-      registryAddress = await newTokenRegistry.address;
+      registryAddress = await instances.TokenRegistry.address;
       console.log("      Token Registry address", registryAddress);
     })
 
@@ -116,26 +116,26 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
 
   describe('Checking HSTServiceRegistry functionality - basic', async() => {
 
-    it('HSTServiceRegistry can be created', async () => {
-      newServiceRegistry = await HSTServiceRegistry.new(
-          instances.IdentityRegistry.address,
-          newTokenRegistry.address,
-          {from: user0.address}
-        )
-        console.log("      HSTServiceRegistry Address", newServiceRegistry.address)
-        console.log("      User 0", user0.address)
-    })
+    // it('HSTServiceRegistry can be created', async () => {
+    //   newServiceRegistry = await HSTServiceRegistry.new(
+    //       instances.IdentityRegistry.address,
+    //       instances.TokenRegistry.address,
+    //       {from: user0.address}
+    //     )
+    //     console.log("      HSTServiceRegistry Address", newServiceRegistry.address)
+    //     console.log("      User 0", user0.address)
+    // })
   
     it('HSTServiceRegistry exists', async () => {
-      _serviceRegistryAddress = await newServiceRegistry.address;
+      _serviceRegistryAddress = await instances.ServiceRegistry.address;
       console.log("      HSTServiceRegistry address", _serviceRegistryAddress)
     })
 
     it('HSTokenRegistry set addresses', async () => {
-      console.log('      Service Registry Address', newServiceRegistry.address)
-      await newTokenRegistry.setAddresses(
+      console.log('      Service Registry Address', instances.ServiceRegistry.address)
+      await instances.TokenRegistry.setAddresses(
         instances.IdentityRegistry.address,
-        newServiceRegistry.address,
+        instances.ServiceRegistry.address,
         {from: user0.address}
       )
     })
@@ -157,16 +157,16 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     it('HSTBuyerRegistry set registries addresses', async () => {
       await instances.BuyerRegistry.setAddresses(
         instances.IdentityRegistry.address,
-        newTokenRegistry.address,
-        newServiceRegistry.address,
+        instances.TokenRegistry.address,
+        instances.ServiceRegistry.address,
         {from: user0.address}
       )
     })
 
-    it('HSTServiceRegistry set default rules enforcer address', async () => {
-      await newServiceRegistry.setAddresses(
+    it('HSTServiceRegistry set registries addresses', async () => {
+      await instances.ServiceRegistry.setAddresses(
         instances.IdentityRegistry.address,
-        newTokenRegistry.address,
+        instances.TokenRegistry.address,
         {from: user0.address}
       )
     })
@@ -183,9 +183,9 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
   describe('Checking HSTokenRegistry functionality - token creation', async() => {
 
     it('Set service registry address in token registry', async () => {
-      await newTokenRegistry.setAddresses(
+      await instances.TokenRegistry.setAddresses(
         instances.IdentityRegistry.address,
-        newServiceRegistry.address,
+        instances.ServiceRegistry.address,
         {from: user0.address}
       );
       console.log("      Service registry address was set");
@@ -197,7 +197,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
 
     it('Appoint a new token', async () => {
-      await newTokenRegistry.appointToken(
+      await instances.TokenRegistry.appointToken(
         tokenDummyAddress,
         web3.utils.fromAscii('TEST'),
         web3.utils.fromAscii('TestToken'),
@@ -209,35 +209,35 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
 
     it('Get token owner EIN', async () => {
-      _tokenOwnerEIN = await newTokenRegistry.getSecuritiesTokenOwnerEIN(
+      _tokenOwnerEIN = await instances.TokenRegistry.getSecuritiesTokenOwnerEIN(
         tokenDummyAddress
       );
       console.log("      Token owner EIN", _tokenOwnerEIN.toNumber());
     })
 
     it('Get token symbol', async () => {
-      _tokenSymbol = await newTokenRegistry.getSecuritiesTokenSymbol(
+      _tokenSymbol = await instances.TokenRegistry.getSecuritiesTokenSymbol(
         tokenDummyAddress
       );
       console.log("      Token symbol", web3.utils.toAscii(_tokenSymbol));
     })
 
     it('Get token name', async () => {
-      _tokenName = await newTokenRegistry.getSecuritiesTokenName(
+      _tokenName = await instances.TokenRegistry.getSecuritiesTokenName(
         tokenDummyAddress
       );
       console.log("      Token address", web3.utils.toAscii(_tokenName));
     })
 
     it('Get token description', async () => {
-      _tokenDescription = await newTokenRegistry.getSecuritiesTokenDescription(
+      _tokenDescription = await instances.TokenRegistry.getSecuritiesTokenDescription(
         tokenDummyAddress
       );
       console.log("      Token description", _tokenDescription);
     })
 
     it('Get token decimals', async () => {
-      _tokenDecimals = await newTokenRegistry.getSecuritiesTokenDecimals(
+      _tokenDecimals = await instances.TokenRegistry.getSecuritiesTokenDecimals(
         tokenDummyAddress
       );
       console.log("      Token decimals", _tokenDecimals.toNumber());
@@ -249,13 +249,13 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
   describe('Checking HSTServiceRegistry functionality - token categories creation', async() => {
 
     it('Token categories exist', async () => {
-      _category1 = await newServiceRegistry.getCategory(tokenDummyAddress, web3.utils.fromAscii("MLA"));
+      _category1 = await instances.ServiceRegistry.getCategory(tokenDummyAddress, web3.utils.fromAscii("MLA"));
       console.log("      MLA category", _category1);
-      _category2 = await newServiceRegistry.getCategory(tokenDummyAddress, web3.utils.fromAscii("KYC"));
+      _category2 = await instances.ServiceRegistry.getCategory(tokenDummyAddress, web3.utils.fromAscii("KYC"));
       console.log("      KYC category", _category2);
-      _category3 = await newServiceRegistry.getCategory(tokenDummyAddress, web3.utils.fromAscii("AML"));
+      _category3 = await instances.ServiceRegistry.getCategory(tokenDummyAddress, web3.utils.fromAscii("AML"));
       console.log("      AML category", _category3);
-      _category4 = await newServiceRegistry.getCategory(tokenDummyAddress, web3.utils.fromAscii("CFT"));
+      _category4 = await instances.ServiceRegistry.getCategory(tokenDummyAddress, web3.utils.fromAscii("CFT"));
       console.log("      CFT category", _category4);
     })
 
@@ -265,7 +265,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
   describe('Checking HSTServiceRegistry functionality - additional', async() => {
 
     it('HSTServiceRegistry - add category', async () => {
-      await newServiceRegistry.addCategory(
+      await instances.ServiceRegistry.addCategory(
         tokenDummyAddress,
         web3.utils.fromAscii("TEST"),
         'just-a-test-category',
@@ -274,7 +274,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
   
     it('HSTServiceRegistry - get category', async () => {
-      _categoryDescription = await newServiceRegistry.getCategory(
+      _categoryDescription = await instances.ServiceRegistry.getCategory(
         tokenDummyAddress,
         web3.utils.fromAscii("TEST"),
         {from: user0.address}
@@ -283,7 +283,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
     
     it('HSTServiceRegistry - add service', async () => {
-      await newServiceRegistry.addService(
+      await instances.ServiceRegistry.addService(
         tokenDummyAddress,
         '3',
         web3.utils.fromAscii("KYC"),
@@ -292,7 +292,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
 
     it('HSTServiceRegistry - get service', async () => {
-      _serviceCategory = await newServiceRegistry.getService(
+      _serviceCategory = await instances.ServiceRegistry.getService(
         tokenDummyAddress,
         '3',
         {from: user0.address}
@@ -301,7 +301,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
 
     it('HSTServiceRegistry - is provider true', async () => {
-      await newServiceRegistry.isProvider(
+      await instances.ServiceRegistry.isProvider(
         tokenDummyAddress,
         '3',
         {from: user0.address}
@@ -309,7 +309,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
 
     it('HSTServiceRegistry - remove service', async () => {
-      await newServiceRegistry.removeService(
+      await instances.ServiceRegistry.removeService(
         tokenDummyAddress,
         '3',
         {from: user1.address}
@@ -317,7 +317,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
 
     it('HSTServiceRegistry - get service after removal', async () => {
-      _serviceCategory = await newServiceRegistry.getService(
+      _serviceCategory = await instances.ServiceRegistry.getService(
         tokenDummyAddress,
         '3',
         {from: user0.address}
@@ -326,7 +326,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
 
     it('HSTServiceRegistry - is provider false', async () => {
-      await newServiceRegistry.isProvider(
+      await instances.ServiceRegistry.isProvider(
         tokenDummyAddress,
         '3',
         {from: user0.address}
@@ -526,7 +526,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
   describe('Checking HSTBuyerRegistry functionality - change buyer status', async() => {
 
     it('HSTServiceRegistry - add service', async () => {
-      await newServiceRegistry.addService(
+      await instances.ServiceRegistry.addService(
         tokenDummyAddress,
         '3',
         web3.utils.fromAscii("KYC"),
@@ -544,7 +544,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
 
     it('HSTServiceRegistry - add service', async () => {
-      await newServiceRegistry.addService(
+      await instances.ServiceRegistry.addService(
         tokenDummyAddress,
         '3',
         web3.utils.fromAscii("AML"),
@@ -562,7 +562,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     })
 
     it('HSTServiceRegistry - add service', async () => {
-      await newServiceRegistry.addService(
+      await instances.ServiceRegistry.addService(
         tokenDummyAddress,
         '3',
         web3.utils.fromAscii("CFT"),
