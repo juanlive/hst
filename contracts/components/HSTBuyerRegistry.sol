@@ -440,6 +440,36 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     }
 
     /**
+    * @notice set buyer data
+    *
+    * @param _buyerKycStatus KYC statusfor the buyer
+    */
+    function setBuyerKycStatus(uint _buyerEIN, bool _buyerKycStatus) public {
+        // TO DO require calling user to be the buyer kyc provider
+        buyerRegistry[_buyerEIN].kycWhitelisted = _buyerKycStatus;
+    }
+
+    /**
+    * @notice set buyer data
+    *
+    * @param _buyerAmlStatus AML statusfor the buyer
+    */
+    function setBuyerAmlStatus(uint _buyerEIN, bool _buyerAmlStatus) public {
+        // TO DO require calling user to be the buyer aml provider
+        buyerRegistry[_buyerEIN].amlWhitelisted = _buyerAmlStatus;
+    }
+
+    /**
+    * @notice set buyer data
+    *
+    * @param _buyerCftStatus CFT statusfor the buyer
+    */
+    function setBuyerCftStatus(uint _buyerEIN, bool _buyerCftStatus) public {
+        // TO DO require calling user to be the buyer cft provider
+        buyerRegistry[_buyerEIN].cftWhitelisted = _buyerCftStatus;
+    }
+    
+    /**
     * @notice get buyer data
     *
     * @param _buyerEIN EIN for the buyer

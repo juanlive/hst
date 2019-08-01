@@ -37,6 +37,13 @@ contract('Testing HSToken', function (accounts) {
       recoveryAddress: accounts[4],
       private: '0x44e02845db8861094c519d72d08acb7435c37c57e64ec5860fb15c5f626cb77c',
       id: 3
+    },
+        {
+      hydroID: 'fiv',
+      address: accounts[0],
+      recoveryAddress: accounts[0],
+      private: '0x2665671af93f210ddb5d5ffa16c77fcf961d52796f2b2d7afd32cc5d886350a8',
+      id: 4
     }
   ]
 
@@ -81,128 +88,14 @@ contract('Testing HSToken', function (accounts) {
   })
 
 
-describe('Preparing infrastructure', async() => {
+/*  it('Snowflake identities created for owner', async() => {
+    for (let i = 0; i < users.length; i++) {
+      await createIdentity(users[3], instances)
+    }
+  })*/
 
-    it('Common contracts deployed', async () => {
-      instances = await common.initialize(owner.public, users);
-    })
-
-    it('Snowflake identities created for all accounts', async() => {
-      for (let i = 0; i < users.length; i++) {
-        await createIdentity(users[i], instances)
-      }
-    })
-
-    // Retrieve EINs for all Identities from IdentityRegistry
-
-    it('IdentityRegistry retrieve EIN - first', async () => {
-      ein0 = await instances.IdentityRegistry.getEIN(
-        users[0].address,
-        {from: users[0].address}
-      )
-      console.log("      User 0 => EIN 0 => value 1", ein0);
-    })
-
-    it('IdentityRegistry retrieve EIN - second', async () => {
-      ein1 = await instances.IdentityRegistry.getEIN(
-        users[1].address,
-        {from: users[1].address}
-      )
-      console.log("      User 1 => EIN 1 => value 2", ein1);
-    })
-
-    it('IdentityRegistry retrieve EIN - third', async () => {
-      ein2 = await instances.IdentityRegistry.getEIN(
-        users[2].address,
-        {from: users[2].address}
-      )
-      console.log("      User 2 => EIN 2 => value 3", ein2);
-    })
-
-  })
-
-
-  describe('Checking HSTokenRegistry functionality - basic', async() => {
-
-    it('HSTokenRegistry can be created', async () => {
-      console.log("      Identity Registry Address", instances.IdentityRegistry.address);
-      console.log("      User 0", users[0].address);
-      newTokenRegistry = await HSTokenRegistry.new(
-          instances.IdentityRegistry.address,
-          {from: users[0].address}
-      );
-    })
-    
-    it('HSTokenRegistry exists', async () => {
-      registryAddress = await newTokenRegistry.address;
-      console.log("      Token Registry address", registryAddress);
-    })
-    
-    it('HSTokenRegistry set Identity Registry', async () => {
-      console.log('      Identity Registry Address', instances.IdentityRegistry.address)
-      await newTokenRegistry.setIdentityRegistryAddress(
-        instances.IdentityRegistry.address,
-        {from: users[0].address}
-      )
-    })
-
-  })
-
-
-  describe('Checking HSTServiceRegistry functionality - basic', async() => {
-
-    it('HSTServiceRegistry can be created', async () => {
-      newServiceRegistry = await HSTServiceRegistry.new(
-          instances.IdentityRegistry.address,
-          newTokenRegistry.address,
-          {from: users[0].address}
-        )
-        console.log("      HSTServiceRegistry Address", newServiceRegistry.address)
-        console.log("      User 0", users[0].address)
-    })
-  
-    it('HSTServiceRegistry exists', async () => {
-      _serviceRegistryAddress = await newServiceRegistry.address;
-      console.log("      HSTServiceRegistry address", _serviceRegistryAddress)
-    })
-        
-    it('HSTServiceRegistry set Identity Registry', async () => {
-      console.log('      Identity Registry Address', instances.IdentityRegistry.address)
-      await newServiceRegistry.setIdentityRegistryAddress(
-        instances.IdentityRegistry.address,
-        {from: users[0].address}
-      )
-    })
-
-  })
 
   describe('Checking HSToken functionality', async() =>{
-
-
-    it('HSTBuyerRegistry can be created', async () => {
-      newBuyerRegistry = await HSTBuyerRegistry.new(
-          instances.DateTime.address,
-          {from: users[0].address}
-        )
-        console.log("HSTBuyerRegistry Address", newBuyerRegistry.address)
-    })
-
-    it('HSTBuyerRegistry set registries addresses', async () => {
-      await newBuyerRegistry.setAddresses(
-        instances.IdentityRegistry.address,
-        newTokenRegistry.address,
-        newServiceRegistry.address,
-        {from: users[0].address}
-      )
-    })
-
-    it('HSTServiceRegistry set default rules enforcer address', async () => {
-      await newServiceRegistry.setDefaultBuyerRegistry(
-        newBuyerRegistry.address,
-        {from: users[0].address}
-      )
-    })
-
 
     it('HSToken can be created', async () => {
       newToken = await HSToken.new(
@@ -213,7 +106,7 @@ describe('Preparing infrastructure', async() => {
           18,
           instances.HydroToken.address, 
           instances.IdentityRegistry.address,
-          newBuyerRegistry.address,
+          instances.BuyerRegistry.address,
           user.address,
           {from: user.address}
         )
@@ -221,11 +114,108 @@ describe('Preparing infrastructure', async() => {
         console.log("User", user.address)
     })
     
-
     it('HSToken exists', async () => {
-      userId = await newToken.Owner();
+      userId = await newToken.isTokenAlive();
     })
 
+/*    it('HSTokenRegistry set addresses', async () => {
+      console.log('      Service Registry Address', instances.ServiceRegistry.address)
+      await instances.TokenRegistry.setAddresses(
+        instances.IdentityRegistry.address,
+        instances.ServiceRegistry.address,
+        {from: users[0].address}
+      )
+    })
+
+    it('HSTBuyerRegistry set registries addresses', async () => {
+      await instances.BuyerRegistry.setAddresses(
+        instances.IdentityRegistry.address,
+        instances.TokenRegistry.address,
+        instances.ServiceRegistry.address,
+        {from: users[0].address}
+      )
+    })
+
+    it('HSTServiceRegistry set registries addresses', async () => {
+      await instances.ServiceRegistry.setAddresses(
+        instances.IdentityRegistry.address,
+        instances.TokenRegistry.address,
+        {from: users[0].address}
+      )
+    })*/
+
+    it('Appoint token', async () => {
+      await instances.TokenRegistry.appointToken(
+        newToken.address,
+        web3.utils.fromAscii('HTST'),
+        web3.utils.fromAscii('Hydro Security'),
+        'just-a-test',
+        18,
+        {from: users[1].address}
+      )
+    })
+
+    // ------------------------------ BuyerRegistry settings
+
+    it('Set default values to BuyerRegistry', async () => {
+      instances.BuyerRegistry.assignTokenValues(
+        newToken.address,
+        "16",
+        "10000",
+        "5000",
+        false,
+        {from: user.address}
+        )
+    })
+
+    it('HSTBuyerRegistry - add buyer 1', async () => {
+      await instances.BuyerRegistry.addBuyer(
+        '1', // EIN
+        'Johnny',
+        'Tester',
+        web3.utils.fromAscii('GMB'),
+        '1984', // year of birth
+        '12', // month of birth
+        '12', // day of birth
+        '100000', // net worth
+        '50000', // salary
+        {from: user.address}
+      )
+    })
+
+
+    it('HSTBuyerRegistry - add buyer 2', async () => {
+      await instances.BuyerRegistry.addBuyer(
+        '2', // EIN
+        'Peter',
+        'Tester',
+        web3.utils.fromAscii('GMB'),
+        '1980', // year of birth
+        '10', // month of birth
+        '20', // day of birth
+        '100000', // net worth
+        '50000', // salary
+        {from: user.address}
+      )
+    })
+
+    it('HSTServiceRegistry - add service', async () => {
+      await instances.ServiceRegistry.addService(
+        newToken.address,
+        '3',
+        web3.utils.fromAscii("KYC"),
+        {from: users[1].address}
+        )
+    })
+
+    it('HSTBuyerRegistry - add kyc for buyer 1', async () => {
+      await instances.BuyerRegistry.addKycServiceToBuyer(
+        '1',
+        newToken.address,
+        '3',
+        {from: users[1].address}
+      )
+    })
 
     it('HSToken set MAIN_PARAMS', async () => {
       await newToken.set_MAIN_PARAMS(
@@ -315,34 +305,47 @@ describe('Preparing infrastructure', async() => {
         { from: user.address })
     })
 
-    it('HSToken buyTokens from EIN user 1', async () => {
-      await newToken.buyTokens(
-          web3.utils.toWei("12"),
-          { from: user.address })
+    it('HSTBuyerRegistry - get buyer data - kyc status: false', async () => {
+      _buyerKycStatus = await instances.BuyerRegistry.getBuyerKycStatus(
+        '1',
+        {from: user.address}
+      )
+      console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
     })
-
-    // Reject Identity 1 and try to buy
-
-/*    it('KYCResolver reject EIN identity 1', async () => {
-      await instances.KYCResolver.rejectEin(
-        "1",
-        { from: user.address });
-    })*/
 
     it('HSToken Reverts buy for EIN user 1', async () => {
         await truffleAssert.reverts(
           newToken.buyTokens(
           "10",
           { from: user.address }),
-          "KYC not approved"
+          "Buyer must be approved for KYC"
         )
     })
 
-/*    it('KYCResolver approve again EIN identity 1', async () => {
-      await instances.KYCResolver.approveEin(
-        "1",
-        { from: user.address });
-    })*/
+    it('Set buyer status true for user 1', async () => {
+      await instances.BuyerRegistry.setBuyerKycStatus(
+        '1',
+        true,
+        {from: user.address}
+      )
+      console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
+    })
+
+
+    it('HSTBuyerRegistry - get buyer data - kyc status: true', async () => {
+      _buyerKycStatus = await instances.BuyerRegistry.getBuyerKycStatus(
+        '1',
+        {from: user.address}
+      )
+      console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
+    })
+
+    it('HSToken buyTokens from EIN user 1', async () => {
+      await newToken.buyTokens(
+          web3.utils.toWei("12"),
+          { from: user.address })
+    })
+
 
     it('HSToken buyTokens again from EIN user 1', async () => {
       await newToken.buyTokens(
@@ -386,6 +389,31 @@ describe('Preparing infrastructure', async() => {
     })
 
 
+    it('HSToken reverts transfer 1.2 HSTokens to Account 2', async () => {
+      await truffleAssert.reverts(
+        newToken.transfer(
+          users[1].address,
+          web3.utils.toWei("1.2"),
+          { from: user.address })
+      )
+      //after(async()=>{
+          console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
+          console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
+      //})
+    })
+
+
+    it('Set buyer status true for user 2', async () => {
+      await instances.BuyerRegistry.setBuyerKycStatus(
+        '2',
+        true,
+        {from: user.address}
+      )
+      console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
+    })
+
+
+
     it('HSToken transfer 1.2 HSTokens to Account 2', async () => {
 
       console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
@@ -403,24 +431,6 @@ describe('Preparing infrastructure', async() => {
     })
 
 
-    it('KYCResolver reject EIN identity 2', async () => {
-      await instances.KYCResolver.rejectEin(
-        "2",
-        { from: user.address });
-    })
-
-    it('HSToken reverts transfer 1.2 HSTokens to Account 2', async () => {
-      await truffleAssert.reverts(
-        newToken.transfer(
-          users[1].address,
-          web3.utils.toWei("1.2"),
-          { from: user.address })
-      )
-      //after(async()=>{
-          console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(user.address)))
-          console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
-      //})
-    })
 
 
     it('Setting oracle address', async() => {
