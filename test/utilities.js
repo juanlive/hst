@@ -74,6 +74,7 @@ async function verifyIdentity (ein, IdentityRegistry, expectedIdentity) {
 
 
 const createIdentity = async(_user, instances) => {
+//async function createIdentity (_user, instances) {
 
     const timestamp = Math.round(new Date() / 1000) - 1
     const permissionString = web3.utils.soliditySha3(
@@ -89,8 +90,8 @@ const createIdentity = async(_user, instances) => {
     const permission = await sign(permissionString, _user.address, _user.private)
 
     await instances.Snowflake.createIdentityDelegated(
-      _user.recoveryAddress, _user.address, [], _user.hydroID, permission.v, permission.r, permission.s, timestamp
-      , {from: _user.address})
+      _user.recoveryAddress, _user.address, [], _user.hydroID, permission.v, permission.r, permission.s, timestamp, {from: _user.address}
+    )
 
     _user.identity = web3.utils.toBN(_user.id)
 
