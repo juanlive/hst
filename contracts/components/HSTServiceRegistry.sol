@@ -78,7 +78,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   * @dev This works on EINs, not on addresses
   */
   modifier onlyTokenOwner(address _tokenAddress) {
-      require(isTokenOwner(_tokenAddress), "Must be owner to call this function");
+      require(isTokenOwner(_tokenAddress), "Caller must be the token EIN owner");
       _;
   }
 

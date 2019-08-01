@@ -214,10 +214,12 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
 
     // functions for token rules update
 
+    // TO DO
+    // restrict access to this function (see @dev)
     /**
     * @notice Assign rule values for each token
     *
-    * @dev This method is only callable by the contract's owner
+    * @dev This function is only callable by the contract's owner
     *
     * @param _tokenAddress Address for the Token
     * @param _minimumAge Required minimum age to buy this Token
@@ -331,7 +333,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
 
 
     // functions for buyer's registry - user data
-
+    // TO DO check who can do this
     /**
     * @notice Add a new buyer
     * @dev    This method is only callable by the contract's owner

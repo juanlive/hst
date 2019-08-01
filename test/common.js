@@ -12,6 +12,7 @@ const Snowflake = artifacts.require('./Snowflake.sol')
 
 async function createUsers (accounts) {
   const users = [
+    // system owner
     {
       hydroID: 'own',
       address: accounts[0],
@@ -19,6 +20,7 @@ async function createUsers (accounts) {
       private: '0x2665671af93f210ddb5d5ffa16c77fcf961d52796f2b2d7afd32cc5d886350a8',
       id: 1
     },
+    // token owner
     {
       hydroID: 'fir',
       address: accounts[1],
@@ -26,6 +28,7 @@ async function createUsers (accounts) {
       private: '0x6bf410ff825d07346c110c5836b33ec76e7d1ee051283937392180b732aa3aff',
       id: 2
     },
+    // kyc service provider
     {
       hydroID: 'sec',
       address: accounts[2],
@@ -33,6 +36,7 @@ async function createUsers (accounts) {
       private: '0xccc3c84f02b038a5d60d93977ab11eb57005f368b5f62dad29486edeb4566954',
       id: 3
     },
+    // general users
     {
       hydroID: 'thi',
       address: accounts[3],

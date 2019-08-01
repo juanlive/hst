@@ -6,14 +6,11 @@ const common = require('./common.js')
 let instances
 // all users
 let users
-// system owner and deployer
+// system owner and deployer (same as users[0])
 let owner
 
-let user0
 let ein0
-let user1
 let ein1
-let user2
 let ein2
 
 contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', function (accounts) {
@@ -23,9 +20,6 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     it('Users created', async () => {
       users = await common.createUsers(accounts);
       owner = users[0];
-      user0 = users[1];
-      user1 = users[2];
-      user2 = users[3];
     })
     
     it('Common contracts deployed', async () => {
@@ -40,28 +34,28 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
 
     // Retrieve EINs for all Identities from IdentityRegistry
 
-    it('IdentityRegistry retrieve EIN - first', async () => {
+    it('IdentityRegistry retrieve EIN - owner', async () => {
       ein0 = await instances.IdentityRegistry.getEIN(
-        user0.address,
-        {from: user0.address}
+        users[0].address//,
+        //{from: owner.address}
       )
-      console.log("      User 0 => EIN 0 => value 1", ein0);
+      console.log("      User 0 (system owner) => EIN 0 => value 1", ein0);
     })
 
-    it('IdentityRegistry retrieve EIN - second', async () => {
+    it('IdentityRegistry retrieve EIN - token owner', async () => {
       ein1 = await instances.IdentityRegistry.getEIN(
-        user1.address,
-        {from: user1.address}
+        users[1].address//,
+        //{from: user1.address}
       )
-      console.log("      User 1 => EIN 1 => value 2", ein1);
+      console.log("      User 1 (token owner) => EIN 1 => value 2", ein1);
     })
 
-    it('IdentityRegistry retrieve EIN - third', async () => {
+    it('IdentityRegistry retrieve EIN', async () => {
       ein2 = await instances.IdentityRegistry.getEIN(
-        user2.address,
-        {from: user2.address}
+        users[2].address//,
+        //{from: user2.address}
       )
-      console.log("      User 2 => EIN 2 => value 3", ein2);
+      console.log("      User 2 (general user) => EIN 2 => value 3", ein2);
     })
 
   })
@@ -84,36 +78,10 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
       console.log("      HSTServiceRegistry address", _serviceRegistryAddress)
     })
 
-    it('HSTokenRegistry set addresses', async () => {
-      console.log('      Service Registry Address', instances.ServiceRegistry.address)
-      await instances.TokenRegistry.setAddresses(
-        instances.IdentityRegistry.address,
-        instances.ServiceRegistry.address,
-        {from: user0.address}
-      )
-    })
-
   })
 
 
   describe('Checking HSTBuyerRegistry functionality - basic', async() => {
-  
-    it('HSTBuyerRegistry set registries addresses', async () => {
-      await instances.BuyerRegistry.setAddresses(
-        instances.IdentityRegistry.address,
-        instances.TokenRegistry.address,
-        instances.ServiceRegistry.address,
-        {from: user0.address}
-      )
-    })
-
-    it('HSTServiceRegistry set registries addresses', async () => {
-      await instances.ServiceRegistry.setAddresses(
-        instances.IdentityRegistry.address,
-        instances.TokenRegistry.address,
-        {from: user0.address}
-      )
-    })
 
     // TO DO
     // it('      HSTBuyerRegistry exists', async () => {
@@ -125,15 +93,6 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
 
 
   describe('Checking HSTokenRegistry functionality - token creation', async() => {
-
-    it('Set service registry address in token registry', async () => {
-      await instances.TokenRegistry.setAddresses(
-        instances.IdentityRegistry.address,
-        instances.ServiceRegistry.address,
-        {from: user0.address}
-      );
-      console.log("      Service registry address was set");
-    })
 
     it('Create token dummy address', async () => {
       tokenDummyAddress = '0xf58161d60b2133b1339563fc3e38a8e80410b08c';
@@ -147,7 +106,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         web3.utils.fromAscii('TestToken'),
         'just-a-test',
         10,
-        {from: user1.address}
+        {from: users[1].address}
       );
       //console.log("      Token was created", result);
     })
@@ -213,15 +172,15 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         tokenDummyAddress,
         web3.utils.fromAscii("TEST"),
         'just-a-test-category',
-        {from: user1.address}
+        {from: users[1].address}
       )
     })
   
     it('HSTServiceRegistry - get category', async () => {
       _categoryDescription = await instances.ServiceRegistry.getCategory(
         tokenDummyAddress,
-        web3.utils.fromAscii("TEST"),
-        {from: user0.address}
+        web3.utils.fromAscii("TEST")//,
+        //{from: user0.address}
       )    
       console.log("      HSTServiceRegistry category description", _categoryDescription)
     })
@@ -231,15 +190,15 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         tokenDummyAddress,
         '3',
         web3.utils.fromAscii("KYC"),
-        {from: user1.address}
+        {from: users[1].address}
         )
     })
 
     it('HSTServiceRegistry - get service', async () => {
       _serviceCategory = await instances.ServiceRegistry.getService(
         tokenDummyAddress,
-        '3',
-        {from: user0.address}
+        '3'//,
+        //{from: user0.address}
       )    
       console.log("      HSTServiceRegistry service category", web3.utils.toAscii(_serviceCategory))
     })
@@ -247,8 +206,8 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     it('HSTServiceRegistry - is provider true', async () => {
       await instances.ServiceRegistry.isProvider(
         tokenDummyAddress,
-        '3',
-        {from: user0.address}
+        '3'//,
+        //{from: user0.address}
       )    
     })
 
@@ -256,7 +215,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
       await instances.ServiceRegistry.removeService(
         tokenDummyAddress,
         '3',
-        {from: user1.address}
+        {from: users[1].address}
       )    
     })
 
@@ -264,7 +223,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
       _serviceCategory = await instances.ServiceRegistry.getService(
         tokenDummyAddress,
         '3',
-        {from: user0.address}
+        //{from: user0.address}
       )    
       console.log("      HSTServiceRegistry service category", web3.utils.toAscii(_serviceCategory))
     })
@@ -272,8 +231,8 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     it('HSTServiceRegistry - is provider false', async () => {
       await instances.ServiceRegistry.isProvider(
         tokenDummyAddress,
-        '3',
-        {from: user0.address}
+        '3'//,
+        //{from: user0.address}
       )    
     })
     
@@ -289,38 +248,38 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '50000', // minimum net worth
         '36000', // minimum salary
         true, // accredited investor status required
-        {from: user0.address}
+        {from: users[1].address}
       )
     })
 
     it('HSTBuyerRegistry - get token values - minimum age', async () => {
       _minimumAge = await instances.BuyerRegistry.getTokenMinimumAge(
         tokenDummyAddress,
-        {from: user0.address}
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry minimum age", _minimumAge.toNumber())
     })
 
     it('HSTBuyerRegistry - get token values - minimum net worth', async () => {
       _minimumNetWorth = await instances.BuyerRegistry.getTokenMinimumNetWorth(
-        tokenDummyAddress,
-        {from: user0.address}
+        tokenDummyAddress//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry minimum net worth", _minimumNetWorth.toNumber())
     })
     
     it('HSTBuyerRegistry - get token values - minimum salary', async () => {
       _minimumSalary = await instances.BuyerRegistry.getTokenMinimumSalary(
-        tokenDummyAddress,
-        {from: user0.address}
+        tokenDummyAddress//,
+        //{from: user0.address}
       )
       console.log("      HSTServiceRegistry minimum salary", _minimumSalary.toNumber())
     })
     
     it('HSTBuyerRegistry - get token values - investor status required', async () => {
       _investorStatus = await instances.BuyerRegistry.getTokenInvestorStatusRequired(
-        tokenDummyAddress,
-        {from: user0.address}
+        tokenDummyAddress//,
+        //{from: user0.address}
       )
       console.log("      HSTServiceRegistry investor status required", _investorStatus)
     })
@@ -334,15 +293,15 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
       await instances.BuyerRegistry.addCountryBan(
         tokenDummyAddress,
         web3.utils.fromAscii('GMB'),
-        {from: user0.address}
+        {from: users[1].address}
       )
     })
 
     it('HSTBuyerRegistry - get country ban', async () => {
       _countryBanStatus = await instances.BuyerRegistry.getCountryBan(
         tokenDummyAddress,
-        web3.utils.fromAscii('GMB'),
-        {from: user0.address}
+        web3.utils.fromAscii('GMB')//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry country ban status", _countryBanStatus)
     })
@@ -351,15 +310,15 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
       await instances.BuyerRegistry.liftCountryBan(
         tokenDummyAddress,
         web3.utils.fromAscii('GMB'),
-        {from: user0.address}
+        {from: users[1].address}
       )
     })
 
     it('HSTBuyerRegistry - get country ban', async () => {
       _countryBanStatus = await instances.BuyerRegistry.getCountryBan(
         tokenDummyAddress,
-        web3.utils.fromAscii('GMB'),
-        {from: user0.address}
+        web3.utils.fromAscii('GMB')//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry country ban status", _countryBanStatus)
     })
@@ -380,86 +339,86 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '12', // day of birth
         '100000', // net worth
         '50000', // salary
-        {from: user0.address}
+        {from: users[1].address}
       )
     })
 
     it('HSTBuyerRegistry - get buyer data - first name', async () => {
       _buyerFirstName = await instances.BuyerRegistry.getBuyerFirstName(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry get first name", _buyerFirstName)
     })
 
     it('HSTBuyerRegistry - get buyer data - last name', async () => {
       _buyerLastName = await instances.BuyerRegistry.getBuyerLastName(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry get last name", _buyerLastName)
     })
 
     it('HSTBuyerRegistry - get buyer data - iso country code', async () => {
       _buyerCountryCode = await instances.BuyerRegistry.getBuyerIsoCountryCode(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry get country code", web3.utils.toAscii(_buyerCountryCode))
     })
 
     it('HSTBuyerRegistry - get buyer data - birthday', async () => {
       _buyerBirthday = await instances.BuyerRegistry.getBuyerBirthTimestamp(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry get birthday", _buyerBirthday.toNumber())
     })
 
     it('HSTBuyerRegistry - get buyer data - net worth', async () => {
       _buyerNetWorth = await instances.BuyerRegistry.getBuyerNetWorth(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry get net worth", _buyerNetWorth.toNumber())
     })
 
     it('HSTBuyerRegistry - get buyer data - salary', async () => {
       _buyerSalary = await instances.BuyerRegistry.getBuyerSalary(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry get salary", _buyerSalary.toNumber()) 
     })
 
     it('HSTBuyerRegistry - get buyer data - accredited investor status', async () => {
       _buyerInvestorStatus = await instances.BuyerRegistry.getBuyerInvestorStatus(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry get accredited investor status", _buyerInvestorStatus)
     })
 
     it('HSTBuyerRegistry - get buyer data - kyc status', async () => {
       _buyerKycStatus = await instances.BuyerRegistry.getBuyerKycStatus(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
     })
 
     it('HSTBuyerRegistry - get buyer data - aml status', async () => {
       _buyerAmlStatus = await instances.BuyerRegistry.getBuyerAmlStatus(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry aml status", _buyerAmlStatus)
     })
 
     it('HSTBuyerRegistry - get buyer data - cft status', async () => {
       _buyerCftStatus = await instances.BuyerRegistry.getBuyerCftStatus(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry cft status", _buyerCftStatus)
     })
@@ -475,7 +434,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '12', // day of birth
         '100000', // net worth
         '50000', // salary
-        {from: user0.address}
+        {from: users[1].address}
       )
     })
 
@@ -483,7 +442,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
       await instances.BuyerRegistry.addCountryBan(
         tokenDummyAddress,
         web3.utils.fromAscii('KEN'),
-        {from: user0.address}
+        {from: users[1].address}
       )
     })
 
@@ -498,7 +457,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '12', // day of birth
         '100000', // net worth
         '50000', // salary
-        {from: user0.address}
+        {from: users[1].address}
       )
     })
 
@@ -513,7 +472,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '12', // day of birth
         '10000', // net worth
         '50000', // salary
-        {from: user0.address}
+        {from: users[1].address}
       )
     })
 
@@ -528,7 +487,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '12', // day of birth
         '100000', // net worth
         '24000', // salary
-        {from: user0.address}
+        {from: users[1].address}
       )
     })
 
@@ -542,7 +501,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         tokenDummyAddress,
         '3',
         web3.utils.fromAscii("KYC"),
-        {from: user1.address}
+        {from: users[1].address}
         )
     })
 
@@ -551,7 +510,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '21',
         tokenDummyAddress,
         '3',
-        {from: user1.address}
+        {from: users[1].address}
       )
     })
 
@@ -560,7 +519,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         tokenDummyAddress,
         '3',
         web3.utils.fromAscii("AML"),
-        {from: user1.address}
+        {from: users[1].address}
         )
     })
 
@@ -569,7 +528,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '21',
         tokenDummyAddress,
         '3',
-        {from: user1.address}
+        {from: users[1].address}
       )
     })
 
@@ -578,7 +537,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         tokenDummyAddress,
         '3',
         web3.utils.fromAscii("CFT"),
-        {from: user1.address}
+        {from: users[1].address}
         )
     })
 
@@ -587,30 +546,30 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '21',
         tokenDummyAddress,
         '3',
-        {from: user1.address}
+        {from: users[1].address}
       )
     })
 
     it('HSTBuyerRegistry - get buyer data - kyc status', async () => {
       _buyerKycStatus = await instances.BuyerRegistry.getBuyerKycStatus(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
     })
 
     it('HSTBuyerRegistry - get buyer data - aml status', async () => {
       _buyerAmlStatus = await instances.BuyerRegistry.getBuyerAmlStatus(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry aml status", _buyerAmlStatus)
     })
 
     it('HSTBuyerRegistry - get buyer data - cft status', async () => {
       _buyerCftStatus = await instances.BuyerRegistry.getBuyerCftStatus(
-        '21',
-        {from: user0.address}
+        '21'//,
+        //{from: user0.address}
       )
       console.log("      HSTBuyerRegistry cft status", _buyerCftStatus)
     })
