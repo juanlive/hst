@@ -1,5 +1,5 @@
 const truffleAssert = require('truffle-assertions')
-const { createIdentity } = require('./utilities')
+const utilities = require('./utilities')
 const common = require('./common.js')
 
 // all contracts
@@ -9,9 +9,6 @@ let users
 // system owner and deployer (same as users[0])
 let owner
 
-let ein0
-let ein1
-let ein2
 
 contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', function (accounts) {
 
@@ -28,18 +25,17 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
 
     it('Snowflake identities created for all accounts', async() => {
       for (let i = 0; i < users.length; i++) {
-        await createIdentity(users[i], instances, {from: owner.address});
+        await utilities.createIdentity(users[i], instances, {from: owner.address});
       }
     })
 
     // Retrieve EINs for all Identities from IdentityRegistry
-
-    it('IdentityRegistry retrieve EIN - owner', async () => {
-      ein0 = await instances.IdentityRegistry.getEIN(
-        users[0].address//,
-        //{from: owner.address}
-      )
-      console.log("      User 0 (system owner) => EIN 0 => value 1", ein0);
+    it('IdentityRegistry retrieve EINs', async () => {
+      for (let i = 0; i < users.length; i++) {
+        _ein = await instances.IdentityRegistry.getEIN(users[i].address);
+        users[i].ein = _ein;
+        console.log("      user("+i+") => EIN "+_ein+" user.id "+users[i].id+" user.ein "+users[i].ein);
+      }
     })
 
     it('IdentityRegistry retrieve EIN - token owner', async () => {

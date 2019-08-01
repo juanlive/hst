@@ -18,7 +18,9 @@ async function createUsers (accounts) {
       address: accounts[0],
       recoveryAddress: accounts[0],
       private: '0x2665671af93f210ddb5d5ffa16c77fcf961d52796f2b2d7afd32cc5d886350a8',
-      id: 1
+      id: 1,
+      identity: 0,
+      ein: 0
     },
     // token owner
     {
@@ -26,7 +28,9 @@ async function createUsers (accounts) {
       address: accounts[1],
       recoveryAddress: accounts[1],
       private: '0x6bf410ff825d07346c110c5836b33ec76e7d1ee051283937392180b732aa3aff',
-      id: 2
+      id: 2,
+      identity: 0,
+      ein: 0
     },
     // kyc service provider
     {
@@ -34,7 +38,9 @@ async function createUsers (accounts) {
       address: accounts[2],
       recoveryAddress: accounts[2],
       private: '0xccc3c84f02b038a5d60d93977ab11eb57005f368b5f62dad29486edeb4566954',
-      id: 3
+      id: 3,
+      identity: 0,
+      ein: 0
     },
     // general users
     {
@@ -42,49 +48,63 @@ async function createUsers (accounts) {
       address: accounts[3],
       recoveryAddress: accounts[3],
       private: '0xfdf12368f9e0735dc01da9db58b1387236120359024024a31e611e82c8853d7f',
-      id: 4
+      id: 4,
+      identity: 0,
+      ein: 0
     },
     {
       hydroID: 'fou',
       address: accounts[4],
       recoveryAddress: accounts[4],
       private: '0x44e02845db8861094c519d72d08acb7435c37c57e64ec5860fb15c5f626cb77c',
-      id: 5
+      id: 5,
+      identity: 0,
+      ein: 0
     },
     {
       hydroID: 'fif',
       address: accounts[5],
       recoveryAddress: accounts[5],
       private: '0x12093c3cd8e0c6ceb7b1b397724cd82c4d84f81263f56a44f11d8bd3a61ffccb',
-      id: 6
+      id: 6,
+      identity: 0,
+      ein: 0
     },
     {
       hydroID: 'six',
       address: accounts[6],
       recoveryAddress: accounts[6],
       private: '0xf65450adda73b32e056ed24246d8d370e49fc88b427f96f37bbf23f6b132b93b',
-      id: 7
+      id: 7,
+      identity: 0,
+      ein: 0
     },
     {
       hydroID: 'sev',
       address: accounts[7],
       recoveryAddress: accounts[7],
       private: '0x34a1f9ed996709f629d712d5b267d23f37be82bf8003a023264f71005f6486e6',
-      id: 8
+      id: 8,
+      identity: 0,
+      ein: 0
     },
     {
       hydroID: 'eig',
       address: accounts[8],
       recoveryAddress: accounts[8],
       private: '0x1711e5c516428d875c14dac234f36bbf3b4622aeac00566483a8087ed5a97297',
-      id: 9
+      id: 9,
+      identity: 0,
+      ein: 0
     },
     {
       hydroID: 'nin',
       address: accounts[9],
       recoveryAddress: accounts[9],
       private: '0xce5e2ea9c47caba88b3421d75023bd8c359e2aaf897e519a10a256d931028ca1',
-      id: 10
+      id: 10,
+      identity: 0,
+      ein: 0
     }
   ]
   return users;
