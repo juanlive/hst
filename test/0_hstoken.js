@@ -1,15 +1,11 @@
-const truffleAssert = require('truffle-assertions')
 const HSToken = artifacts.require('./HSToken.sol')
-const HSTokenRegistry = artifacts.require('./HSTokenRegistry.sol')
-const HSTServiceRegistry = artifacts.require('./components/HSTServiceRegistry.sol')
-const HSTBuyerRegistry = artifacts.require('./components/HSTBuyerRegistry.sol')
-const IdentityRegistry = artifacts.require('./components/IdentityRegistry.sol')
 
+const truffleAssert = require('truffle-assertions')
 const common = require('./common.js')
-const { sign, verifyIdentity, daysOn, daysToSeconds, createIdentity, timeTravel } = require('./utilities')
+const utilities = require('./utilities')
 
 let instances
-let user
+let users
 
 contract('Testing HSToken', function (accounts) {
 
@@ -27,7 +23,7 @@ console.log(users)
 
   it('Snowflake identities created for all accounts', async() => {
     for (let i = 0; i < users.length; i++) {
-      await createIdentity(users[i], instances)
+      await utilities.createIdentity(users[i], instances)
     }
   })
 
@@ -78,10 +74,12 @@ console.log(users)
     it('Set default values to BuyerRegistry', async () => {
       instances.BuyerRegistry.assignTokenValues(
         newToken.address,
-        "16",
-        "10000",
-        "5000",
-        false,
+        '21', // minimum age
+        '50000', // minimum net worth
+        '36000', // minimum salary
+        false, // accredited investor status required
+        false, // aml whitelisting required
+        false, // cft whitelisting required
         {from: users[0].address}
         )
     })
@@ -138,12 +136,11 @@ console.log(users)
     it('HSToken set MAIN_PARAMS', async () => {
       await newToken.set_MAIN_PARAMS(
         web3.utils.toWei("0.1"), // hydroPrice: 1 ether = same price
-        web3.utils.toWei("0.001"), // ethPrice
-        daysOn(15), // beginningDate
-        daysOn(20), // lockEnds
-        daysOn(24), // endDate
+        utilities.daysOn(15), // beginningDate
+        utilities.daysOn(20), // lockEnds
+        utilities.daysOn(24), // endDate
         web3.utils.toWei("20000000"), // _maxSupply
-        daysOn(18), // _escrowLimitPeriod
+        utilities.daysOn(18), // _escrowLimitPeriod
         { from: users[0].address }
         )
     })
@@ -155,14 +152,9 @@ console.log(users)
           false, // _PERIOD_LOCKED,
           true, // _PERC_OWNERSHIP_TYPE,
           true, // _HYDRO_AMOUNT_TYPE,
-          true, // _ETH_AMOUNT_TYPE,
           true, // _HYDRO_ALLOWED,
-          true, // _ETH_ALLOWED,
-          true, // _KYC_WHITELIST_RESTRICTED, 
-          true, // _AML_WHITELIST_RESTRICTED
           true, // WHITELIST_RESTRICTED
           true, // BLACKLIST_RESTRICTED
-          false, // ETH_ORACLE
           false, // HYDRO_ORACLE
         { from: users[0].address }
         )
@@ -173,11 +165,9 @@ console.log(users)
       await newToken.set_STO_PARAMS(
           web3.utils.toWei("0.2"), // _percAllowedTokens: 1 ether = 100%, 0.2 ether = 20%
           web3.utils.toWei("1000"), // _hydroAllowed,
-          web3.utils.toWei("1000"), // _ethAllowed,
-          daysToSeconds(12).toString(), // _lockPeriod,
+          utilities.daysToSeconds(12).toString(), // _lockPeriod,
           "1", // _minInvestors,
           "4", // _maxInvestors
-          users[0].address, // ethOracle
           users[0].address, // hydroOracle
         { from: users[0].address }
         )
@@ -285,7 +275,7 @@ console.log(users)
         periods.push(now + i * 200)
       }
 
-      await timeTravel(200)
+      await utilities.timeTravel(200)
 
       var tx = await newToken.addPaymentPeriodBoundaries(
           periods,
@@ -379,7 +369,7 @@ console.log(users)
     })
 
     it('Go to next period', async() => {
-      await timeTravel(200)
+      await utilities.timeTravel(200)
       period = await newToken._getPeriod(
         { from: users[0].address });
       console.log("Current Period:", period.toNumber())
@@ -408,7 +398,7 @@ console.log(users)
         { from: users[0].address });
       console.log("Current Period:", period.toNumber())
 
-      await timeTravel(400)
+      await utilities.timeTravel(400)
 
       period = await newToken._getPeriod(
         { from: users[0].address });
@@ -438,7 +428,7 @@ console.log(users)
     })
 
     it('Advancing new period', async () => {
-      await timeTravel(200)
+      await utilities.timeTravel(200)
 
       period = await newToken._getPeriod(
         { from: users[0].address });
