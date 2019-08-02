@@ -240,7 +240,7 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
     it('HSTBuyerRegistry - assign token values', async () => {
       await instances.BuyerRegistry.assignTokenValues(
         tokenDummyAddress,
-        '21', // mininum age
+        '21', // minimum age
         '50000', // minimum net worth
         '36000', // minimum salary
         true, // accredited investor status required

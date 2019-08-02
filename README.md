@@ -1,4 +1,6 @@
-HST - Hydro Security Tokens
+<h1>HST - Hydro Security Tokens</h1>
+
+<h3>Description</h3>
 
 This is a set of Ethereum Smart Contracts which work on top of Hydro Snowflake. They allow a validated Snowflake address to create standardized Security Tokens that can be issued, bought and sold, validated, transferred, paid as dividends, and destroyed.
 
@@ -8,7 +10,7 @@ Architecture draft:
   <img src="https://github.com/juanlive/hst/blob/master/images/HST%20Securities%20Architecture.png" width="500">
 </p>
 
-To run tests:
+<h3>To run tests:</h3>
 
 1. Run the following:
 npm install
@@ -23,7 +25,7 @@ npm run chain
 npm run test
 
 
-Features (some are yet work-in-progress):
+<h3/>Features (some are yet work-in-progress):<h3/>
 
     Create Security Token - unique IDs are attributed to each token, called a Hydro Security Token or HST
 
@@ -60,7 +62,7 @@ Features (some are yet work-in-progress):
     Dividend Payout - payout dividend from admin pro-rata to Snowflake wallet holders in HYDRO
     
 
-HSTOken - General Description and Usage
+<h3>HSTOken - General Description and Usage<h3/>
 
 Constructor
 
@@ -122,4 +124,77 @@ token will be in stage = FINALIZED
 Once issuing has finalized, the HSToken will be able to be transacted as normal tokens.
 
 * The dApp responsible of generating the HSTokens could opt to require all parameters at a time and make all the calls at a time. The system is designed for the dApp to be able to allow users to create their token first, without much to consider, and then give them 15 days to think about all the details. The token will be reserved in the blockhain for 15 days. If it has not been configured after that time, the token will be considered non existent.
+
+
+<h3>Granting a user the OK to buy a Token - Javascript Example</h3>
+
+We use a  group of pre-loaded contracts which we stored in the “instances” object array.
+Also note that most steps are done by user number 1 (the token owner) but changing the user KYC status must be done by user number 2 (the service provider).
+To allow a buyer to buy a Hydro Security Token, you need to follow this 6-steps recipe.
+
+
+Appoint the Token to the Token Registry
+
+await instances.TokenRegistry.appointToken(
+        tokenDummyAddress,
+        web3.utils.fromAscii('TEST'),
+        web3.utils.fromAscii('TestToken'),
+        'just-a-test',
+        10,
+        {from: users[1].address}
+)
+
+Assign Token buyer values in the Buyer Registry
+
+await instances.BuyerRegistry.assignTokenValues(
+        tokenDummyAddress,
+        '21', // minimum age
+        '50000', // minimum net worth
+        '36000', // minimum salary
+        true, // accredited investor status required
+        {from: user[1].address}
+  )
+
+
+Add the Buyer to the Buyer Registry
+
+await instances.BuyerRegistry.addBuyer(
+        '21', // EIN
+        'Test first name 1',
+        'Test last name 1',
+        web3.utils.fromAscii('GMB'),
+        '1984', // year of birth
+        '12', // month of birth
+        '12', // day of birth
+        '100000', // net worth
+        '50000', // salary
+        {from: users[1].address}
+  )
+
+Add a KYC Service to the Service Registry
+  
+await instances.ServiceRegistry.addService(
+        newToken.address,
+        '3',
+        web3.utils.fromAscii("KYC"),
+        {from: users[1].address}
+    )
+
+
+Assign a KYC Service to the Buyer in the Buyer Registry
+  
+await instances.BuyerRegistry.addKycServiceToBuyer(
+        '1',
+        newToken.address,
+        '3',
+        {from: users[1].address}
+  )
+
+Set KYC Status for the Buyer in the Buyer Registry
+
+await instances.BuyerRegistry.setBuyerKycStatus(
+            '21',
+        true,
+            {from: users[2].address}
+      )
 
