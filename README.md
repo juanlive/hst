@@ -24,6 +24,8 @@ npm run chain
 4. Then in another console window, run this:
 npm run test
 
+You can find an example test run in the file test.txt
+
 
 <h3>Features (some are yet work-in-progress):</h3>
 
