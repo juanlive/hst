@@ -133,7 +133,7 @@ Also note that most steps are done by user number 1 (the token owner) but changi
 To allow a buyer to buy a Hydro Security Token, you need to follow this 6-steps recipe.
 
 
-Appoint the Token to the Token Registry
+1. Appoint the Token to the Token Registry
 
 <pre><code>
 await instances.TokenRegistry.appointToken(
@@ -146,8 +146,9 @@ await instances.TokenRegistry.appointToken(
 )
 </code></pre>
 
-Assign Token buyer values in the Buyer Registry
+2. Assign Token buyer values in the Buyer Registry
 
+<pre><code>
 await instances.BuyerRegistry.assignTokenValues(
         tokenDummyAddress,
         '21', // minimum age
@@ -156,10 +157,11 @@ await instances.BuyerRegistry.assignTokenValues(
         true, // accredited investor status required
         {from: user[1].address}
   )
+</code></pre>
 
+3. Add the Buyer to the Buyer Registry
 
-Add the Buyer to the Buyer Registry
-
+<pre><code>
 await instances.BuyerRegistry.addBuyer(
         '21', // EIN
         'Test first name 1',
@@ -172,31 +174,36 @@ await instances.BuyerRegistry.addBuyer(
         '50000', // salary
         {from: users[1].address}
   )
+</code></pre>
 
-Add a KYC Service to the Service Registry
-  
+4. Add a KYC Service to the Service Registry
+
+<pre><code>
 await instances.ServiceRegistry.addService(
         newToken.address,
         '3',
         web3.utils.fromAscii("KYC"),
         {from: users[1].address}
     )
+</code></pre>
 
+5. Assign a KYC Service to the Buyer in the Buyer Registry
 
-Assign a KYC Service to the Buyer in the Buyer Registry
-  
+<pre><code>
 await instances.BuyerRegistry.addKycServiceToBuyer(
         '1',
         newToken.address,
         '3',
         {from: users[1].address}
   )
+</code></pre>
 
-Set KYC Status for the Buyer in the Buyer Registry
+6. Set KYC Status for the Buyer in the Buyer Registry
 
+<pre><code>
 await instances.BuyerRegistry.setBuyerKycStatus(
             '21',
         true,
             {from: users[2].address}
       )
-
+</code></pre>
