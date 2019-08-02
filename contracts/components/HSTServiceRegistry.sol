@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import '../HSToken.sol';
+//import '../HSToken.sol';
 import './SnowflakeOwnable.sol';
 import './HSTokenRegistry.sol';
 import '../_testing/IdentityRegistry.sol';
@@ -27,7 +27,7 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   IdentityRegistry identityRegistry;
   address tokenRegistryAddress;
   HSTokenRegistry tokenRegistry;
-  HSToken token;
+  //HSToken token;
   uint tokenEINOwner;
 
   // token address => service category symbol => category description
