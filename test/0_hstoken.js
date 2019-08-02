@@ -118,32 +118,6 @@ contract('Testing HSToken', function (accounts) {
       userId = await newToken.isTokenAlive();
     })
 
-/*    it('HSTokenRegistry set addresses', async () => {
-      console.log('      Service Registry Address', instances.ServiceRegistry.address)
-      await instances.TokenRegistry.setAddresses(
-        instances.IdentityRegistry.address,
-        instances.ServiceRegistry.address,
-        {from: users[0].address}
-      )
-    })
-
-    it('HSTBuyerRegistry set registries addresses', async () => {
-      await instances.BuyerRegistry.setAddresses(
-        instances.IdentityRegistry.address,
-        instances.TokenRegistry.address,
-        instances.ServiceRegistry.address,
-        {from: users[0].address}
-      )
-    })
-
-    it('HSTServiceRegistry set registries addresses', async () => {
-      await instances.ServiceRegistry.setAddresses(
-        instances.IdentityRegistry.address,
-        instances.TokenRegistry.address,
-        {from: users[0].address}
-      )
-    })*/
-
     it('Appoint token', async () => {
       await instances.TokenRegistry.appointToken(
         newToken.address,

@@ -405,6 +405,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
         require(STO_PARAMS_ready, "STO_PARAMS not setted");
+        require(EXT_PARAMS_ready, "EXT_PARAMS not setted"); // Parameters required for payment modules
 
         if (beginningDate == 0) beginningDate = now;
         stage = Stage.PRELAUNCH;
@@ -619,8 +620,20 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         return IdentityRegistry.getEIN(_address);
     }
 
+    function _getStage() private view returns(uint256) {
+    	return uint(stage);
+    }
+
+    function _getTokenOwner() private view returns(uint256) {
+    	return einOwner;
+    }
+
     function _transferHydroToken(address _address, uint256 _payment) private returns(bool) {
         return HydroToken.transfer(_address, _payment);
+    }
+
+    function _hydroTokensBalance() private returns(uint256) {
+    	return HydroToken.balanceOf(address(this));
     }
 
 
