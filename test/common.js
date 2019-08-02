@@ -17,7 +17,7 @@ async function createUsers (accounts) {
       hydroID: 'own',
       address: accounts[0],
       recoveryAddress: accounts[0],
-      private: '0x2665671af93f210ddb5d5ffa16c77fcf961d52796f2b2d7afd32cc5d886350a8',
+      private: '0xae3e306946509ed8b16ef2164537c8ab00338eaf2790a342af41c32f4f8897c6',
       id: 1,
       identity: 0,
       ein: 0
@@ -27,7 +27,7 @@ async function createUsers (accounts) {
       hydroID: 'fir',
       address: accounts[1],
       recoveryAddress: accounts[1],
-      private: '0x6bf410ff825d07346c110c5836b33ec76e7d1ee051283937392180b732aa3aff',
+      private: '0x8ea994d52a042bce97741bab4bd7ac669b985c49459139837df04cdf481fe290',
       id: 2,
       identity: 0,
       ein: 0
@@ -37,7 +37,7 @@ async function createUsers (accounts) {
       hydroID: 'sec',
       address: accounts[2],
       recoveryAddress: accounts[2],
-      private: '0xccc3c84f02b038a5d60d93977ab11eb57005f368b5f62dad29486edeb4566954',
+      private: '0xe2d20428b94388902bacbba3e3a3e69d9024e45a8d4fa8f5e9b1348cfb953c3c',
       id: 3,
       identity: 0,
       ein: 0
@@ -47,7 +47,7 @@ async function createUsers (accounts) {
       hydroID: 'thi',
       address: accounts[3],
       recoveryAddress: accounts[3],
-      private: '0xfdf12368f9e0735dc01da9db58b1387236120359024024a31e611e82c8853d7f',
+      private: '0x76b9be39e7cc525ee53b91b1aaa5b3e284eb2d6994a190fdf7a30b87bf6e56d6',
       id: 4,
       identity: 0,
       ein: 0
@@ -56,7 +56,7 @@ async function createUsers (accounts) {
       hydroID: 'fou',
       address: accounts[4],
       recoveryAddress: accounts[4],
-      private: '0x44e02845db8861094c519d72d08acb7435c37c57e64ec5860fb15c5f626cb77c',
+      private: '0x4a6ee7599b26cd6b39c2ea2c2de126ce8eee088090d62265889884387ccf2ea2',
       id: 5,
       identity: 0,
       ein: 0
@@ -65,7 +65,7 @@ async function createUsers (accounts) {
       hydroID: 'fif',
       address: accounts[5],
       recoveryAddress: accounts[5],
-      private: '0x12093c3cd8e0c6ceb7b1b397724cd82c4d84f81263f56a44f11d8bd3a61ffccb',
+      private: '0x9e4ab61a4b29cc679981efb4748c6ec2de17200a62fb1d882e4b1ac4ecca6a93',
       id: 6,
       identity: 0,
       ein: 0
@@ -74,7 +74,7 @@ async function createUsers (accounts) {
       hydroID: 'six',
       address: accounts[6],
       recoveryAddress: accounts[6],
-      private: '0xf65450adda73b32e056ed24246d8d370e49fc88b427f96f37bbf23f6b132b93b',
+      private: '0x7f6f7ca60c9db88f09aacfe371f46de7b5c094cba1dc8f9e763276b980ebff90',
       id: 7,
       identity: 0,
       ein: 0
@@ -83,7 +83,7 @@ async function createUsers (accounts) {
       hydroID: 'sev',
       address: accounts[7],
       recoveryAddress: accounts[7],
-      private: '0x34a1f9ed996709f629d712d5b267d23f37be82bf8003a023264f71005f6486e6',
+      private: '0x4e327aab54f780303a93ac02bad4002172a8d9f3a8d51a422cbff2db92da9908',
       id: 8,
       identity: 0,
       ein: 0
@@ -92,7 +92,7 @@ async function createUsers (accounts) {
       hydroID: 'eig',
       address: accounts[8],
       recoveryAddress: accounts[8],
-      private: '0x1711e5c516428d875c14dac234f36bbf3b4622aeac00566483a8087ed5a97297',
+      private: '0x353a17890673fe618532977eda16f6f3caf2cf67bb678c6fa39c03c64abcc2e8',
       id: 9,
       identity: 0,
       ein: 0
@@ -101,7 +101,7 @@ async function createUsers (accounts) {
       hydroID: 'nin',
       address: accounts[9],
       recoveryAddress: accounts[9],
-      private: '0xce5e2ea9c47caba88b3421d75023bd8c359e2aaf897e519a10a256d931028ca1',
+      private: '0xe68a092b21338e8dc378c322a2cc0bc3fbb9ddc5a50781018825430a7b60e413',
       id: 10,
       identity: 0,
       ein: 0

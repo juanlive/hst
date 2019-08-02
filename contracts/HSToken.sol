@@ -56,7 +56,6 @@ contract MAIN_PARAMS {
     bool public MAIN_PARAMS_ready;
 
     uint256 public hydroPrice;
-    uint256 public ethPrice;
     uint256 public beginningDate;
     uint256 public lockEnds; // Date of end of locking period
     uint256 public endDate;
@@ -71,14 +70,9 @@ contract STO_FLAGS {
     bool public PERIOD_LOCKED;  // Locked period active or inactive
     bool public PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
     bool public HYDRO_AMOUNT_TYPE; // is Hydro amount limited
-    bool public ETH_AMOUNT_TYPE; // is Ether amount limited
     bool public HYDRO_ALLOWED; // Is Hydro allowed to purchase
-    bool public ETH_ALLOWED; // Is Ether allowed for purchase
-    bool public KYC_RESTRICTED;
-    bool public AML_RESTRICTED;
     bool public WHITELIST_RESTRICTED;
     bool public BLACKLIST_RESTRICTED;
-    bool public ETH_ORACLE;
     bool public HYDRO_ORACLE;
 }
 
@@ -87,11 +81,9 @@ contract STO_PARAMS {
     // @param percAllowedTokens: 100% = 1 ether, 50% = 0.5 ether
     uint256 public percAllowedTokens; // considered if PERC_OWNERSHIP_TYPE
     uint256 public hydroAllowed; // considered if HYDRO_AMOUNT_TYPE
-    uint256 public ethAllowed; // considered if ETH_AMOUNT_TYPE
     uint256 public lockPeriod; // in days
     uint256 public minInvestors;
     uint256 public maxInvestors;
-    address public ethOracle;
     address public hydroOracle;
 }
 
@@ -115,13 +107,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         uint quantity; // Current quantity of tokens in a batch.
         uint age; // Creation of the batch (timestamp)
     }
-
-// This is already declared in SharesPaymentSystem
-//    struct Investor {
-//        bool exists;
-//        uint256 hydroSent;
-//        uint256 lastPeriodPayed;
-//    }
 
     // Basic states
     bool public exists; // Flag to deactivate it
@@ -169,16 +154,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     mapping(address => uint256) public balance;
     // mapping(uint256 => mapping(address => uint256)) public balanceAt; // It is at the payment module
 
-    // Escrow contract's address => security number
-    // mapping(address => uint256) public escrowContracts;
-    // address[] public escrowContractsArray;
-
     // Declaring interfaces
     IdentityRegistryInterface public IdentityRegistry;
     HydroInterface public HydroToken;
     HSTBuyerRegistry public BuyerRegistry;
-    // SnowflakeViaInterface public snowflakeVia;
-    // TokenWithDates private tokenWithDates;
 
     event HydroSTCreated(
         uint256 indexed id,
@@ -299,7 +278,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     function set_MAIN_PARAMS(
         uint256 _hydroPrice,
-        uint256 _ethPrice,
         uint256 _beginningDate,
         uint256 _lockEnds,
         uint256 _endDate,
@@ -310,7 +288,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     {
         // Validations
         require(
-            (_hydroPrice > 0 || _ethPrice > 0) &&
+            _hydroPrice > 0 &&
             (_beginningDate == 0 || _beginningDate > now) &&
             (_lockEnds > _beginningDate && _lockEnds > now) &&
             _endDate > _lockEnds &&
@@ -321,7 +299,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         require(!MAIN_PARAMS_ready, "Params already setted");
         // Load values
         hydroPrice = _hydroPrice;
-        ethPrice = _ethPrice;
         beginningDate = _beginningDate;
         lockEnds = _lockEnds; // Date of end of locking period
         endDate = _endDate;
@@ -329,23 +306,16 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         escrowLimitPeriod = _escrowLimitPeriod;
         // Set flag
         MAIN_PARAMS_ready = true;
-
     }
-
 
     function set_STO_FLAGS(
         bool _LIMITED_OWNERSHIP,
         bool _PERIOD_LOCKED,
         bool _PERC_OWNERSHIP_TYPE,
         bool _HYDRO_AMOUNT_TYPE,
-        bool _ETH_AMOUNT_TYPE,
         bool _HYDRO_ALLOWED,
-        bool _ETH_ALLOWED,
-        bool _KYC_RESTRICTED,
-        bool _AML_RESTRICTED,
         bool _WHITELIST_RESTRICTED,
         bool _BLACKLIST_RESTRICTED,
-        bool _ETH_ORACLE,
         bool _HYDRO_ORACLE
     )
         public onlyAdmin onlyAtSetup
@@ -356,14 +326,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         PERIOD_LOCKED = _PERIOD_LOCKED;
         PERC_OWNERSHIP_TYPE = _PERC_OWNERSHIP_TYPE;
         HYDRO_AMOUNT_TYPE = _HYDRO_AMOUNT_TYPE;
-        ETH_AMOUNT_TYPE = _ETH_AMOUNT_TYPE;
         HYDRO_ALLOWED = _HYDRO_ALLOWED;
-        ETH_ALLOWED = _ETH_ALLOWED;
-        KYC_RESTRICTED = _KYC_RESTRICTED;
-        AML_RESTRICTED = _AML_RESTRICTED;
         WHITELIST_RESTRICTED = _WHITELIST_RESTRICTED;
         BLACKLIST_RESTRICTED = _BLACKLIST_RESTRICTED;
-        ETH_ORACLE = _ETH_ORACLE;
         HYDRO_ORACLE = _HYDRO_ORACLE;
         // Set flag
         STO_FLAGS_ready = true;
@@ -372,11 +337,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     function set_STO_PARAMS(
         uint256 _percAllowedTokens,
         uint256 _hydroAllowed,
-        uint256 _ethAllowed,
         uint256 _lockPeriod,
         uint256 _minInvestors,
         uint256 _maxInvestors,
-        address _ethOracle,
         address _hydroOracle
     )
         public onlyAdmin onlyAtSetup
@@ -386,11 +349,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         // Load values
         percAllowedTokens = _percAllowedTokens;
         hydroAllowed = _hydroAllowed;
-        ethAllowed = _ethAllowed;
         lockPeriod = _lockPeriod;
         minInvestors = _minInvestors;
         maxInvestors = _maxInvestors;
-        ethOracle = _ethOracle;
         hydroOracle = _hydroOracle;
         // Set flag
         STO_PARAMS_ready = true;
@@ -536,11 +497,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     // Only at Prelaunch functions:
 
-    // Setting oracles
-
-    function addEthOracle(address _newAddress) public onlyAdmin {
-    	ethOracle = _newAddress;
-    }
+    // Setting oracle address
 
     function addHydroOracle(address _newAddress) public onlyAdmin {
     	hydroOracle = _newAddress;
@@ -548,7 +505,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     // Release gains. Only after escrow is released
 
-    // Retrieve tokens and ethers
+    // Retrieve tokens
     function releaseHydroTokens() public onlyAdmin escrowReleased {
         uint256 thisBalance = HydroToken.balanceOf(address(this));
         require(thisBalance > 0, "There are not HydroTokens in this account");
