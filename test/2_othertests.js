@@ -244,6 +244,8 @@ contract('Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry', fun
         '50000', // minimum net worth
         '36000', // minimum salary
         true, // accredited investor status required
+        false, // aml whitelisting required
+        false, // cft whitelisting required
         {from: users[1].address}
       )
     })
