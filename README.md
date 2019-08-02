@@ -135,6 +135,7 @@ To allow a buyer to buy a Hydro Security Token, you need to follow this 6-steps 
 
 Appoint the Token to the Token Registry
 
+<code>
 await instances.TokenRegistry.appointToken(
         tokenDummyAddress,
         web3.utils.fromAscii('TEST'),
@@ -143,6 +144,7 @@ await instances.TokenRegistry.appointToken(
         10,
         {from: users[1].address}
 )
+</code>
 
 Assign Token buyer values in the Buyer Registry
 
