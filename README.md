@@ -235,6 +235,60 @@ Once issuing has finalized, the HSToken will be able to be transacted as normal 
 
 * The dApp responsible of generating the HSTokens could opt to require all parameters at a time and make all the calls at a time. The system is designed for the dApp to be able to allow users to create their token first, without much to consider, and then give them 15 days to think about all the details. The token will be reserved in the blockhain for 15 days. If it has not been configured after that time, the token will be considered non existent.
 
+There can be restrictions of amount per investor, total amount of tokens, quantity of investors, or new rules that can be added in the future.
+
+
+
+    Token issuing closes
+
+Issuing will end once endDate parameter has been reached. When that occurs, token will change to stage = FINALIZED
+
+Once issuing has finalized, the HSToken will be able to be transacted as ERC20 tokens, except that they should follow additional rules, as to be approved by external KYC or AML resolvers, and fulfill any other rules. They can also track the date of each portion of tokens sent in any transaction, if that can influentiate its value according to some pre-configured rule.
+
+    Token oraclizing
+
+An Oracle can be assigned to the token, and it should call the following function to update the price of the token in Ethers:
+
+updateEthPrice(uint)
+
+Oracles can be assigned, replaced or revoked (by assigning a passive address) by the owner/issuer of the token, at any time, calling the function:
+
+addEthOracle(address)
+
+
+
+    Other administrative functions
+
+setLockUpPeriod(uint _lockEnds)
+
+Locks the token for a period of time. Date of unlock expressed in unix timestamp.
+
+lock() / unLock()
+
+Lock/unlocks the token.
+
+freeze(uint[]) / unfreeze(uint[])
+
+Freezes/unfreezes bulk or individual EIN identities for using the token.
+
+releaseHydroTokens()
+
+Release HydroTokens held in escrow to the owner/issuer.
+
+    Public Getters
+
+getTokenEINOwner()
+
+isLocked()
+
+isAlive()
+
+getStage()
+
+isSetupTime()
+
+isPrelaunchTime( )
+
 
 <h3>Granting a user the OK to buy a Token - Javascript Example</h3>
 
