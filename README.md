@@ -62,7 +62,7 @@ npm run test
     Dividend Payout - payout dividend from admin pro-rata to Snowflake wallet holders in HYDRO
     
 
-<h3>HSTOken - General Description and Usage<h3/>
+<h3>HSTOken - General Description and Usage</h3>
 
 Constructor
 
