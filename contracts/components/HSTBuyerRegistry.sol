@@ -232,12 +232,16 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         uint _minimumAge,
         uint64 _minimumNetWorth,
         uint32 _minimumSalary,
-        bool _accreditedInvestorStatusRequired)
+        bool _accreditedInvestorStatusRequired,
+        bool _amlWhitelistingRequired,
+        bool _cftWhitelistingRequired)
     public {
         tokenData[_tokenAddress].minimumAge = _minimumAge;
         tokenData[_tokenAddress].minimumNetWorth = _minimumNetWorth;
         tokenData[_tokenAddress].minimumSalary = _minimumSalary;
         tokenData[_tokenAddress].accreditedInvestorStatusRequired = _accreditedInvestorStatusRequired;
+        tokenData[_tokenAddress].amlWhitelistingRequired = _amlWhitelistingRequired;
+        tokenData[_tokenAddress].cftWhitelistingRequired = _cftWhitelistingRequired;
         emit TokenValuesAssigned(_tokenAddress);
     }
 

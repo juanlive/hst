@@ -1,16 +1,18 @@
-<h1>HST - Hydro Security Tokens</h1>
+<h1>HST - Hydro Security Tokens Generator and Manager</h1>
 
 <h3>Description</h3>
 
 This is a set of Ethereum Smart Contracts which work on top of Hydro Snowflake. They allow a validated Snowflake address to create standardized Security Tokens that can be issued, bought and sold, validated, transferred, paid as dividends, and destroyed.
 
-Architecture draft:
+
+
+<h3>Architecture draft</h3>
 
 <p>
   <img src="https://github.com/juanlive/hst/blob/master/images/HST%20Securities%20Architecture.png" width="500">
 </p>
 
-<h3>To run tests:</h3>
+<h3>To run tests</h3>
 
 1. Run the following:
 npm install
@@ -27,7 +29,7 @@ npm run test
 You can find an example test run in the file test.txt
 
 
-<h3>Features (some are yet work-in-progress):</h3>
+<h3>Features (some are yet work-in-progress)</h3>
 
     Create Security Token - unique IDs are attributed to each token, called a Hydro Security Token or HST
 
