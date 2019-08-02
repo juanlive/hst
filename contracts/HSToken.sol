@@ -589,7 +589,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         return HydroToken.transfer(_address, _payment);
     }
 
-    function _hydroTokensBalance() private returns(uint256) {
+    function _hydroTokensBalance() private view returns(uint256) {
     	return HydroToken.balanceOf(address(this));
     }
 

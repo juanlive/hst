@@ -4,7 +4,7 @@ import '../interfaces/HydroInterface.sol';
 import '../zeppelin/math/SafeMath.sol';
 
 
-contract SharesPaymentSystem {
+contract InvestmentFundSystem {
 
     using SafeMath for uint256;
 
