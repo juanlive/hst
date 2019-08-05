@@ -41,1158 +41,320 @@ Compiling your contracts...
 > Compiling ./contracts/samples/KYCResolver.sol
 > Compiling ./contracts/zeppelin/math/SafeMath.sol
 > Compiling ./contracts/zeppelin/ownership/Ownable.sol
-> Artifacts written to /tmp/test-11975-14889-huj4jd.thy5
+> Artifacts written to /tmp/test-11975-15338-gu882r.ly98r
 > Compiled successfully using:
    - solc: 0.5.4+commit.9549d8ff.Emscripten.clang
 
-SafeMath: 0x74d2a4e5a5C9a786D08ecc0Cb440e5eC7D01F2D4
-HydroToken: 0x3B469DaDee32d6A2BEDBf1536deC52618F6cDAdB
+SafeMath: 0xE225EED8c83B5D800C1C6Cf58eC1A62dF864fe3C
+HydroToken: 0x12e7B80e83de597Fb1d89b6DE991877E103b2Cac
 Network: development
-DEV 0x3B469DaDee32d6A2BEDBf1536deC52618F6cDAdB 0xC55A228A04Ac091e7BFDA6d680241D440dBE0510
+DEV 0x12e7B80e83de597Fb1d89b6DE991877E103b2Cac 0xa3c3508DBEF3B80a220340c2869a4514a1AFb43A
 undefined
 
 [0m[0m
 [0m  Contract: Testing HSToken[0m
   [32m  ✓[0m[90m Users created[0m
-    common - Date Time 0x08e1793c8c4FB5bca0eCC82B85cefD44813b9896
-    common - Hydro Token 0x4DFf40080198738C773030c44b048FB4465e86Bf
-    common - Identity Registry 0x4b4614B83B1FAbFd1FFE68c1E626C318B4b43669
-    common - Snowflake 0xF077Acb349B70822aB7E6eF2fb6d2eE365663Cc1
-    common - Old Client Raindrop 0xB38D9C93792437787B2455B7ee4e496960d14803
-    common - Client Raindrop 0x2d7AA37123596433831c563Dba27E3De1A6893e8
-    common - KYC Resolver 0x7d53dC02E104DB6A9703DC9771b17881ec7fE8b6
-    common - Buyer Registry 0x94e3038d31A069c4DDdF812BdAdbcc0885D5B247
-    common - Token Registry 0xea69B4Fe6d86FFcd047F71eC4c2aEfA3f4f20F3F
-    common - Service Registry 0x4C014c10195a94E50cB08348a44f1Db39f181a68
-  [31m  1) common contracts deployed[0m
-
-    Events emitted during test:
-    ---------------------------
-
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x35B3635fAa18029924F19a008fF32e92140a7250 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xDC9e6124c9F6BFA1a921Ab1F2182492D08932646 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xB81dFcee1cB8C7a180C9982eDE8305BC884A63B4 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x9714932A0356B1181f6F4A5E9f9dF305844f8598 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x24dA42761760033fb2e2C2Eb6c0b28166ebC193f (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xf75121739b2bE9CC52a277E46f8CB26b2e6A9Df9 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xE806952b40f5354ccC5bbE00133DB0aeAd72b256 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xbb027dB57997B0E8F6803DBeb7091E07C75Caa65 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x38edfC696cc9886CA8124AC3e340D47e18b93eAF (address), _amount: 1000000000000000000000 (uint256))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-
-    ---------------------------
-  [31m  2) Snowflake identities created for all accounts[0m
-    > No events were emitted
+    common - Date Time 0x70e7a4b70c60EE932Df26dB1AB03CAd19a9d92a1
+    common - Hydro Token 0x0a77af46B84f8600289b484C130093Fa6e8A7EB4
+    common - Identity Registry 0x5499722A878F40feE8228e2BFf2dDd04E42bfc8d
+    common - Snowflake 0x70e511d1FC42C719B8525e93C2F8216B0Ca24640
+    common - Old Client Raindrop 0xCCed8BfA7a6C974591a6134b9991B154c892948E
+    common - Client Raindrop 0x1A26617525F0B03D9165Fd547E82ffebFE38888f
+    common - KYC Resolver 0x5A867b8A02ae112337cb3F35ADE0F5A4aA3aF24E
+    common - Buyer Registry 0x42FbADecCd2b7189280f32AD079600d03324caf9
+    common - Token Registry 0xf1A909B20947125c37cB54e44dd81E39c6527DF0
+    common - Service Registry 0x51AEC82ec2b6b41ac1a9beE7fe9AA4e4c3F3F8e2
+    common - finishing and returning instances
+  [32m  ✓[0m[90m common contracts deployed[0m[31m (1439ms)[0m
+  [32m  ✓[0m[90m Snowflake identities created for all accounts[0m[31m (2762ms)[0m
 [0m    Checking HSToken functionality[0m
-    [31m  3) HSToken can be created[0m
-    > No events were emitted
-    [31m  4) HSToken exists[0m
-    > No events were emitted
-    [31m  5) Appoint token[0m
-    > No events were emitted
-    [31m  6) Set default values to BuyerRegistry[0m
-    > No events were emitted
-    [31m  7) HSTBuyerRegistry - add buyer 1[0m
-    > No events were emitted
-    [31m  8) HSTBuyerRegistry - add buyer 2[0m
-    > No events were emitted
-    [31m  9) HSTServiceRegistry - add service[0m
-    > No events were emitted
-    [31m  10) HSTBuyerRegistry - add kyc for buyer 1[0m
-    > No events were emitted
-    [31m  11) HSToken set MAIN_PARAMS[0m
-    > No events were emitted
-    [31m  12) HSToken set STO_FLAGS[0m
-    > No events were emitted
-    [31m  13) HSToken set STO_PARAMS[0m
-    > No events were emitted
-    [31m  14) HSToken activate Prelaunch[0m
-    > No events were emitted
-    [31m  15) HSToken activate Presale[0m
-    > No events were emitted
-    [31m  16) HSToken activate Sale[0m
-    > No events were emitted
-    [31m  17) HSToken activate Lock[0m
-    > No events were emitted
-    [31m  18) HSToken activate Market[0m
-    > No events were emitted
-    [31m  19) HSToken adds EIN 1 to whitelist[0m
-    > No events were emitted
-    [31m  20) HydroToken user 1 approves 1M HydroTokens for HSToken[0m
-    > No events were emitted
-    [31m  21) HSTBuyerRegistry - get buyer data - kyc status: false[0m
-    > No events were emitted
-    [31m  22) HSToken Reverts buy for EIN user 1[0m
-    > No events were emitted
-    [31m  23) Set buyer status true for user 1[0m
-    > No events were emitted
-    [31m  24) HSTBuyerRegistry - get buyer data - kyc status: true[0m
-    > No events were emitted
-    [31m  25) HSToken buyTokens from EIN user 1[0m
-    > No events were emitted
-    [31m  26) HSToken buyTokens again from EIN user 1[0m
-    > No events were emitted
-    [31m  27) Store periods[0m
-    > No events were emitted
-    [31m  28) Read periods[0m
-    > No events were emitted
-    [31m  29) HSToken reverts transfer 1.2 HSTokens to Account 2[0m
-    > No events were emitted
-    [31m  30) Set buyer status true for user 2[0m
-    > No events were emitted
-    [31m  31) HSToken transfer 1.2 HSTokens to Account 2[0m
-    > No events were emitted
-    [31m  32) Setting oracle address[0m
-    > No events were emitted
-    [31m  33) Oracle notifies results of 5 Hydros for this period[0m
-    > No events were emitted
-    [31m  34) User claims payment 1[0m
-    > No events were emitted
-    [31m  35) Go to next period[0m
-    > No events were emitted
-    [31m  36) Oracle notifies results of 4 Hydros for this period[0m
-    > No events were emitted
-    [31m  37) User claims payment 1[0m
-    > No events were emitted
-    [31m  38) Advancing periods[0m
-    > No events were emitted
-    [31m  39) KYCResolver approve again EIN identity 2[0m
-    > No events were emitted
-    [31m  40) HSToken transfer 0.8 HSTokens to Account 2, to decrease his participationRate at period 4[0m
-    > No events were emitted
-    [31m  41) Advancing new period[0m
-    > No events were emitted
-    [31m  42) Oracle notifies results of 5 Hydros for this period[0m
-    > No events were emitted
-    [31m  43) User claims payment 1 but there is nothing, once[0m
-    > No events were emitted
-    [31m  44) User claims payment 1 but there is nothing twice[0m
-    > No events were emitted
-    [31m  45) User claims payment 1 and now it works[0m
-    > No events were emitted
-
-[0m  Contract: Testing SnowflakeOwnable[0m
-  [32m  ✓[0m[90m Users created[0m
-    common - Date Time 0x08e1793c8c4FB5bca0eCC82B85cefD44813b9896
-    common - Hydro Token 0x4DFf40080198738C773030c44b048FB4465e86Bf
-    common - Identity Registry 0x4b4614B83B1FAbFd1FFE68c1E626C318B4b43669
-    common - Snowflake 0xF077Acb349B70822aB7E6eF2fb6d2eE365663Cc1
-    common - Old Client Raindrop 0xB38D9C93792437787B2455B7ee4e496960d14803
-    common - Client Raindrop 0x2d7AA37123596433831c563Dba27E3De1A6893e8
-    common - KYC Resolver 0x7d53dC02E104DB6A9703DC9771b17881ec7fE8b6
-    common - Buyer Registry 0x94e3038d31A069c4DDdF812BdAdbcc0885D5B247
-    common - Token Registry 0xea69B4Fe6d86FFcd047F71eC4c2aEfA3f4f20F3F
-    common - Service Registry 0x4C014c10195a94E50cB08348a44f1Db39f181a68
-  [31m  46) Common contracts deployed[0m
-
-    Events emitted during test:
-    ---------------------------
-
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x35B3635fAa18029924F19a008fF32e92140a7250 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xDC9e6124c9F6BFA1a921Ab1F2182492D08932646 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xB81dFcee1cB8C7a180C9982eDE8305BC884A63B4 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x9714932A0356B1181f6F4A5E9f9dF305844f8598 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x24dA42761760033fb2e2C2Eb6c0b28166ebC193f (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xf75121739b2bE9CC52a277E46f8CB26b2e6A9Df9 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xE806952b40f5354ccC5bbE00133DB0aeAd72b256 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xbb027dB57997B0E8F6803DBeb7091E07C75Caa65 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x38edfC696cc9886CA8124AC3e340D47e18b93eAF (address), _amount: 1000000000000000000000 (uint256))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-
-    ---------------------------
-  [31m  47) Snowflake identities created for all accounts[0m
-    > No events were emitted
-[0m    Checking IdentityRegistry functionality[0m
-    [31m  48) IdentityRegistry create Identity (exists, should revert)[0m
-    > No events were emitted
-    [31m  49) IdentityRegistry retrieve EIN[0m
-    > No events were emitted
-[0m    Checking SnowflakeOwnable functionality[0m
-      SnowflakeOwnable Address 0xA1f33D04FF6FC4D6eb33CAADBa7bBDAA36D14E03
-      users[1] 0x35B3635fAa18029924F19a008fF32e92140a7250
-    [32m  ✓[0m[90m SnowflakeOwnable can be created[0m[33m (41ms)[0m
-      Owner EIN <BN: 0>
-    [32m  ✓[0m[90m SnowflakeOwnable exists[0m
-    [31m  50) SnowflakeOwnable set Identity Registry[0m
-    > No events were emitted
-      snowflake ownable identity registry address 0x0000000000000000000000000000000000000000
-    [32m  ✓[0m[90m SnowflakeOwnable get Identity Registry Address[0m[31m (118ms)[0m
-    [31m  51) SnowflakeOwnable get owner EIN[0m
-    > No events were emitted
-    [31m  52) Snowflake ownable transfer ownership (no identity, should revert)[0m
-    > No events were emitted
-    [31m  53) SnowflakeOwnable get owner EIN[0m
-    > No events were emitted
-    [31m  54) Snowflake ownable transfer ownership (not the owner, should revert)[0m
-    > No events were emitted
-    [31m  55) SnowflakeOwnable get owner EIN[0m
-    > No events were emitted
-    [31m  56) Snowflake ownable transfer ownership[0m
-    > No events were emitted
-    [31m  57) SnowflakeOwnable get owner EIN[0m
-    > No events were emitted
+HSToken Address 0x58B88F2cBD915d611B3F795aA89DC9A56192a489
+User 0xE996E35F30f51399B28a9B36E82cedc873381EE9
+    [32m  ✓[0m[90m HSToken can be created[0m[31m (117ms)[0m
+    [32m  ✓[0m[90m HSToken exists[0m
+    [32m  ✓[0m[90m Appoint token[0m[33m (71ms)[0m
+    [32m  ✓[0m[90m Set default values to BuyerRegistry[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add buyer 1[0m[31m (109ms)[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add buyer 2[0m[33m (64ms)[0m
+    [32m  ✓[0m[90m HSTServiceRegistry - add service[0m[31m (176ms)[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add kyc for buyer 1[0m[33m (57ms)[0m
+    [32m  ✓[0m[90m HSToken set MAIN_PARAMS[0m[33m (53ms)[0m
+    [32m  ✓[0m[90m HSToken set STO_FLAGS[0m[33m (53ms)[0m
+    [32m  ✓[0m[90m HSToken set STO_PARAMS[0m[33m (51ms)[0m
+    [32m  ✓[0m[90m HSToken activate Prelaunch[0m[33m (41ms)[0m
+    [32m  ✓[0m[90m HSToken activate Presale[0m[33m (43ms)[0m
+    [32m  ✓[0m[90m HSToken activate Sale[0m[33m (41ms)[0m
+    [32m  ✓[0m[90m HSToken activate Lock[0m[33m (42ms)[0m
+    [32m  ✓[0m[90m HSToken activate Market[0m[33m (40ms)[0m
+    [32m  ✓[0m[90m HSToken adds EIN 1 to whitelist[0m[33m (51ms)[0m
+    [32m  ✓[0m[90m HydroToken user 1 approves 1M HydroTokens for HSToken[0m
+      HSTBuyerRegistry kyc status false
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - kyc status: false[0m
+    [32m  ✓[0m[90m HSToken Reverts buy for EIN user 1[0m[33m (68ms)[0m
+      HSTBuyerRegistry kyc status false
+    [32m  ✓[0m[90m Set buyer status true for user 1[0m[33m (38ms)[0m
+      HSTBuyerRegistry kyc status true
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - kyc status: true[0m
+    [32m  ✓[0m[90m HSToken buyTokens from EIN user 1[0m[31m (91ms)[0m
+    [32m  ✓[0m[90m HSToken buyTokens again from EIN user 1[0m[31m (85ms)[0m
+NOW:  1565038292
+Gas: 654464
+    [32m  ✓[0m[90m Store periods[0m[31m (189ms)[0m
+Periods: [ 1565038290,
+  1565038492,
+  1565038692,
+  1565038892,
+  1565039092,
+  1565039292,
+  1565039492,
+  1565039692,
+  1565039892,
+  1565040092,
+  1565040292,
+  1565040492,
+  1565040692,
+  1565040892,
+  1565041092,
+  1565041292,
+  1565041492,
+  1565041692,
+  1565041892,
+  1565042092,
+  1565042292,
+  1565042492,
+  1565042692,
+  1565042892,
+  1565043092 ]
+Now: 1565038492
+Current period: 1
+    [32m  ✓[0m[90m Read periods[0m[31m (101ms)[0m
+Balance user 1: 3.6
+Balance user 3: 0
+    [32m  ✓[0m[90m HSToken reverts transfer 1.2 HSTokens to Account 2[0m[31m (115ms)[0m
+      HSTBuyerRegistry kyc status true
+    [32m  ✓[0m[90m Set buyer status true for user 2[0m
+Balance user 1: 3.6
+Balance user 3: 0
+Balance user 1: 2.4
+Balance user 3: 1.2
+    [32m  ✓[0m[90m HSToken transfer 1.2 HSTokens to Account 2[0m[31m (135ms)[0m
+    [32m  ✓[0m[90m Setting oracle address[0m[33m (44ms)[0m
+    [32m  ✓[0m[90m Oracle notifies results of 5 Hydros for this period[0m[33m (40ms)[0m
+HydroToken Balance user 1 BEFORE: 11111102075
+Period payed: 1
+Participation rate: 0.666666666666666666
+Period results: 5
+Amount payed: 3.33333333333333333
+Amount from transfer log: 3.33333333333333333
+HydroToken Balance user 1 AFTER: 11111102078.33333333333333333
+    [32m  ✓[0m[90m User claims payment 1[0m[33m (75ms)[0m
+Current Period: 1
+    [32m  ✓[0m[90m Go to next period[0m
+    [32m  ✓[0m[90m Oracle notifies results of 4 Hydros for this period[0m[33m (44ms)[0m
+Period payed: 2
+Participation rate: 0.666666666666666666
+Period results: 4
+Amount payed: 2.666666666666666664
+Amount from transfer log: 2.666666666666666664
+HydroToken Balance user 1 AFTER: 11111102080.999999999999999994
+    [32m  ✓[0m[90m User claims payment 1[0m[33m (65ms)[0m
+Current Period: 2
+Current Period: 2
+    [32m  ✓[0m[90m Advancing periods[0m
+    [32m  ✓[0m[90m KYCResolver approve again EIN identity 2[0m
+Balance user 1: 1.6
+Balance user 3: 2
+    [32m  ✓[0m[90m HSToken transfer 0.8 HSTokens to Account 2, to decrease his participationRate at period 4[0m[31m (106ms)[0m
+Current Period: 4
+    [32m  ✓[0m[90m Advancing new period[0m
+    [32m  ✓[0m[90m Oracle notifies results of 5 Hydros for this period[0m[33m (40ms)[0m
+Period payed: 3
+Participation rate: 0.666666666666666666
+Period results: 0
+Amount payed: 0
+    [32m  ✓[0m[90m User claims payment 1 but there is nothing, once[0m[33m (50ms)[0m
+Period payed: 4
+Participation rate: 0.444444444444444444
+Period results: 0
+Amount payed: 0
+    [32m  ✓[0m[90m User claims payment 1 but there is nothing twice[0m[33m (47ms)[0m
+Period payed: 5
+Participation rate: 0.444444444444444444
+Period results: 5
+Amount payed: 2.22222222222222222
+Amount from transfer log: 2.22222222222222222
+HydroToken Balance user 1 AFTER: 11111102083.222222222222222214
+    [32m  ✓[0m[90m User claims payment 1 and now it works[0m[31m (79ms)[0m
 
 [0m  Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry[0m
 [0m    Preparing infrastructure[0m
     [32m  ✓[0m[90m Users created[0m
-    common - Date Time 0x08e1793c8c4FB5bca0eCC82B85cefD44813b9896
-    common - Hydro Token 0x4DFf40080198738C773030c44b048FB4465e86Bf
-    common - Identity Registry 0x4b4614B83B1FAbFd1FFE68c1E626C318B4b43669
-    common - Snowflake 0xF077Acb349B70822aB7E6eF2fb6d2eE365663Cc1
-    common - Old Client Raindrop 0xB38D9C93792437787B2455B7ee4e496960d14803
-    common - Client Raindrop 0x2d7AA37123596433831c563Dba27E3De1A6893e8
-    common - KYC Resolver 0x7d53dC02E104DB6A9703DC9771b17881ec7fE8b6
-    common - Buyer Registry 0x94e3038d31A069c4DDdF812BdAdbcc0885D5B247
-    common - Token Registry 0xea69B4Fe6d86FFcd047F71eC4c2aEfA3f4f20F3F
-    common - Service Registry 0x4C014c10195a94E50cB08348a44f1Db39f181a68
-    [31m  58) Common contracts deployed[0m
-
-    Events emitted during test:
-    ---------------------------
-
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x35B3635fAa18029924F19a008fF32e92140a7250 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xDC9e6124c9F6BFA1a921Ab1F2182492D08932646 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xB81dFcee1cB8C7a180C9982eDE8305BC884A63B4 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x9714932A0356B1181f6F4A5E9f9dF305844f8598 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x24dA42761760033fb2e2C2Eb6c0b28166ebC193f (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xf75121739b2bE9CC52a277E46f8CB26b2e6A9Df9 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xE806952b40f5354ccC5bbE00133DB0aeAd72b256 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0xbb027dB57997B0E8F6803DBeb7091E07C75Caa65 (address), _amount: 1000000000000000000000 (uint256))
-    Transfer(_from: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address), _to: <indexed> 0x38edfC696cc9886CA8124AC3e340D47e18b93eAF (address), _amount: 1000000000000000000000 (uint256))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-    OwnershipTransferred(previousOwner: <indexed> 0x0000000000000000000000000000000000000000 (address), newOwner: <indexed> 0xE996E35F30f51399B28a9B36E82cedc873381EE9 (address))
-
-    ---------------------------
-    [31m  59) Snowflake identities created for all accounts[0m
-    > No events were emitted
-    [31m  60) IdentityRegistry retrieve EINs[0m
-    > No events were emitted
-    [31m  61) IdentityRegistry retrieve EIN - token owner[0m
-    > No events were emitted
-    [31m  62) IdentityRegistry retrieve EIN[0m
-    > No events were emitted
+    common - Date Time 0x70e7a4b70c60EE932Df26dB1AB03CAd19a9d92a1
+    common - Hydro Token 0x0a77af46B84f8600289b484C130093Fa6e8A7EB4
+    common - Identity Registry 0x5499722A878F40feE8228e2BFf2dDd04E42bfc8d
+    common - Snowflake 0x70e511d1FC42C719B8525e93C2F8216B0Ca24640
+    common - Old Client Raindrop 0xCCed8BfA7a6C974591a6134b9991B154c892948E
+    common - Client Raindrop 0x1A26617525F0B03D9165Fd547E82ffebFE38888f
+    common - KYC Resolver 0x5A867b8A02ae112337cb3F35ADE0F5A4aA3aF24E
+    common - Buyer Registry 0x42FbADecCd2b7189280f32AD079600d03324caf9
+    common - Token Registry 0xf1A909B20947125c37cB54e44dd81E39c6527DF0
+    common - Service Registry 0x51AEC82ec2b6b41ac1a9beE7fe9AA4e4c3F3F8e2
+    common - finishing and returning instances
+    [32m  ✓[0m[90m Common contracts deployed[0m[31m (1201ms)[0m
+    [32m  ✓[0m[90m Snowflake identities created for all accounts[0m[31m (3048ms)[0m
+      user(0) => EIN 1 user.id 1 user.ein 1
+      user(1) => EIN 2 user.id 2 user.ein 2
+      user(2) => EIN 3 user.id 3 user.ein 3
+      user(3) => EIN 4 user.id 4 user.ein 4
+      user(4) => EIN 5 user.id 5 user.ein 5
+      user(5) => EIN 6 user.id 6 user.ein 6
+      user(6) => EIN 7 user.id 7 user.ein 7
+      user(7) => EIN 8 user.id 8 user.ein 8
+      user(8) => EIN 9 user.id 9 user.ein 9
+      user(9) => EIN 10 user.id 10 user.ein 10
+    [32m  ✓[0m[90m IdentityRegistry retrieve EINs[0m[31m (126ms)[0m
+      User 1 (token owner) => EIN 1 => value 2 <BN: 2>
+    [32m  ✓[0m[90m IdentityRegistry retrieve EIN - token owner[0m
+      User 2 (general user) => EIN 2 => value 3 <BN: 3>
+    [32m  ✓[0m[90m IdentityRegistry retrieve EIN[0m
 [0m    Checking HSTokenRegistry functionality - basic[0m
-    [31m  63) HSTokenRegistry exists[0m
-    > No events were emitted
+      Token Registry address 0xf1A909B20947125c37cB54e44dd81E39c6527DF0
+    [32m  ✓[0m[90m HSTokenRegistry exists[0m
 [0m    Checking HSTServiceRegistry functionality - basic[0m
-    [31m  64) HSTServiceRegistry exists[0m
-    > No events were emitted
+      HSTServiceRegistry address 0x51AEC82ec2b6b41ac1a9beE7fe9AA4e4c3F3F8e2
+    [32m  ✓[0m[90m HSTServiceRegistry exists[0m
 [0m    Checking HSTokenRegistry functionality - token creation[0m
       Token dummy address 0xf58161d60b2133b1339563fc3e38a8e80410b08c
     [32m  ✓[0m[90m Create token dummy address[0m
-    [31m  65) Appoint a new token[0m
-    > No events were emitted
-    [31m  66) Get token owner EIN[0m
-    > No events were emitted
-    [31m  67) Get token symbol[0m
-    > No events were emitted
-    [31m  68) Get token name[0m
-    > No events were emitted
-    [31m  69) Get token description[0m
-    > No events were emitted
-    [31m  70) Get token decimals[0m
-    > No events were emitted
+    [32m  ✓[0m[90m Appoint a new token[0m[33m (65ms)[0m
+      Token owner EIN 2
+    [32m  ✓[0m[90m Get token owner EIN[0m
+      Token symbol TEST                            
+    [32m  ✓[0m[90m Get token symbol[0m
+      Token address TestToken                       
+    [32m  ✓[0m[90m Get token name[0m
+      Token description just-a-test
+    [32m  ✓[0m[90m Get token description[0m
+      Token decimals 10
+    [32m  ✓[0m[90m Get token decimals[0m
 [0m    Checking HSTServiceRegistry functionality - token categories creation[0m
-    [31m  71) Token categories exist[0m
-    > No events were emitted
+      MLA category Main Legal Advisors
+      KYC category Know Your Customer
+      AML category Anti Money Laundering
+      CFT category Counter Financing of Terrorism
+    [32m  ✓[0m[90m Token categories exist[0m[33m (55ms)[0m
 [0m    Checking HSTServiceRegistry functionality - additional[0m
-    [31m  72) HSTServiceRegistry - add category[0m
-    > No events were emitted
-    [31m  73) HSTServiceRegistry - get category[0m
-    > No events were emitted
-    [31m  74) HSTServiceRegistry - add service[0m
-    > No events were emitted
-    [31m  75) HSTServiceRegistry - get service[0m
-    > No events were emitted
-    [31m  76) HSTServiceRegistry - is provider true[0m
-    > No events were emitted
-    [31m  77) HSTServiceRegistry - remove service[0m
-    > No events were emitted
-    [31m  78) HSTServiceRegistry - get service after removal[0m
-    > No events were emitted
-    [31m  79) HSTServiceRegistry - is provider false[0m
-    > No events were emitted
+    [32m  ✓[0m[90m HSTServiceRegistry - add category[0m[33m (43ms)[0m
+      HSTServiceRegistry category description just-a-test-category
+    [32m  ✓[0m[90m HSTServiceRegistry - get category[0m
+    [32m  ✓[0m[90m HSTServiceRegistry - add service[0m[33m (45ms)[0m
+      HSTServiceRegistry service category KYC                             
+    [32m  ✓[0m[90m HSTServiceRegistry - get service[0m
+    [32m  ✓[0m[90m HSTServiceRegistry - is provider true[0m
+    [32m  ✓[0m[90m HSTServiceRegistry - remove service[0m[33m (47ms)[0m
+      HSTServiceRegistry service category                                 
+    [32m  ✓[0m[90m HSTServiceRegistry - get service after removal[0m
+    [32m  ✓[0m[90m HSTServiceRegistry - is provider false[0m
 [0m    Checking HSTBuyerRegistry functionality - token rules[0m
-    [31m  80) HSTBuyerRegistry - assign token values[0m
-    > No events were emitted
-    [31m  81) HSTBuyerRegistry - get token values - minimum age[0m
-    > No events were emitted
-    [31m  82) HSTBuyerRegistry - get token values - minimum net worth[0m
-    > No events were emitted
-    [31m  83) HSTBuyerRegistry - get token values - minimum salary[0m
-    > No events were emitted
-    [31m  84) HSTBuyerRegistry - get token values - investor status required[0m
-    > No events were emitted
+    [32m  ✓[0m[90m HSTBuyerRegistry - assign token values[0m[33m (45ms)[0m
+      HSTBuyerRegistry minimum age 21
+    [32m  ✓[0m[90m HSTBuyerRegistry - get token values - minimum age[0m
+      HSTBuyerRegistry minimum net worth 50000
+    [32m  ✓[0m[90m HSTBuyerRegistry - get token values - minimum net worth[0m
+      HSTServiceRegistry minimum salary 36000
+    [32m  ✓[0m[90m HSTBuyerRegistry - get token values - minimum salary[0m
+      HSTServiceRegistry investor status required true
+    [32m  ✓[0m[90m HSTBuyerRegistry - get token values - investor status required[0m
 [0m    Checking HSTBuyerRegistry functionality - country ban[0m
-    [31m  85) HSTBuyerRegistry - ban country[0m
-    > No events were emitted
-    [31m  86) HSTBuyerRegistry - get country ban[0m
-    > No events were emitted
-    [31m  87) HSTBuyerRegistry - lift country ban[0m
-    > No events were emitted
-    [31m  88) HSTBuyerRegistry - get country ban[0m
-    > No events were emitted
+    [32m  ✓[0m[90m HSTBuyerRegistry - ban country[0m
+      HSTBuyerRegistry country ban status true
+    [32m  ✓[0m[90m HSTBuyerRegistry - get country ban[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - lift country ban[0m[33m (40ms)[0m
+      HSTBuyerRegistry country ban status false
+    [32m  ✓[0m[90m HSTBuyerRegistry - get country ban[0m
 [0m    Checking HSTBuyerRegistry functionality - buyer data[0m
-    [31m  89) HSTBuyerRegistry - add buyer - suitable[0m
-    > No events were emitted
-    [31m  90) HSTBuyerRegistry - get buyer data - first name[0m
-    > No events were emitted
-    [31m  91) HSTBuyerRegistry - get buyer data - last name[0m
-    > No events were emitted
-    [31m  92) HSTBuyerRegistry - get buyer data - iso country code[0m
-    > No events were emitted
-    [31m  93) HSTBuyerRegistry - get buyer data - birthday[0m
-    > No events were emitted
-    [31m  94) HSTBuyerRegistry - get buyer data - net worth[0m
-    > No events were emitted
-    [31m  95) HSTBuyerRegistry - get buyer data - salary[0m
-    > No events were emitted
-    [31m  96) HSTBuyerRegistry - get buyer data - accredited investor status[0m
-    > No events were emitted
-    [31m  97) HSTBuyerRegistry - get buyer data - kyc status[0m
-    > No events were emitted
-    [31m  98) HSTBuyerRegistry - get buyer data - aml status[0m
-    > No events were emitted
-    [31m  99) HSTBuyerRegistry - get buyer data - cft status[0m
-    > No events were emitted
-    [31m  100) HSTBuyerRegistry - add buyer - unsuitable - Kenya[0m
-    > No events were emitted
-    [31m  101) HSTBuyerRegistry - ban country - Kenya[0m
-    > No events were emitted
-    [31m  102) HSTBuyerRegistry - add buyer - unsuitable - 20 years old[0m
-    > No events were emitted
-    [31m  103) HSTBuyerRegistry - add buyer - unsuitable - low net worth[0m
-    > No events were emitted
-    [31m  104) HSTBuyerRegistry - add buyer - unsuitable - low salary[0m
-    > No events were emitted
+    [32m  ✓[0m[90m HSTBuyerRegistry - add buyer - suitable[0m[33m (61ms)[0m
+      HSTBuyerRegistry get first name Test first name 1
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - first name[0m
+      HSTBuyerRegistry get last name Test last name 1
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - last name[0m[31m (83ms)[0m
+      HSTBuyerRegistry get country code GMB                             
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - iso country code[0m
+      HSTBuyerRegistry get birthday 471657600
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - birthday[0m
+      HSTBuyerRegistry get net worth 100000
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - net worth[0m
+      HSTBuyerRegistry get salary 50000
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - salary[0m
+      HSTBuyerRegistry get accredited investor status false
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - accredited investor status[0m
+      HSTBuyerRegistry kyc status false
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - kyc status[0m
+      HSTBuyerRegistry aml status false
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - aml status[0m
+      HSTBuyerRegistry cft status false
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - cft status[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add buyer - unsuitable - Kenya[0m[31m (78ms)[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - ban country - Kenya[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add buyer - unsuitable - 20 years old[0m[33m (73ms)[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add buyer - unsuitable - low net worth[0m[33m (69ms)[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add buyer - unsuitable - low salary[0m[33m (62ms)[0m
 [0m    Checking HSTBuyerRegistry functionality - change buyer status[0m
-    [31m  105) HSTServiceRegistry - add service[0m
-    > No events were emitted
-    [31m  106) HSTBuyerRegistry - add kyc for buyer[0m
-    > No events were emitted
-    [31m  107) HSTServiceRegistry - add service[0m
-    > No events were emitted
-    [31m  108) HSTBuyerRegistry - add aml for buyer[0m
-    > No events were emitted
-    [31m  109) HSTServiceRegistry - add service[0m
-    > No events were emitted
-    [31m  110) HSTBuyerRegistry - add cft for buyer[0m
-    > No events were emitted
-    [31m  111) HSTBuyerRegistry - get buyer data - kyc status[0m
-    > No events were emitted
-    [31m  112) HSTBuyerRegistry - get buyer data - aml status[0m
-    > No events were emitted
-    [31m  113) HSTBuyerRegistry - get buyer data - cft status[0m
-    > No events were emitted
+    [32m  ✓[0m[90m HSTServiceRegistry - add service[0m[33m (45ms)[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add kyc for buyer[0m[33m (49ms)[0m
+    [32m  ✓[0m[90m HSTServiceRegistry - add service[0m[33m (38ms)[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add aml for buyer[0m[33m (52ms)[0m
+    [32m  ✓[0m[90m HSTServiceRegistry - add service[0m[33m (44ms)[0m
+    [32m  ✓[0m[90m HSTBuyerRegistry - add cft for buyer[0m[33m (71ms)[0m
+      HSTBuyerRegistry kyc status false
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - kyc status[0m
+      HSTBuyerRegistry aml status false
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - aml status[0m
+      HSTBuyerRegistry cft status false
+    [32m  ✓[0m[90m HSTBuyerRegistry - get buyer data - cft status[0m
+
+[0m  Contract: Testing SnowflakeOwnable[0m
+  [32m  ✓[0m[90m Users created[0m
+    common - Date Time 0x70e7a4b70c60EE932Df26dB1AB03CAd19a9d92a1
+    common - Hydro Token 0x0a77af46B84f8600289b484C130093Fa6e8A7EB4
+    common - Identity Registry 0x5499722A878F40feE8228e2BFf2dDd04E42bfc8d
+    common - Snowflake 0x70e511d1FC42C719B8525e93C2F8216B0Ca24640
+    common - Old Client Raindrop 0xCCed8BfA7a6C974591a6134b9991B154c892948E
+    common - Client Raindrop 0x1A26617525F0B03D9165Fd547E82ffebFE38888f
+    common - KYC Resolver 0x5A867b8A02ae112337cb3F35ADE0F5A4aA3aF24E
+    common - Buyer Registry 0x42FbADecCd2b7189280f32AD079600d03324caf9
+    common - Token Registry 0xf1A909B20947125c37cB54e44dd81E39c6527DF0
+    common - Service Registry 0x51AEC82ec2b6b41ac1a9beE7fe9AA4e4c3F3F8e2
+    common - finishing and returning instances
+  [32m  ✓[0m[90m Common contracts deployed[0m[31m (1222ms)[0m
+  [32m  ✓[0m[90m Snowflake identities created for all accounts[0m[31m (2503ms)[0m
+[0m    Checking IdentityRegistry functionality[0m
+    [32m  ✓[0m[90m IdentityRegistry create Identity (exists, should revert)[0m[33m (45ms)[0m
+      EIN users[1] <BN: 2>
+    [32m  ✓[0m[90m IdentityRegistry retrieve EIN[0m
+[0m    Checking SnowflakeOwnable functionality[0m
+      SnowflakeOwnable Address 0xD62Baf02b76Ba177Ba3BE18DcEB95ebC8d96D2E0
+      users[1] 0x35B3635fAa18029924F19a008fF32e92140a7250
+    [32m  ✓[0m[90m SnowflakeOwnable can be created[0m[33m (43ms)[0m
+      Owner EIN <BN: 0>
+    [32m  ✓[0m[90m SnowflakeOwnable exists[0m
+      Identity Registry Address 0x5499722A878F40feE8228e2BFf2dDd04E42bfc8d
+    [32m  ✓[0m[90m SnowflakeOwnable set Identity Registry[0m[33m (40ms)[0m
+      snowflake ownable identity registry address 0x5499722A878F40feE8228e2BFf2dDd04E42bfc8d
+    [32m  ✓[0m[90m SnowflakeOwnable get Identity Registry Address[0m
+      snowflake ownable owner EIN <BN: 2>
+    [32m  ✓[0m[90m SnowflakeOwnable get owner EIN[0m
+    [32m  ✓[0m[90m Snowflake ownable transfer ownership (no identity, should revert)[0m[33m (52ms)[0m
+      snowflake ownable new owner EIN after transfer 1 <BN: 2>
+    [32m  ✓[0m[90m SnowflakeOwnable get owner EIN[0m
+      EIN users[3] <BN: 4>
+    [32m  ✓[0m[90m Snowflake ownable transfer ownership (not the owner, should revert)[0m[31m (137ms)[0m
+      snowflake ownable new owner EIN after transfer 2 <BN: 2>
+    [32m  ✓[0m[90m SnowflakeOwnable get owner EIN[0m
+    [32m  ✓[0m[90m Snowflake ownable transfer ownership[0m[33m (58ms)[0m
+      snowflake ownable new owner EIN after transfer 3 <BN: 9>
+    [32m  ✓[0m[90m SnowflakeOwnable get owner EIN[0m
 
 
-[92m [0m[32m 7 passing[0m[90m (7s)[0m
-[31m  113 failing[0m
-
-[0m  1) Contract: Testing HSToken
-       common contracts deployed:
-[0m[31m     Error: Returned error: VM Exception while processing transaction: revert This is not a contract -- Reason given: This is not a contract.[0m[90m
-      at Object.ErrorResponse (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/~/web3-core-helpers/src/errors.js:29:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/src/index.js:140:1
-      at Object.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-provider/wrapper.js:112:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:121:1
-      at Array.forEach (<anonymous>)
-      at W3CWebSocket.WebsocketProvider.connection.onmessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:98:1)
-      at W3CWebSocket._dispatchEvent [as dispatchEvent] (/usr/local/lib/node_modules/truffle/build/webpack:/~/yaeti/lib/EventTarget.js:107:1)
-      at W3CWebSocket.onMessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:234:1)
-      at WebSocketConnection.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:205:1)
-      at WebSocketConnection.processFrame (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:552:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:321:34
-      at _combinedTickCallback (internal/process/next_tick.js:131:7)
-      at process._tickCallback (internal/process/next_tick.js:180:9)
-[0m
-[0m  2) Contract: Testing HSToken
-       Snowflake identities created for all accounts:
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Object.createIdentity (test/utilities.js:81:33)
-      at Context.it (test/0_hstoken.js:26:23)
-      at web3.eth.getBlockNumber.then.result (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-core/lib/testing/testrunner.js:153:1)
-      at <anonymous>
-      at process._tickCallback (internal/process/next_tick.js:188:7)
-[0m
-[0m  3) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken can be created:
-[0m[31m     TypeError: Cannot read property 'HydroToken' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:47:21)
-[0m
-[0m  4) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken exists:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:58:7)
-[0m
-[0m  5) Contract: Testing HSToken
-       Checking HSToken functionality
-         Appoint token:
-[0m[31m     TypeError: Cannot read property 'TokenRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:62:23)
-[0m
-[0m  6) Contract: Testing HSToken
-       Checking HSToken functionality
-         Set default values to BuyerRegistry:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:75:17)
-[0m
-[0m  7) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSTBuyerRegistry - add buyer 1:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:88:23)
-[0m
-[0m  8) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSTBuyerRegistry - add buyer 2:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:104:23)
-[0m
-[0m  9) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSTServiceRegistry - add service:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:119:23)
-[0m
-[0m  10) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSTBuyerRegistry - add kyc for buyer 1:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:128:23)
-[0m
-[0m  11) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken set MAIN_PARAMS:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:137:7)
-[0m
-[0m  12) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken set STO_FLAGS:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:150:7)
-[0m
-[0m  13) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken set STO_PARAMS:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:165:7)
-[0m
-[0m  14) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken activate Prelaunch:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:177:7)
-[0m
-[0m  15) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken activate Presale:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:188:7)
-[0m
-[0m  16) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken activate Sale:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:192:7)
-[0m
-[0m  17) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken activate Lock:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:196:7)
-[0m
-[0m  18) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken activate Market:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:200:7)
-[0m
-[0m  19) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken adds EIN 1 to whitelist:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:205:7)
-[0m
-[0m  20) Contract: Testing HSToken
-       Checking HSToken functionality
-         HydroToken user 1 approves 1M HydroTokens for HSToken:
-[0m[31m     TypeError: Cannot read property 'HydroToken' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:210:23)
-[0m
-[0m  21) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSTBuyerRegistry - get buyer data - kyc status: false:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:217:41)
-[0m
-[0m  22) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken Reverts buy for EIN user 1:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:226:11)
-[0m
-[0m  23) Contract: Testing HSToken
-       Checking HSToken functionality
-         Set buyer status true for user 1:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:234:23)
-[0m
-[0m  24) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSTBuyerRegistry - get buyer data - kyc status: true:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:244:41)
-[0m
-[0m  25) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken buyTokens from EIN user 1:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:252:7)
-[0m
-[0m  26) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken buyTokens again from EIN user 1:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:259:7)
-[0m
-[0m  27) Contract: Testing HSToken
-       Checking HSToken functionality
-         Store periods:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:269:25)
-[0m
-[0m  28) Contract: Testing HSToken
-       Checking HSToken functionality
-         Read periods:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:288:24)
-[0m
-[0m  29) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken reverts transfer 1.2 HSTokens to Account 2:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:302:9)
-[0m
-[0m  30) Contract: Testing HSToken
-       Checking HSToken functionality
-         Set buyer status true for user 2:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:315:23)
-[0m
-[0m  31) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken transfer 1.2 HSTokens to Account 2:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:327:63)
-[0m
-[0m  32) Contract: Testing HSToken
-       Checking HSToken functionality
-         Setting oracle address:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:345:7)
-[0m
-[0m  33) Contract: Testing HSToken
-       Checking HSToken functionality
-         Oracle notifies results of 5 Hydros for this period:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:351:7)
-[0m
-[0m  34) Contract: Testing HSToken
-       Checking HSToken functionality
-         User claims payment 1:
-[0m[31m     TypeError: Cannot read property 'HydroToken' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:357:91)
-[0m
-[0m  35) Contract: Testing HSToken
-       Checking HSToken functionality
-         Go to next period:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:373:7)
-      at <anonymous>
-      at process._tickCallback (internal/process/next_tick.js:188:7)
-[0m
-[0m  36) Contract: Testing HSToken
-       Checking HSToken functionality
-         Oracle notifies results of 4 Hydros for this period:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:379:7)
-[0m
-[0m  37) Contract: Testing HSToken
-       Checking HSToken functionality
-         User claims payment 1:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:385:21)
-[0m
-[0m  38) Contract: Testing HSToken
-       Checking HSToken functionality
-         Advancing periods:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:397:7)
-[0m
-[0m  39) Contract: Testing HSToken
-       Checking HSToken functionality
-         KYCResolver approve again EIN identity 2:
-[0m[31m     TypeError: Cannot read property 'KYCResolver' of undefined[0m[90m
-      at Context.it (test/0_hstoken.js:411:23)
-[0m
-[0m  40) Contract: Testing HSToken
-       Checking HSToken functionality
-         HSToken transfer 0.8 HSTokens to Account 2, to decrease his participationRate at period 4:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:419:7)
-[0m
-[0m  41) Contract: Testing HSToken
-       Checking HSToken functionality
-         Advancing new period:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:433:7)
-      at <anonymous>
-      at process._tickCallback (internal/process/next_tick.js:188:7)
-[0m
-[0m  42) Contract: Testing HSToken
-       Checking HSToken functionality
-         Oracle notifies results of 5 Hydros for this period:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:440:7)
-[0m
-[0m  43) Contract: Testing HSToken
-       Checking HSToken functionality
-         User claims payment 1 but there is nothing, once:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:447:21)
-[0m
-[0m  44) Contract: Testing HSToken
-       Checking HSToken functionality
-         User claims payment 1 but there is nothing twice:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:457:21)
-[0m
-[0m  45) Contract: Testing HSToken
-       Checking HSToken functionality
-         User claims payment 1 and now it works:
-[0m[31m     ReferenceError: newToken is not defined[0m[90m
-      at Context.it (test/0_hstoken.js:466:21)
-[0m
-[0m  46) Contract: Testing SnowflakeOwnable
-       Common contracts deployed:
-[0m[31m     Error: Returned error: VM Exception while processing transaction: revert This is not a contract -- Reason given: This is not a contract.[0m[90m
-      at Object.ErrorResponse (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/~/web3-core-helpers/src/errors.js:29:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/src/index.js:140:1
-      at Object.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-provider/wrapper.js:112:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:121:1
-      at Array.forEach (<anonymous>)
-      at W3CWebSocket.WebsocketProvider.connection.onmessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:98:1)
-      at W3CWebSocket._dispatchEvent [as dispatchEvent] (/usr/local/lib/node_modules/truffle/build/webpack:/~/yaeti/lib/EventTarget.js:107:1)
-      at W3CWebSocket.onMessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:234:1)
-      at WebSocketConnection.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:205:1)
-      at WebSocketConnection.processFrame (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:552:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:321:34
-      at _combinedTickCallback (internal/process/next_tick.js:131:7)
-      at process._tickCallback (internal/process/next_tick.js:180:9)
-[0m
-[0m  47) Contract: Testing SnowflakeOwnable
-       Snowflake identities created for all accounts:
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Object.createIdentity (test/utilities.js:81:33)
-      at Context.it (test/4_snowflakeownable.js:28:23)
-      at web3.eth.getBlockNumber.then.result (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-core/lib/testing/testrunner.js:153:1)
-      at <anonymous>
-      at process._tickCallback (internal/process/next_tick.js:188:7)
-[0m
-[0m  48) Contract: Testing SnowflakeOwnable
-       Checking IdentityRegistry functionality
-         IdentityRegistry create Identity (exists, should revert):
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Context.it (test/4_snowflakeownable.js:38:19)
-[0m
-[0m  49) Contract: Testing SnowflakeOwnable
-       Checking IdentityRegistry functionality
-         IdentityRegistry retrieve EIN:
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Context.it (test/4_snowflakeownable.js:49:30)
-[0m
-[0m  50) Contract: Testing SnowflakeOwnable
-       Checking SnowflakeOwnable functionality
-         SnowflakeOwnable set Identity Registry:
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Context.it (test/4_snowflakeownable.js:76:64)
-[0m
-[0m  51) Contract: Testing SnowflakeOwnable
-       Checking SnowflakeOwnable functionality
-         SnowflakeOwnable get owner EIN:
-[0m[31m     Error: Returned error: VM Exception while processing transaction: revert 3. The identity registry address is required[0m[90m
-      at Object.ErrorResponse (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/~/web3-core-helpers/src/errors.js:29:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/src/index.js:140:1
-      at Object.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-provider/wrapper.js:112:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:121:1
-      at Array.forEach (<anonymous>)
-      at W3CWebSocket.WebsocketProvider.connection.onmessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:98:1)
-      at W3CWebSocket._dispatchEvent [as dispatchEvent] (/usr/local/lib/node_modules/truffle/build/webpack:/~/yaeti/lib/EventTarget.js:107:1)
-      at W3CWebSocket.onMessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:234:1)
-      at WebSocketConnection.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:205:1)
-      at WebSocketConnection.processFrame (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:552:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:321:34
-      at _combinedTickCallback (internal/process/next_tick.js:131:7)
-      at process._tickCallback (internal/process/next_tick.js:180:9)
-[0m
-[0m  52) Contract: Testing SnowflakeOwnable
-       Checking SnowflakeOwnable functionality
-         Snowflake ownable transfer ownership (no identity, should revert):
-[0m[31m     AssertionError: Expected to fail with New owner identity must exist, but failed with: Error: Returned error: VM Exception while processing transaction: revert 0. The identity registry address is required -- Reason given: 0. The identity registry address is required.[0m[90m
-      at fails (node_modules/truffle-assertions/index.js:138:13)
-      at <anonymous>
-      at process._tickCallback (internal/process/next_tick.js:188:7)
-[0m
-[0m  53) Contract: Testing SnowflakeOwnable
-       Checking SnowflakeOwnable functionality
-         SnowflakeOwnable get owner EIN:
-[0m[31m     Error: Returned error: VM Exception while processing transaction: revert 3. The identity registry address is required[0m[90m
-      at Object.ErrorResponse (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/~/web3-core-helpers/src/errors.js:29:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/src/index.js:140:1
-      at Object.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-provider/wrapper.js:112:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:121:1
-      at Array.forEach (<anonymous>)
-      at W3CWebSocket.WebsocketProvider.connection.onmessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:98:1)
-      at W3CWebSocket._dispatchEvent [as dispatchEvent] (/usr/local/lib/node_modules/truffle/build/webpack:/~/yaeti/lib/EventTarget.js:107:1)
-      at W3CWebSocket.onMessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:234:1)
-      at WebSocketConnection.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:205:1)
-      at WebSocketConnection.processFrame (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:552:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:321:34
-      at _combinedTickCallback (internal/process/next_tick.js:131:7)
-      at process._tickCallback (internal/process/next_tick.js:180:9)
-[0m
-[0m  54) Contract: Testing SnowflakeOwnable
-       Checking SnowflakeOwnable functionality
-         Snowflake ownable transfer ownership (not the owner, should revert):
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Context.it (test/4_snowflakeownable.js:118:30)
-[0m
-[0m  55) Contract: Testing SnowflakeOwnable
-       Checking SnowflakeOwnable functionality
-         SnowflakeOwnable get owner EIN:
-[0m[31m     Error: Returned error: VM Exception while processing transaction: revert 3. The identity registry address is required[0m[90m
-      at Object.ErrorResponse (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/~/web3-core-helpers/src/errors.js:29:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/src/index.js:140:1
-      at Object.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-provider/wrapper.js:112:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:121:1
-      at Array.forEach (<anonymous>)
-      at W3CWebSocket.WebsocketProvider.connection.onmessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:98:1)
-      at W3CWebSocket._dispatchEvent [as dispatchEvent] (/usr/local/lib/node_modules/truffle/build/webpack:/~/yaeti/lib/EventTarget.js:107:1)
-      at W3CWebSocket.onMessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:234:1)
-      at WebSocketConnection.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:205:1)
-      at WebSocketConnection.processFrame (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:552:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:321:34
-      at _combinedTickCallback (internal/process/next_tick.js:131:7)
-      at process._tickCallback (internal/process/next_tick.js:180:9)
-[0m
-[0m  56) Contract: Testing SnowflakeOwnable
-       Checking SnowflakeOwnable functionality
-         Snowflake ownable transfer ownership:
-[0m[31m     Error: Returned error: VM Exception while processing transaction: revert 0. The identity registry address is required -- Reason given: 0. The identity registry address is required.[0m[90m
-      at Object.ErrorResponse (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/~/web3-core-helpers/src/errors.js:29:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/src/index.js:140:1
-      at Object.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-provider/wrapper.js:112:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:121:1
-      at Array.forEach (<anonymous>)
-      at W3CWebSocket.WebsocketProvider.connection.onmessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:98:1)
-      at W3CWebSocket._dispatchEvent [as dispatchEvent] (/usr/local/lib/node_modules/truffle/build/webpack:/~/yaeti/lib/EventTarget.js:107:1)
-      at W3CWebSocket.onMessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:234:1)
-      at WebSocketConnection.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:205:1)
-      at WebSocketConnection.processFrame (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:552:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:321:34
-      at _combinedTickCallback (internal/process/next_tick.js:131:7)
-      at process._tickCallback (internal/process/next_tick.js:180:9)
-[0m
-[0m  57) Contract: Testing SnowflakeOwnable
-       Checking SnowflakeOwnable functionality
-         SnowflakeOwnable get owner EIN:
-[0m[31m     Error: Returned error: VM Exception while processing transaction: revert 3. The identity registry address is required[0m[90m
-      at Object.ErrorResponse (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/~/web3-core-helpers/src/errors.js:29:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/src/index.js:140:1
-      at Object.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-provider/wrapper.js:112:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:121:1
-      at Array.forEach (<anonymous>)
-      at W3CWebSocket.WebsocketProvider.connection.onmessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:98:1)
-      at W3CWebSocket._dispatchEvent [as dispatchEvent] (/usr/local/lib/node_modules/truffle/build/webpack:/~/yaeti/lib/EventTarget.js:107:1)
-      at W3CWebSocket.onMessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:234:1)
-      at WebSocketConnection.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:205:1)
-      at WebSocketConnection.processFrame (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:552:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:321:34
-      at _combinedTickCallback (internal/process/next_tick.js:131:7)
-      at process._tickCallback (internal/process/next_tick.js:180:9)
-[0m
-[0m  58) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Preparing infrastructure
-         Common contracts deployed:
-[0m[31m     Error: Returned error: VM Exception while processing transaction: revert This is not a contract -- Reason given: This is not a contract.[0m[90m
-      at Object.ErrorResponse (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/~/web3-core-helpers/src/errors.js:29:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-core-requestmanager/src/index.js:140:1
-      at Object.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/packages/truffle-provider/wrapper.js:112:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:121:1
-      at Array.forEach (<anonymous>)
-      at W3CWebSocket.WebsocketProvider.connection.onmessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/src/index.js:98:1)
-      at W3CWebSocket._dispatchEvent [as dispatchEvent] (/usr/local/lib/node_modules/truffle/build/webpack:/~/yaeti/lib/EventTarget.js:107:1)
-      at W3CWebSocket.onMessage (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:234:1)
-      at WebSocketConnection.<anonymous> (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/W3CWebSocket.js:205:1)
-      at WebSocketConnection.processFrame (/usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:552:1)
-      at /usr/local/lib/node_modules/truffle/build/webpack:/~/web3-providers-ws/~/websocket/lib/WebSocketConnection.js:321:34
-      at _combinedTickCallback (internal/process/next_tick.js:131:7)
-      at process._tickCallback (internal/process/next_tick.js:180:9)
-[0m
-[0m  59) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Preparing infrastructure
-         Snowflake identities created for all accounts:
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Object.createIdentity (test/utilities.js:81:33)
-      at Context.it (test/3_othertests.js:28:25)
-[0m
-[0m  60) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Preparing infrastructure
-         IdentityRegistry retrieve EINs:
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:35:32)
-[0m
-[0m  61) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Preparing infrastructure
-         IdentityRegistry retrieve EIN - token owner:
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:42:30)
-[0m
-[0m  62) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Preparing infrastructure
-         IdentityRegistry retrieve EIN:
-[0m[31m     TypeError: Cannot read property 'IdentityRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:50:30)
-[0m
-[0m  63) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTokenRegistry functionality - basic
-         HSTokenRegistry exists:
-[0m[31m     TypeError: Cannot read property 'TokenRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:63:41)
-[0m
-[0m  64) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - basic
-         HSTServiceRegistry exists:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:73:49)
-[0m
-[0m  65) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTokenRegistry functionality - token creation
-         Appoint a new token:
-[0m[31m     TypeError: Cannot read property 'TokenRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:99:23)
-[0m
-[0m  66) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTokenRegistry functionality - token creation
-         Get token owner EIN:
-[0m[31m     TypeError: Cannot read property 'TokenRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:111:40)
-[0m
-[0m  67) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTokenRegistry functionality - token creation
-         Get token symbol:
-[0m[31m     TypeError: Cannot read property 'TokenRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:118:38)
-[0m
-[0m  68) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTokenRegistry functionality - token creation
-         Get token name:
-[0m[31m     TypeError: Cannot read property 'TokenRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:125:36)
-[0m
-[0m  69) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTokenRegistry functionality - token creation
-         Get token description:
-[0m[31m     TypeError: Cannot read property 'TokenRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:132:43)
-[0m
-[0m  70) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTokenRegistry functionality - token creation
-         Get token decimals:
-[0m[31m     TypeError: Cannot read property 'TokenRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:139:40)
-[0m
-[0m  71) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - token categories creation
-         Token categories exist:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:151:36)
-[0m
-[0m  72) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - additional
-         HSTServiceRegistry - add category:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:167:23)
-[0m
-[0m  73) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - additional
-         HSTServiceRegistry - get category:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:176:46)
-[0m
-[0m  74) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - additional
-         HSTServiceRegistry - add service:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:185:23)
-[0m
-[0m  75) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - additional
-         HSTServiceRegistry - get service:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:194:42)
-[0m
-[0m  76) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - additional
-         HSTServiceRegistry - is provider true:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:203:23)
-[0m
-[0m  77) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - additional
-         HSTServiceRegistry - remove service:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:211:23)
-[0m
-[0m  78) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - additional
-         HSTServiceRegistry - get service after removal:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:219:42)
-[0m
-[0m  79) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTServiceRegistry functionality - additional
-         HSTServiceRegistry - is provider false:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:228:23)
-[0m
-[0m  80) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - token rules
-         HSTBuyerRegistry - assign token values:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:241:23)
-[0m
-[0m  81) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - token rules
-         HSTBuyerRegistry - get token values - minimum age:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:254:37)
-[0m
-[0m  82) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - token rules
-         HSTBuyerRegistry - get token values - minimum net worth:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:262:42)
-[0m
-[0m  83) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - token rules
-         HSTBuyerRegistry - get token values - minimum salary:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:270:40)
-[0m
-[0m  84) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - token rules
-         HSTBuyerRegistry - get token values - investor status required:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:278:41)
-[0m
-[0m  85) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - country ban
-         HSTBuyerRegistry - ban country:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:291:23)
-[0m
-[0m  86) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - country ban
-         HSTBuyerRegistry - get country ban:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:299:43)
-[0m
-[0m  87) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - country ban
-         HSTBuyerRegistry - lift country ban:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:308:23)
-[0m
-[0m  88) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - country ban
-         HSTBuyerRegistry - get country ban:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:316:43)
-[0m
-[0m  89) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - add buyer - suitable:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:330:23)
-[0m
-[0m  90) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - first name:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:345:41)
-[0m
-[0m  91) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - last name:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:353:40)
-[0m
-[0m  92) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - iso country code:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:361:43)
-[0m
-[0m  93) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - birthday:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:369:40)
-[0m
-[0m  94) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - net worth:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:377:40)
-[0m
-[0m  95) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - salary:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:385:38)
-[0m
-[0m  96) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - accredited investor status:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:393:46)
-[0m
-[0m  97) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - kyc status:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:401:41)
-[0m
-[0m  98) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - aml status:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:409:41)
-[0m
-[0m  99) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - get buyer data - cft status:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:417:41)
-[0m
-[0m  100) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - add buyer - unsuitable - Kenya:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:425:23)
-[0m
-[0m  101) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - ban country - Kenya:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:440:23)
-[0m
-[0m  102) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - add buyer - unsuitable - 20 years old:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:448:23)
-[0m
-[0m  103) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - add buyer - unsuitable - low net worth:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:463:23)
-[0m
-[0m  104) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - buyer data
-         HSTBuyerRegistry - add buyer - unsuitable - low salary:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:478:23)
-[0m
-[0m  105) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - change buyer status
-         HSTServiceRegistry - add service:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:498:23)
-[0m
-[0m  106) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - change buyer status
-         HSTBuyerRegistry - add kyc for buyer:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:507:23)
-[0m
-[0m  107) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - change buyer status
-         HSTServiceRegistry - add service:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:516:23)
-[0m
-[0m  108) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - change buyer status
-         HSTBuyerRegistry - add aml for buyer:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:525:23)
-[0m
-[0m  109) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - change buyer status
-         HSTServiceRegistry - add service:
-[0m[31m     TypeError: Cannot read property 'ServiceRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:534:23)
-[0m
-[0m  110) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - change buyer status
-         HSTBuyerRegistry - add cft for buyer:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:543:23)
-[0m
-[0m  111) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - change buyer status
-         HSTBuyerRegistry - get buyer data - kyc status:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:552:41)
-[0m
-[0m  112) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - change buyer status
-         HSTBuyerRegistry - get buyer data - aml status:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:560:41)
-[0m
-[0m  113) Contract: Testing: HSTokenRegistry + HSTServiceRegistry + HSTBuyerRegistry
-       Checking HSTBuyerRegistry functionality - change buyer status
-         HSTBuyerRegistry - get buyer data - cft status:
-[0m[31m     TypeError: Cannot read property 'BuyerRegistry' of undefined[0m[90m
-      at Context.it (test/3_othertests.js:568:41)
-[0m
-
+[92m [0m[32m 120 passing[0m[90m (19s)[0m
 
