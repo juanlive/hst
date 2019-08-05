@@ -5,8 +5,6 @@ import '../interfaces/IdentityRegistryInterface.sol';
 import './HSTServiceRegistry.sol';
 import './SnowflakeOwnable.sol';
 
-// TO DO
-
 
 /**
  * @title HSTokenRegistry

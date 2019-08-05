@@ -6,11 +6,6 @@ import './HSTokenRegistry.sol';
 import '../_testing/IdentityRegistry.sol';
 
 
-// TO DO
-// review addDefaultRulesService
-// Create basic service categories
-
-
 /**
  * @title HSTServiceRegistry
  *
@@ -89,7 +84,6 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _identityRegistryAddress The address for the identity registry
    * @param _tokenRegistryAddress The address for the token registry
    */
-    // set rules enforcer
   function setAddresses(
     address _identityRegistryAddress,
     address _tokenRegistryAddress) public {
