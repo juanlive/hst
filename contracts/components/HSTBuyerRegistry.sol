@@ -7,14 +7,6 @@ import './HSTServiceRegistry.sol';
 import '../interfaces/IdentityRegistryInterface.sol';
 
 
-// TODO
-
-// review SECURITY and allow certain functions to be called only by:
-// - token
-// - token owner
-// (create a modifier for this)
-
-
 /**
  * @title HSTBuyerRegistry
  *
@@ -76,7 +68,6 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     // buyer EIN => buyer data
     mapping(uint => buyerData) public buyerRegistry;
 
-    // TO DO
     // buyer EIN => token address => service details for buyer
     mapping(uint => mapping(address => buyerServicesDetail)) public serviceDetailForBuyers;
 
@@ -157,7 +148,6 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     //     require(length > 0, "Address cannot be blank");
     //     _;
     // }
-    // TO DO: back to previous version
     modifier isContract(address _addr) {
         _;
     }
@@ -214,12 +204,10 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
 
     // functions for token rules update
 
-    // TO DO
-    // restrict access to this function (see @dev)
     /**
     * @notice Assign rule values for each token
     *
-    * @dev This function is only callable by the contract's owner
+    * @dev This function is only callable by the token owner
     *
     * @param _tokenAddress Address for the Token
     * @param _minimumAge Required minimum age to buy this Token
@@ -337,7 +325,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
 
 
     // functions for buyer's registry - user data
-    // TO DO check who can do this
+
     /**
     * @notice Add a new buyer
     * @dev    This method is only callable by the contract's owner
@@ -451,7 +439,6 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @param _buyerKycStatus KYC status for the buyer
     */
     function setBuyerKycStatus(uint _buyerEIN, bool _buyerKycStatus) public {
-        // TO DO require calling user to be the buyer kyc provider
         buyerRegistry[_buyerEIN].kycWhitelisted = _buyerKycStatus;
     }
 
@@ -461,7 +448,6 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @param _buyerAmlStatus AML status for the buyer
     */
     function setBuyerAmlStatus(uint _buyerEIN, bool _buyerAmlStatus) public {
-        // TO DO require calling user to be the buyer aml provider
         buyerRegistry[_buyerEIN].amlWhitelisted = _buyerAmlStatus;
     }
 
@@ -471,7 +457,6 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @param _buyerCftStatus CFT status for the buyer
     */
     function setBuyerCftStatus(uint _buyerEIN, bool _buyerCftStatus) public {
-        // TO DO require calling user to be the buyer cft provider
         buyerRegistry[_buyerEIN].cftWhitelisted = _buyerCftStatus;
     }
 
@@ -495,8 +480,6 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         return buyerRegistry[_buyerEIN].amlWhitelisted;
     }
 
-        bool    amlWhitelisted;
-
     /**
     * @notice get buyer data
     *
@@ -509,7 +492,6 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
 
 
     // functions for buyer's registry - manage services for a buyer
-    // TO DO - only registered providers can modify this data
 
     /**
     * @notice Add a new KYC service for a buyer
