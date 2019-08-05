@@ -142,13 +142,10 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * Credit: https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/ERC223_Token.sol#L107-L114
     * @param _addr The address of a smart contract
     */
-    // modifier isContract(address _addr) {
-    //     uint length;
-    //     assembly { length := extcodesize(_addr) }
-    //     require(length > 0, "Address cannot be blank");
-    //     _;
-    // }
     modifier isContract(address _addr) {
+        uint length;
+        assembly { length := extcodesize(_addr) }
+        require(length > 0, "Address cannot be blank");
         _;
     }
 
@@ -194,7 +191,11 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         address _identityRegistryAddress,
         address _tokenRegistryAddress,
         address _serviceRegistryAddress)
-    public {
+        public
+        isContract(_identityRegistryAddress)
+        isContract(_tokenRegistryAddress)
+        isContract(_serviceRegistryAddress)
+    {
         //setIdentityRegistryAddress(_identityRegistryAddress);
         identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
         tokenRegistry = HSTokenRegistry(_tokenRegistryAddress);
@@ -503,8 +504,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         uint _buyerEIN,
         address _tokenFor,
         uint _serviceProviderEIN)
-    public isContract(_tokenFor)
-           isRegisteredToken(_tokenFor)
+    public isRegisteredToken(_tokenFor)
            isRegisteredProvider(_tokenFor, _serviceProviderEIN) {
         // control buyer
         require(_buyerEIN != 0, "Buyer EIN cannot be blank");
@@ -529,8 +529,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         uint _buyerEIN,
         address _tokenFor,
         uint _serviceProviderEIN)
-    public isContract(_tokenFor)
-           isRegisteredToken(_tokenFor)
+    public isRegisteredToken(_tokenFor)
            isRegisteredProvider(_tokenFor, _serviceProviderEIN) {
         // control buyer
         require(_buyerEIN != 0, "Buyer EIN cannot be blank");
@@ -555,8 +554,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         uint _buyerEIN,
         address _tokenFor,
         uint _serviceProviderEIN)
-    public isContract(_tokenFor)
-           isRegisteredToken(_tokenFor)
+    public isRegisteredToken(_tokenFor)
            isRegisteredProvider(_tokenFor, _serviceProviderEIN) {
         // control buyer
         require(_buyerEIN != 0, "Buyer EIN cannot be blank");

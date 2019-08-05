@@ -82,6 +82,19 @@ contract HSTokenRegistry is SnowflakeOwnable {
 
 
   /**
+   * @dev Validate that a contract exists in an address received as such
+   * Credit: https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/ERC223_Token.sol#L107-L114
+   * @param _addr The address of a smart contract
+   */
+  modifier isContract(address _addr) {
+    uint length;
+    assembly { length := extcodesize(_addr) }
+    require(length > 0, "This is not a contract");
+    _;
+  }
+
+
+  /**
   * @notice Set the address for the registries
   *
   * @param _identityRegistryAddress The address for the identity registry
@@ -90,9 +103,10 @@ contract HSTokenRegistry is SnowflakeOwnable {
   function setAddresses (
     address _identityRegistryAddress,
     address _serviceRegistryAddress)
-    //public onlySnowflakeOwner {
-    public {
-    //setIdentityRegistryAddress(_identityRegistryAddress);
+    public
+    isContract(_identityRegistryAddress)
+    isContract(_serviceRegistryAddress)
+  {
     identityRegistry = IdentityRegistryInterface(_identityRegistryAddress);
     serviceRegistry = HSTServiceRegistry(_serviceRegistryAddress);
   }

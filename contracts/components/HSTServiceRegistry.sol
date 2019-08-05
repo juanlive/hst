@@ -61,12 +61,12 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * Credit: https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/ERC223_Token.sol#L107-L114
    * @param _addr The address of a smart contract
    */
-  // modifier isContract(address _addr) {
-  //   uint length;
-  //   assembly { length := extcodesize(_addr) }
-  //   require(length > 0, "This is not a contract");
-  //   _;
-  // }
+  modifier isContract(address _addr) {
+    uint length;
+    assembly { length := extcodesize(_addr) }
+    require(length > 0, "This is not a contract");
+    _;
+  }
 
   /**
   * @notice Throws if called by any account other than the owner
@@ -75,21 +75,6 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   modifier onlyTokenOwner(address _tokenAddress) {
       require(isTokenOwner(_tokenAddress), "Caller must be the token EIN owner");
       _;
-  }
-
-
-  /**
-   * @notice Set addresses for the registries
-   *
-   * @param _identityRegistryAddress The address for the identity registry
-   * @param _tokenRegistryAddress The address for the token registry
-   */
-  function setAddresses(
-    address _identityRegistryAddress,
-    address _tokenRegistryAddress) public {
-    identityRegistry = IdentityRegistry(_identityRegistryAddress);
-    tokenRegistryAddress = _tokenRegistryAddress;
-    tokenRegistry = HSTokenRegistry(_tokenRegistryAddress);
   }
 
   /**
@@ -105,6 +90,24 @@ contract HSTServiceRegistry is SnowflakeOwnable {
       uint _senderEIN = identityRegistry.getEIN(msg.sender);
       // compare them
       return (_senderEIN == _tokenEINOwner);
+  }
+
+  /**
+   * @notice Set addresses for the registries
+   *
+   * @param _identityRegistryAddress The address for the identity registry
+   * @param _tokenRegistryAddress The address for the token registry
+   */
+  function setAddresses(
+    address _identityRegistryAddress,
+    address _tokenRegistryAddress)
+    public
+    isContract(_identityRegistryAddress)
+    isContract(_tokenRegistryAddress)
+  {
+    identityRegistry = IdentityRegistry(_identityRegistryAddress);
+    tokenRegistryAddress = _tokenRegistryAddress;
+    tokenRegistry = HSTokenRegistry(_tokenRegistryAddress);
   }
 
   /**
