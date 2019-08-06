@@ -5,7 +5,7 @@ pragma solidity ^0.5.0;
 //import './components/TokenWithDates.sol';
 import './components/HSTBuyerRegistry.sol';
 import './interfaces/HydroInterface.sol';
-import './interfaces/ResolverInterface.sol';
+//import './interfaces/ResolverInterface.sol';
 import './interfaces/IdentityRegistryInterface.sol';
 //import './interfaces/SnowflakeViaInterface.sol';
 import './zeppelin/math/SafeMath.sol';

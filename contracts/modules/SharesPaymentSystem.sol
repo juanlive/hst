@@ -85,8 +85,8 @@ contract SharesPaymentSystem {
 
 
     // Dummy functions (to be overwritten by main contract)
-    function _getPeriod() public view returns(uint256) {}
-    function _getEIN(address) private view returns(uint256) {}
+    function _getPeriod() public view returns(uint256);
+    function _getEIN(address) private view returns(uint256);
 //    function _issuedTokens() internal view returns(uint256);
     function _transferHydroToken(address, uint256) private returns(bool);
 

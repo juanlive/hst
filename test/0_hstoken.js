@@ -49,11 +49,11 @@ console.log(users)
           instances.HydroToken.address, 
           instances.IdentityRegistry.address,
           instances.BuyerRegistry.address,
-          users[0].address,
-          {from: users[0].address}
+          users[9].address,
+          {from: users[9].address}
         )
         console.log("HSToken Address", newToken.address)
-        console.log("User", users[0].address)
+        console.log("User", users[9].address)
     })
     
     it('HSToken exists', async () => {
@@ -82,7 +82,7 @@ console.log(users)
         false, // accredited investor status required
         false, // aml whitelisting required
         false, // cft whitelisting required
-        {from: users[0].address}
+        {from: users[9].address}
         )
     })
 
@@ -97,7 +97,7 @@ console.log(users)
         '12', // day of birth
         '100000', // net worth
         '50000', // salary
-        {from: users[0].address}
+        {from: users[9].address}
       )
     })
 
@@ -113,7 +113,7 @@ console.log(users)
         '20', // day of birth
         '100000', // net worth
         '50000', // salary
-        {from: users[0].address}
+        {from: users[9].address}
       )
     })
 
@@ -143,7 +143,7 @@ console.log(users)
         utilities.daysOn(24), // endDate
         web3.utils.toWei("20000000"), // _maxSupply
         utilities.daysOn(18), // _escrowLimitPeriod
-        { from: users[0].address }
+        { from: users[9].address }
         )
     })
 
@@ -158,7 +158,7 @@ console.log(users)
           true, // WHITELIST_RESTRICTED
           true, // BLACKLIST_RESTRICTED
           false, // HYDRO_ORACLE
-        { from: users[0].address }
+        { from: users[9].address }
         )
     })
 
@@ -170,42 +170,42 @@ console.log(users)
           utilities.daysToSeconds(12).toString(), // _lockPeriod,
           "1", // _minInvestors,
           "4", // _maxInvestors
-          users[0].address, // hydroOracle
-        { from: users[0].address }
+          users[5].address, // hydroOracle
+        { from: users[9].address }
         )
     })
 
     it('HSToken activate Prelaunch', async () => {
-      await newToken.stagePrelaunch({ from: users[0].address });
+      await newToken.stagePrelaunch({ from: users[9].address });
     })
 
 /*    it('HSToken add KYC Resolver', async () => {
       await newToken.addKYCResolver(
         instances.KYCResolver.address,
-        { from: users[0].address })
+        { from: users[9].address })
     })*/
 
 
     it('HSToken activate Presale', async () => {
-      await newToken.stagePresale({ from: users[0].address });
+      await newToken.stagePresale({ from: users[9].address });
     })
 
     it('HSToken activate Sale', async () => {
-      await newToken.stageSale({ from: users[0].address });
+      await newToken.stageSale({ from: users[9].address });
     })
 
     it('HSToken activate Lock', async () => {
-      await newToken.stageLock({ from: users[0].address });
+      await newToken.stageLock({ from: users[9].address });
     })
 
     it('HSToken activate Market', async () => {
-      await newToken.stageMarket({ from: users[0].address });
+      await newToken.stageMarket({ from: users[9].address });
     })
 
 
     it('HSToken adds EIN 2 to whitelist', async() => {
       await newToken.addWhitelist(["2"],
-        { from: users[0].address })
+        { from: users[9].address })
     })
 
     it('HydroToken user 2 approves 1M HydroTokens for HSToken', async() => {
@@ -218,7 +218,7 @@ console.log(users)
     it('HSTBuyerRegistry - get buyer data - kyc status: false', async () => {
       _buyerKycStatus = await instances.BuyerRegistry.getBuyerKycStatus(
         '2',
-        {from: users[0].address}
+        {from: users[9].address}
       )
       console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
     })
@@ -236,7 +236,7 @@ console.log(users)
       await instances.BuyerRegistry.setBuyerKycStatus(
         '2',
         true,
-        {from: users[0].address}
+        {from: users[9].address}
       )
       console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
     })
@@ -245,7 +245,7 @@ console.log(users)
     it('HSTBuyerRegistry - get buyer data - kyc status: true', async () => {
       _buyerKycStatus = await instances.BuyerRegistry.getBuyerKycStatus(
         '2',
-        {from: users[0].address}
+        {from: users[9].address}
       )
       console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
     })
@@ -281,20 +281,20 @@ console.log(users)
 
       var tx = await newToken.addPaymentPeriodBoundaries(
           periods,
-          { from: users[0].address })
+          { from: users[9].address })
       console.log("Gas:",tx.receipt.gasUsed)
     })
 
 
     it('Read periods', async() => {
       var getPeriods = await newToken.getPaymentPeriodBoundaries(
-            { from: users[0].address })
+            { from: users[9].address })
       console.log("Periods:",getPeriods.map(period=>period.toNumber()))
       var now = await newToken.getNow()
       console.log("Now:", now.toNumber())
 
       currentPeriod = await newToken._getPeriod(
-        { from: users[0].address });
+        { from: users[9].address });
       console.log("Current period:",currentPeriod.toNumber())
     })
 
@@ -317,7 +317,7 @@ console.log(users)
       await instances.BuyerRegistry.setBuyerKycStatus(
         '3',
         true,
-        {from: users[0].address}
+        {from: users[9].address}
       )
       console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
     })
@@ -348,7 +348,7 @@ console.log(users)
     it('Setting oracle address', async() => {
       await newToken.addHydroOracle(
         users[5].address,
-        { from: users[0].address })
+        { from: users[9].address })
     })
 
     it('Oracle notifies results of 5 Hydros for this period', async() => {
@@ -374,7 +374,7 @@ console.log(users)
     it('Go to next period', async() => {
       await utilities.timeTravel(200)
       period = await newToken._getPeriod(
-        { from: users[0].address });
+        { from: users[9].address });
       console.log("Current Period:", period.toNumber())
     })
 
@@ -398,24 +398,24 @@ console.log(users)
 
     it('Advancing periods', async () => {
       period = await newToken._getPeriod(
-        { from: users[0].address });
+        { from: users[9].address });
       console.log("Current Period:", period.toNumber())
 
       await utilities.timeTravel(400)
 
       period = await newToken._getPeriod(
-        { from: users[0].address });
+        { from: users[9].address });
       console.log("Current Period:", period.toNumber())
 
     })
 
-
+/*
     it('KYCResolver approve again EIN identity 2', async () => {
       await instances.KYCResolver.approveEin(
         "2",
         { from: users[0].address });
     })
-
+*/
 
     it('HSToken transfer 0.8 HSTokens to Account 2, to decrease his participationRate at period 4', async () => {
 
@@ -434,7 +434,7 @@ console.log(users)
       await utilities.timeTravel(200)
 
       period = await newToken._getPeriod(
-        { from: users[0].address });
+        { from: users[9].address });
       console.log("Current Period:", period.toNumber())
 
     })
