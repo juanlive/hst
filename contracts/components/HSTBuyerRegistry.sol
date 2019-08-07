@@ -135,6 +135,16 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     event ReplaceCftServiceForBuyer(uint _buyerEIN, address _tokenAddress, uint _providerEIN);
 
 
+    /**
+    * @notice Constructor
+    *
+    * @param _dateTimeAddress address for the date time contract
+    */
+    constructor(address _dateTimeAddress) public {
+        dateTime = DateTime(_dateTimeAddress);
+    }
+
+
     // modifiers
 
     /**
@@ -148,6 +158,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         require(length > 0, "Address cannot be blank");
         _;
     }
+
 
    /**
     * @dev Validate that a token exists in token registry
@@ -165,15 +176,29 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         _;
     }
 
+  /**
+  * @notice Throws if called by any account other than the owner
+  * @dev This works on EINs, not on addresses
+  */
+  modifier onlyTokenOwner(address _tokenAddress) {
+      require(isTokenOwner(_tokenAddress), "Caller must be the token EIN owner");
+      _;
+  }
 
-    /**
-    * @notice Constructor
-    *
-    * @param _dateTimeAddress address for the date time contract
-    */
-    constructor(address _dateTimeAddress) public {
-        dateTime = DateTime(_dateTimeAddress);
-    }
+  /**
+  * @notice Check if caller is owner
+  * @dev This works on EINs, not on addresses
+  *
+  * @return true if `msg.sender` is the owner of the contract
+  */
+  function isTokenOwner(address _tokenAddress) public view returns(bool) {
+      // find out owner EIN
+      uint _tokenEINOwner = tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenAddress);
+      // find out caller EIN
+      uint _senderEIN = identityRegistry.getEIN(msg.sender);
+      // compare them
+      return (_senderEIN == _tokenEINOwner);
+  }
 
 
     // functions for contract configuration
@@ -224,7 +249,9 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         bool _accreditedInvestorStatusRequired,
         bool _amlWhitelistingRequired,
         bool _cftWhitelistingRequired)
-    public {
+    public
+    onlyTokenOwner(_tokenAddress)
+    {
         tokenData[_tokenAddress].minimumAge = _minimumAge;
         tokenData[_tokenAddress].minimumNetWorth = _minimumNetWorth;
         tokenData[_tokenAddress].minimumSalary = _minimumSalary;
@@ -288,7 +315,9 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     function addCountryBan(
         address _tokenAddress,
         bytes32 _isoCountryCode)
-    public {
+    public
+        onlyTokenOwner(_tokenAddress)
+    {
         bannedCountries[_tokenAddress][_isoCountryCode] = true;
         emit AddCountryBan(_tokenAddress, _isoCountryCode);
     }
@@ -319,7 +348,9 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     function liftCountryBan(
         address _tokenAddress,
         bytes32 _isoCountryCode)
-    public {
+    public
+        onlyTokenOwner(_tokenAddress)
+    {
         bannedCountries[_tokenAddress][_isoCountryCode] = false;
         emit LiftCountryBan(_tokenAddress, _isoCountryCode);
     }
@@ -504,8 +535,11 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         uint _buyerEIN,
         address _tokenFor,
         uint _serviceProviderEIN)
-    public isRegisteredToken(_tokenFor)
-           isRegisteredProvider(_tokenFor, _serviceProviderEIN) {
+    public
+        isRegisteredToken(_tokenFor)
+        isRegisteredProvider(_tokenFor, _serviceProviderEIN)
+        onlyTokenOwner(_tokenFor)
+    {
         // control buyer
         require(_buyerEIN != 0, "Buyer EIN cannot be blank");
         // control that caller is owner
@@ -529,8 +563,11 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         uint _buyerEIN,
         address _tokenFor,
         uint _serviceProviderEIN)
-    public isRegisteredToken(_tokenFor)
-           isRegisteredProvider(_tokenFor, _serviceProviderEIN) {
+    public
+        isRegisteredToken(_tokenFor)
+        isRegisteredProvider(_tokenFor, _serviceProviderEIN)
+        onlyTokenOwner(_tokenFor)
+    {
         // control buyer
         require(_buyerEIN != 0, "Buyer EIN cannot be blank");
         // control that caller is owner
@@ -554,8 +591,11 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         uint _buyerEIN,
         address _tokenFor,
         uint _serviceProviderEIN)
-    public isRegisteredToken(_tokenFor)
-           isRegisteredProvider(_tokenFor, _serviceProviderEIN) {
+    public
+        isRegisteredToken(_tokenFor)
+        isRegisteredProvider(_tokenFor, _serviceProviderEIN)
+        onlyTokenOwner(_tokenFor)
+    {
         // control buyer
         require(_buyerEIN != 0, "Buyer EIN cannot be blank");
         // control that caller is owner

@@ -67,7 +67,7 @@ console.log(users)
         web3.utils.fromAscii('Hydro Security'),
         'just-a-test',
         18,
-        {from: users[1].address}
+        {from: users[9].address}
       )
     })
 
@@ -122,7 +122,7 @@ console.log(users)
         newToken.address,
         '3',
         web3.utils.fromAscii("KYC"),
-        {from: users[1].address}
+        {from: users[9].address}
         )
     })
 
@@ -131,7 +131,7 @@ console.log(users)
         '1',
         newToken.address,
         '3',
-        {from: users[1].address}
+        {from: users[9].address}
       )
     })
 
