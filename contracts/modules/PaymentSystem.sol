@@ -58,36 +58,7 @@ contract PaymentSystem {
 
 
 
-    function claimPayment()
-        public
-    {
-        //return uint(address(IdentityRegistry));
-        uint256 _ein = _getEIN(msg.sender);
-        uint256 _period = getPeriod();
-        uint256 _periodToPay = investors[_ein].lastPeriodPayed + 1;
-        require(_periodToPay <= _period, "There is no period to pay yet");
-
-        investors[_ein].lastPeriodPayed = _periodToPay;
-
-        uint256 _participationRate = _balanceAt(_periodToPay, msg.sender) * 1 ether / issuedTokens;
-        uint256 _paymentForInvestor = profits[_periodToPay] * _participationRate / 1 ether;
-
-        if (_paymentForInvestor > 0) {
-            require(_transferHydroToken(msg.sender, _paymentForInvestor), "Error while releasing Tokens");
-            }
-        emit SharesPayed(_ein, _periodToPay, profits[_periodToPay], _participationRate, _paymentForInvestor);
-    }
-
-    function notifyPeriodProfits(uint256 _profits) public {
-        require(msg.sender == hydroOracle, "Only registered oracle can notify profits");
-        require(_profits > 0, "Profits has to be greater than zero");
-        uint256 _period = getPeriod();
-        require(profits[_period] == 0, "Period already notified");
-        profits[_period] = _profits;
-        emit PeriodNotified(_period, _profits);
-    }
-
-
+    // PUBLIC SETTERS FOR SETUP STAGE, only for admin -----------------------------------------------------------
 
     function setIssuerProperties(
         string memory _issuerName,
@@ -136,6 +107,49 @@ contract PaymentSystem {
     }
 
 
+    // PUBLIC FUNCTION FOR INVESTORS --------------------------------------------------------------------------
+
+    function claimPayment()
+        public
+    {
+        uint256 _ein = _getEIN(msg.sender);
+        uint256 _period = getPeriod();
+        uint256 _periodToPay = investors[_ein].lastPeriodPayed + 1;
+        require(_periodToPay <= _period, "There is no period to pay yet");
+
+        investors[_ein].lastPeriodPayed = _periodToPay;
+
+        uint256 _participationRate = _balanceAt(_periodToPay, msg.sender) * 1 ether / issuedTokens;
+        uint256 _paymentForInvestor = profits[_periodToPay] * _participationRate / 1 ether;
+
+        if (_paymentForInvestor > 0) {
+            require(_transferHydroToken(msg.sender, _paymentForInvestor), "Error while releasing Tokens");
+            }
+        emit SharesPayed(_ein, _periodToPay, profits[_periodToPay], _participationRate, _paymentForInvestor);
+    }
+
+
+    // FUNCTION FOR ORACLE UPDATES ----------------------------------------------------------------------------
+
+    function notifyPeriodProfits(uint256 _profits) public {
+        require(msg.sender == hydroOracle, "Only registered oracle can notify profits");
+        require(_profits > 0, "Profits has to be greater than zero");
+        uint256 _period = getPeriod();
+        require(profits[_period] == 0, "Period already notified");
+
+        profits[_period] = _profits;
+
+        if (stoType == STOTypes.UNITS) {
+            uint256 _paymentForManager = _profits.mul(carriedInterestRate) / 1 ether;
+            require(_profits <= _hydroTokensBalance().sub(_paymentForManager), "There is not enough HydroTokens to pay");
+            require(_transferHydroToken(msg.sender, _paymentForManager), "Error while releasing Tokens");
+        }
+
+        emit PeriodNotified(_period, _profits);
+    }
+
+    // INTERNAL FUNCTIONS ---------------------------------------------------------------------
+
     function _balanceAt(uint256 _period, address _address) private view returns(uint256) {
         for (uint256 i = _period; i > 0; i--) {
             if (balanceAt[i][_address] > 0) {
@@ -145,13 +159,12 @@ contract PaymentSystem {
         return 0;
     }
 
-
     // Dummy functions (to be overwritten by main contract)
     function getPeriod() public view returns(uint256);
     function _getEIN(address) private view returns(uint256);
     function _getTokenEinOwner() private view returns(uint256);
     function tokenInSetupStage() private view returns(bool);
-    // function _issuedTokens() internal view returns(uint256);
     function _transferHydroToken(address, uint256) private returns(bool);
+    function _hydroTokensBalance() private view returns(uint256);
 
 }

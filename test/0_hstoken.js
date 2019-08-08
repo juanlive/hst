@@ -41,7 +41,8 @@ console.log(users)
     it('HSToken can be created', async () => {
 
       newToken = await HSToken.new(
-          1,
+          1, // Id
+          0, // STO Type (0: Shares, 1: Units, 2: Bonds)
           web3.utils.stringToHex("HydroSecurityToken"),
           "Hydro Security",
           web3.utils.fromAscii("HTST"),
@@ -54,7 +55,6 @@ console.log(users)
         )
         console.log("HSToken Address", newToken.address)
         console.log("User", users[9].address)
-        console.log("Gas used:", newToken)
     })
     
     it('HSToken exists', async () => {
@@ -174,16 +174,22 @@ console.log(users)
         )
     })
 
+
+    it('HSToken set Issuer Properties', async () => {
+      await newToken.setIssuerProperties(
+          "Company Name", // Company name
+          "1234567890", // RegisteredNumber,
+          "NYC, USA", // jurisdiction,
+          users[9].address, // fundManager (can be 0x0 for Shares and Bonds),
+          "0", // carriedInterestRate
+        { from: users[9].address }
+        )
+    })
+
+
     it('HSToken activate Prelaunch', async () => {
       await newToken.stagePrelaunch({ from: users[9].address });
     })
-
-/*    it('HSToken add KYC Resolver', async () => {
-      await newToken.addKYCResolver(
-        instances.KYCResolver.address,
-        { from: users[9].address })
-    })*/
-
 
     it('HSToken activate Presale', async () => {
       await newToken.stagePresale({ from: users[9].address });
@@ -342,8 +348,8 @@ console.log(users)
         { from: users[9].address })
     })
 
-    it('Oracle notifies results of 5 Hydros for this period', async() => {
-      await newToken.notifyPeriodResults(
+    it('Oracle notifies profits of 5 Hydros for this period', async() => {
+      await newToken.notifyPeriodProfits(
         web3.utils.toWei("5"),
         { from: users[5].address })
     })
@@ -355,7 +361,7 @@ console.log(users)
 
       console.log("Period payed:", payment.receipt.logs[1].args.periodToPay.toNumber())
       console.log("Participation rate:", web3.utils.fromWei(payment.receipt.logs[1].args.investorParticipationRate))
-      console.log("Period results:", web3.utils.fromWei(payment.receipt.logs[1].args.periodResults))
+      console.log("Period profits:", web3.utils.fromWei(payment.receipt.logs[1].args.periodProfits))
       console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[1].args.paymentForInvestor))
       console.log("Amount from transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
       console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(users[1].address)))
@@ -369,8 +375,8 @@ console.log(users)
       console.log("Current Period:", period.toNumber())
     })
 
-    it('Oracle notifies results of 4 Hydros for this period', async() => {
-      await newToken.notifyPeriodResults(
+    it('Oracle notifies profits of 4 Hydros for this period', async() => {
+      await newToken.notifyPeriodProfits(
         web3.utils.toWei("4"),
         { from: users[5].address })
     })
@@ -380,7 +386,7 @@ console.log(users)
         { from: users[1].address })
       console.log("Period payed:", payment.receipt.logs[1].args.periodToPay.toNumber())
       console.log("Participation rate:", web3.utils.fromWei(payment.receipt.logs[1].args.investorParticipationRate))
-      console.log("Period results:", web3.utils.fromWei(payment.receipt.logs[1].args.periodResults))
+      console.log("Period profits:", web3.utils.fromWei(payment.receipt.logs[1].args.periodProfits))
       console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[1].args.paymentForInvestor))
       console.log("Amount from transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
       console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(users[1].address)))
@@ -422,8 +428,8 @@ console.log(users)
 
     })
 
-    it('Oracle notifies results of 5 Hydros for this period', async() => {
-      await newToken.notifyPeriodResults(
+    it('Oracle notifies profits of 5 Hydros for this period', async() => {
+      await newToken.notifyPeriodProfits(
         web3.utils.toWei("5"),
         { from: users[5].address })
     })
@@ -434,7 +440,7 @@ console.log(users)
         { from: users[1].address })
       console.log("Period payed:", payment.logs[0].args.periodToPay.toNumber())
       console.log("Participation rate:", web3.utils.fromWei(payment.logs[0].args.investorParticipationRate))
-      console.log("Period results:", web3.utils.fromWei(payment.logs[0].args.periodResults))
+      console.log("Period profits:", web3.utils.fromWei(payment.logs[0].args.periodProfits))
       console.log("Amount payed:", web3.utils.fromWei(payment.logs[0].args.paymentForInvestor))
     })
 
@@ -444,7 +450,7 @@ console.log(users)
         { from: users[1].address })
       console.log("Period payed:", payment.logs[0].args.periodToPay.toNumber())
       console.log("Participation rate:", web3.utils.fromWei(payment.logs[0].args.investorParticipationRate))
-      console.log("Period results:", web3.utils.fromWei(payment.logs[0].args.periodResults))
+      console.log("Period profits:", web3.utils.fromWei(payment.logs[0].args.periodProfits))
       console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[0].args.paymentForInvestor))
     })
 
@@ -453,7 +459,7 @@ console.log(users)
         { from: users[1].address })
       console.log("Period payed:", payment.receipt.logs[1].args.periodToPay.toNumber())
       console.log("Participation rate:", web3.utils.fromWei(payment.receipt.logs[1].args.investorParticipationRate))
-      console.log("Period results:", web3.utils.fromWei(payment.receipt.logs[1].args.periodResults))
+      console.log("Period profits:", web3.utils.fromWei(payment.receipt.logs[1].args.periodProfits))
       console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[1].args.paymentForInvestor))
       console.log("Amount from transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
       console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(users[1].address)))

@@ -1,37 +1,16 @@
 pragma solidity ^0.5.0;
 
 
-//import './components/SnowflakeOwnable.sol';
-//import './components/TokenWithDates.sol';
 import './components/HSTBuyerRegistry.sol';
 import './interfaces/HydroInterface.sol';
-//import './interfaces/ResolverInterface.sol';
 import './interfaces/IdentityRegistryInterface.sol';
-//import './interfaces/SnowflakeViaInterface.sol';
 import './zeppelin/math/SafeMath.sol';
 import './zeppelin/ownership/Ownable.sol';
 import './modules/PaymentSystem.sol';
 
-//interface IdentityRegistryInterface {
-//    function getEIN(address _address) external view returns (uint ein);
-//}
-
-// For testing
-
 // Rinkeby testnet addresses
 // HydroToken: 0x4959c7f62051d6b2ed6eaed3aaee1f961b145f20
 // IdentityRegistry: 0xa7ba71305be9b2dfead947dc0e5730ba2abd28ea
-
-// TODO
-//
-// External pricer
-//
-// A global Registry with data of all Securities issued, to check for repeated ids or symbols
-//
-// Feature #15: Carried interest ?
-// Feature #16: Interest payout ?
-// Feature #17: Dividend payout ?
-
 
 /**
  * @title HSToken
@@ -135,8 +114,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     mapping(uint256 => uint256) hydroPriceAt;
     // mapping(uint256 => uint256) results; // It is in the payment module
 
- 	// Links to Modules
-	// address public RegistryRules;
     address public raindropAddress;
 
     // address InterestSolver;
@@ -239,7 +216,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         address _identityRegistry,
         address _buyerRegistry,
         address payable _owner
-        // address _RaindropAddress
     )
         public
     {
