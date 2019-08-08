@@ -54,6 +54,7 @@ console.log(users)
         )
         console.log("HSToken Address", newToken.address)
         console.log("User", users[9].address)
+        console.log("Gas used:", newToken)
     })
     
     it('HSToken exists', async () => {
@@ -138,9 +139,7 @@ console.log(users)
     it('HSToken set MAIN_PARAMS', async () => {
       await newToken.set_MAIN_PARAMS(
         web3.utils.toWei("0.1"), // hydroPrice: 1 ether = same price
-        utilities.daysOn(15), // beginningDate
         utilities.daysOn(20), // lockEnds
-        utilities.daysOn(24), // endDate
         web3.utils.toWei("20000000"), // _maxSupply
         utilities.daysOn(18), // _escrowLimitPeriod
         { from: users[9].address }
@@ -192,14 +191,6 @@ console.log(users)
 
     it('HSToken activate Sale', async () => {
       await newToken.stageSale({ from: users[9].address });
-    })
-
-    it('HSToken activate Lock', async () => {
-      await newToken.stageLock({ from: users[9].address });
-    })
-
-    it('HSToken activate Market', async () => {
-      await newToken.stageMarket({ from: users[9].address });
     })
 
 
@@ -293,7 +284,7 @@ console.log(users)
       var now = await newToken.getNow()
       console.log("Now:", now.toNumber())
 
-      currentPeriod = await newToken._getPeriod(
+      currentPeriod = await newToken.getPeriod(
         { from: users[9].address });
       console.log("Current period:",currentPeriod.toNumber())
     })
@@ -373,7 +364,7 @@ console.log(users)
 
     it('Go to next period', async() => {
       await utilities.timeTravel(200)
-      period = await newToken._getPeriod(
+      period = await newToken.getPeriod(
         { from: users[9].address });
       console.log("Current Period:", period.toNumber())
     })
@@ -397,25 +388,17 @@ console.log(users)
     })
 
     it('Advancing periods', async () => {
-      period = await newToken._getPeriod(
+      period = await newToken.getPeriod(
         { from: users[9].address });
       console.log("Current Period:", period.toNumber())
 
       await utilities.timeTravel(400)
 
-      period = await newToken._getPeriod(
+      period = await newToken.getPeriod(
         { from: users[9].address });
       console.log("Current Period:", period.toNumber())
 
     })
-
-/*
-    it('KYCResolver approve again EIN identity 2', async () => {
-      await instances.KYCResolver.approveEin(
-        "2",
-        { from: users[0].address });
-    })
-*/
 
     it('HSToken transfer 0.8 HSTokens to Account 2, to decrease his participationRate at period 4', async () => {
 
@@ -433,7 +416,7 @@ console.log(users)
     it('Advancing new period', async () => {
       await utilities.timeTravel(200)
 
-      period = await newToken._getPeriod(
+      period = await newToken.getPeriod(
         { from: users[9].address });
       console.log("Current Period:", period.toNumber())
 
@@ -476,6 +459,15 @@ console.log(users)
       console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(users[1].address)))
 
     })
+
+    it('HSToken activate Lock', async () => {
+      await newToken.stageLock({ from: users[9].address });
+    })
+
+    it('HSToken activate Market', async () => {
+      await newToken.stageMarket({ from: users[9].address });
+    })
+
 
   })
 })

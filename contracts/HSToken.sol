@@ -56,9 +56,7 @@ contract MAIN_PARAMS {
     bool public MAIN_PARAMS_ready;
 
     uint256 public hydroPrice;
-    uint256 public beginningDate;
     uint256 public lockEnds; // Date of end of locking period
-    uint256 public endDate;
     uint256 public maxSupply;
     uint256 public escrowLimitPeriod;
 }
@@ -200,13 +198,16 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     modifier onlyAtPreLaunch() {
         require(stage == Stage.PRELAUNCH, "Not in Prelaunch stage");
-        require(beginningDate == 0 || beginningDate > now, "Prelaunch time has passed");
     	_;
     }
 
     modifier onlyActive() {
-        require(stage == Stage.MARKET, "Not in active stage");
-        require(endDate > now, "Issuing stage finalized");
+        require(
+            stage == Stage.PRESALE || 
+            stage == Stage.SALE || 
+            stage == Stage.MARKET, 
+            "Not in active stage"
+            );
         _;
     }
 
@@ -278,9 +279,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     function set_MAIN_PARAMS(
         uint256 _hydroPrice,
-        uint256 _beginningDate,
         uint256 _lockEnds,
-        uint256 _endDate,
         uint256 _maxSupply,
         uint256 _escrowLimitPeriod
     )
@@ -289,9 +288,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         // Validations
         require(
             _hydroPrice > 0 &&
-            (_beginningDate == 0 || _beginningDate > now) &&
-            (_lockEnds > _beginningDate && _lockEnds > now) &&
-            _endDate > _lockEnds &&
+            _lockEnds > now &&
             _maxSupply > 10000 &&
             _escrowLimitPeriod > (10 * 24 * 60 * 60),
             "Incorrect input data"
@@ -299,9 +296,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         require(!MAIN_PARAMS_ready, "Params already setted");
         // Load values
         hydroPrice = _hydroPrice;
-        beginningDate = _beginningDate;
         lockEnds = _lockEnds; // Date of end of locking period
-        endDate = _endDate;
         maxSupply = _maxSupply;
         escrowLimitPeriod = _escrowLimitPeriod;
         // Set flag
@@ -358,7 +353,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     }
 
 
-    // ADMIN STAGES CHANGING
+    // ADMIN CHANGING STAGES -------------------------------------------------------------------
 
     function stagePrelaunch()
         public onlyAdmin onlyAtSetup
@@ -367,8 +362,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
         require(STO_PARAMS_ready, "STO_PARAMS not setted");
         require(EXT_PARAMS_ready, "EXT_PARAMS not setted"); // Parameters required for payment modules
-
-        if (beginningDate == 0) beginningDate = now;
         stage = Stage.PRELAUNCH;
     }
 
@@ -404,7 +397,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
 
 
-    // Feature #10: ADMIN FUNCTIONS
+    // ADMIN GENERAL FUNCTIONS ----------------------------------------------------------------
 
     function getTokenEINOwner() public view returns(uint) {
         return einOwner;
@@ -414,24 +407,24 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         return Owner;
     }
 
-
-    // Feature #9
     function setLockupPeriod(uint256 _lockEnds)
         public onlyAdmin
     {
-    	require(lockEnds > now, "Lock ending should be in the future");
-
+        // Remove lock period
         if (_lockEnds == 0) {
             PERIOD_LOCKED = false;
+            lockEnds = 0;
+            return;
             }
-
+        // Add lock period
+        require(_lockEnds > now + 24 * 60 * 60, "Lock ending should be at least 24 hours in the future");
         PERIOD_LOCKED = true;
         lockEnds = _lockEnds;
     }
 
 
     function changeBuyerRegistry(address _newBuyerRegistry) public onlyAdmin {
-    	require(stage == Stage.SETUP, "Stage should be Setup to change this");
+    	require(stage == Stage.SETUP, "Stage should be Setup to change this registry");
 		BuyerRegistry = HSTBuyerRegistry(_newBuyerRegistry);
     }
 
@@ -483,7 +476,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     function addPaymentPeriodBoundaries(uint256[] memory _periods) public onlyAdmin {
         for (uint i = 0; i < _periods.length; i++) {
-          // require(periods[periods.length-1] < _periods[i], "Period must be after previous one"); 
+          require(periods[periods.length-1] < _periods[i], "Period must be after previous one"); 
           periods.push(_periods[i]);
         }
         emit PaymentPeriodBoundariesAdded(_periods);
@@ -495,17 +488,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     }
 
 
-    // Only at Prelaunch functions:
-
-    // Setting oracle address
-
     function addHydroOracle(address _newAddress) public onlyAdmin {
     	hydroOracle = _newAddress;
     }
 
-    // Release gains. Only after escrow is released
-
-    // Retrieve tokens
+    // Release gains Only after escrow is released
     function releaseHydroTokens() public onlyAdmin escrowReleased {
         uint256 thisBalance = HydroToken.balanceOf(address(this));
         require(thisBalance > 0, "There are not HydroTokens in this account");
@@ -523,8 +510,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     {
         uint256 total;
         uint256 _ein = IdentityRegistry.getEIN(msg.sender);
-        // bytes32 HYDRO = keccak256(abi.encode("HYDRO"));
-        // bytes32 ETH = keccak256(abi.encode("ETH"));
 
         if (!investors[_ein].exists) {
             investorsQuantity++;
@@ -532,9 +517,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
             require(investorsQuantity <= maxInvestors || maxInvestors == 0, "Maximum investors reached");
         }
 
-        require(stage == Stage.MARKET, "Current stage is not active");
-
-        // CHECKINGS (to be replaced by HSTRulesEnforcer)
         // Check for limits
         if (HYDRO_AMOUNT_TYPE) {
             require(hydroReceived.add(_amount) <= hydroAllowed, "Hydro amount exceeded");
@@ -543,21 +525,28 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         // Check with KYC and AML providers
         BuyerRegistry.checkRules(_ein);
 
-        // Check with whitelist and blacklist
-        if (WHITELIST_RESTRICTED) _checkWhitelist(msg.sender);
-        if (BLACKLIST_RESTRICTED) _checkBlacklist(msg.sender);
+        // If Stage is PRESALE, check with whitelist and blacklist
+        if (stage == Stage.PRESALE) {
+            if (WHITELIST_RESTRICTED) _checkWhitelist(_ein);
+            if (BLACKLIST_RESTRICTED) _checkBlacklist(_ein);
+        }
 
         // Calculate total
         total = _amount.mul(hydroPrice) / 1 ether;
+        // Adjust state
         investors[_ein].hydroSent = investors[_ein].hydroSent.add(_amount);
         hydroReceived = hydroReceived.add(_amount);
+        issuedTokens = issuedTokens.add(total);
+        issuedTokensAt[0] = issuedTokens;
+        balance[msg.sender] = balance[msg.sender].add(total);
+        balanceAt[0][msg.sender] = balance[msg.sender];
 
         // Check with maxSupply
-        require(issuedTokens.add(total) <= maxSupply, "Max supply of Tokens is exceeded");
+        require(issuedTokens <= maxSupply, "Max supply of Tokens is exceeded");
 
         // Check for ownership percentage
         if (PERC_OWNERSHIP_TYPE) {
-            require ((issuedTokens.add(total).mul(1 ether) / maxSupply) < percAllowedTokens,
+            require ((issuedTokens.mul(1 ether) / maxSupply) < percAllowedTokens,
                 "Perc ownership exceeded");
         }
 
@@ -565,14 +554,21 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         require(HydroToken.transferFrom(msg.sender, address(this), _amount),
             "Hydro transfer was not possible");
 
-        // _updateBatches(address(0), _to, _amount);
-        // Sell
-        _doSell(msg.sender, total);
         emit Sell(msg.sender, total);
         return true;
     }
 
-    // To be accesed by modules
+
+    // To be accesed by modules ---------------------------------------------------------------
+
+    // FUNCTIONS
+
+    function _transferHydroToken(address _address, uint256 _payment) private returns(bool) {
+        return HydroToken.transfer(_address, _payment);
+    }
+
+    // GETTERS
+
     function _getEIN(address _address) private view returns(uint256) {
         return IdentityRegistry.getEIN(_address);
     }
@@ -585,18 +581,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     	return einOwner;
     }
 
-    function _transferHydroToken(address _address, uint256 _payment) private returns(bool) {
-        return HydroToken.transfer(_address, _payment);
-    }
-
     function _hydroTokensBalance() private view returns(uint256) {
     	return HydroToken.balanceOf(address(this));
     }
 
 
-    // Token ERC-20 wrapper -----------------------------------------------------------
+    // Token ERC-20 wrapper ---------------------------------------------------------------------
 
-    // Feature #11
     function transfer(address _to, uint256 _amount)
         public isUnlocked isUnfreezed(msg.sender, _to)
         returns(bool success)
@@ -607,7 +598,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         return true;
     }
 
-    // Feature #11
     function transferFrom(address _from, address _to, uint256 _amount)
         public isUnlocked isUnfreezed(_from, _to)
         returns(bool success)
@@ -650,7 +640,16 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     }
 
 
-    // PUBLIC GETTERS ----------------------------------------------------------------
+    function _doTransfer(address _from, address _to, uint256 _amount) private {
+        uint256 _period = getPeriod();
+        balance[_to] = balance[_to].add(_amount);
+        balance[_from] = balance[_from].sub(_amount);
+        balanceAt[_period][_to] = balance[_to];
+        balanceAt[_period][_from] = balance[_from];
+        emit Transfer(_from, _to, _amount);
+    }
+
+    // PUBLIC GETTERS --------------------------------------------------------------------------
 
     function isTokenLocked() public view returns(bool) {
         if (locked) return true;
@@ -660,76 +659,43 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     function isTokenAlive() public view returns(bool) {
         if (!exists) return false;
-        if (stage == Stage.SETUP && !tokenInSetupStage()) return false;
+        if (!tokenInSetupStage()) return false;
         return true;
     }
 
-    function getTokenStage() public view returns(string memory _stage) {
-        if (stage == Stage.FINALIZED || stage == Stage.MARKET && endDate < now) return "FINALIZED";
-        if (stage == Stage.MARKET || stage == Stage.PRELAUNCH && beginningDate > 0 && beginningDate > now) return "ACTIVE";
-        if (stage == Stage.PRELAUNCH) return "PRELAUNCH";
-        if (stage == Stage.SETUP && tokenInSetupStage()) return "SETUP";
-        return "TOKEN IS INACTIVE";
-    }
 
     function getNow() public view returns(uint256) {
     	return now;
     }
 
-    // PRIVATE GETTERS
-
-    function tokenInSetupStage() private view returns(bool) {
-        // 15 days to complete setup
-        return((now - registerDate) < (15 * 24 * 60 * 60));
+    function getPeriod() public view returns(uint256) {
+        if (periods.length < 2) return 0;
+        for (uint i = 1; i < periods.length; i++) {
+          if (periods[i] > now) return i-1;
+        }
+        return 0;
     }
 
-    function tokenInPrelaunchStage() private view returns(bool) {
-        // 15 days to complete setup
-        return((now - registerDate) < (15 * 24 * 60 * 60));
-    }
-
-
-    // ONLY FOR ORACLES
+    // ONLY FOR ORACLES ------------------------------------------------------------------
 
     function updateHydroPrice(uint256 _newPrice) external {
     	require(msg.sender == hydroOracle, "This can only be executed by the registered Oracle");
     	hydroPrice = _newPrice;
     }
 
-    // PRIVATE FUNCTIONS ----------------------------------------------------------
+    // PRIVATE GETTERS --------------------------------------------------------------------
 
-     function _doSell(address _to, uint256 _amount) private {
-        issuedTokens = issuedTokens.add(_amount);
-        issuedTokensAt[0] = issuedTokens;
-        balance[_to] = balance[_to].add(_amount);
-        balanceAt[0][_to] = balance[_to];
+    function tokenInSetupStage() private view returns(bool) {
+        // Stage is SETUP and 15 days to complete setup has not passed yet
+        return(stage == Stage.SETUP && (now - registerDate) < (15 * 24 * 60 * 60));
     }
 
-    function _doTransfer(address _from, address _to, uint256 _amount) private {
-    	uint256 _period = _getPeriod();
-        balance[_to] = balance[_to].add(_amount);
-        balance[_from] = balance[_from].sub(_amount);
-        balanceAt[_period][_to] = balance[_to];
-        balanceAt[_period][_from] = balance[_from];
-        emit Transfer(_from, _to, _amount);
+    function _checkWhitelist(uint256 _einUser) private view {
+        require(whitelist[_einUser], "EIN address not in whitelist");
     }
 
-    function _getPeriod() public view returns(uint256) {
-    	if (periods.length < 2) return 0;
-    	for (uint i = 1; i < periods.length; i++) {
-          if (periods[i] > now) return i-1;
-        }
-     	return 0;
-    }
-
-    function _checkWhitelist(address _user) private view {
-        uint256 einUser = IdentityRegistry.getEIN(_user);
-        require(whitelist[einUser], "EIN address not in whitelist");
-    }
-
-    function _checkBlacklist(address _user) private view {
-        uint256 einUser = IdentityRegistry.getEIN(_user);
-        require(!blacklist[einUser], "EIN address is blacklisted");
+    function _checkBlacklist(uint256 _einUser) private view {
+        require(!blacklist[_einUser], "EIN address is blacklisted");
     }
 
 }
