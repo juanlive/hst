@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import './SnowflakeOwnable.sol';
-import './HSTokenRegistry.sol';
 import './DateTime.sol';
+import './HSTokenRegistry.sol';
 import './HSTServiceRegistry.sol';
+import './SnowflakeOwnable.sol';
 import '../interfaces/IdentityRegistryInterface.sol';
 
 
@@ -66,7 +66,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     }
 
     // buyer EIN => buyer data
-    mapping(uint => buyerData) public buyerRegistry;
+    mapping(uint => buyerData) public buyerRegistryDetail;
 
     // buyer EIN => token address => service details for buyer
     mapping(uint => mapping(address => buyerServicesDetail)) public serviceDetailForBuyers;
@@ -75,8 +75,8 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     // external
 
     DateTime dateTime;
-    HSTServiceRegistry serviceRegistry;
     HSTokenRegistry tokenRegistry;
+    HSTServiceRegistry serviceRegistry;
     IdentityRegistryInterface identityRegistry;
 
 
@@ -186,6 +186,46 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
   }
 
   /**
+  * @notice Throws if called by any account who is not a registered token owner
+  * @dev This works on EINs, not on addresses
+  */
+  modifier onlyRegisteredTokenOwner() {
+      require(isRegisteredTokenOwner(), "Caller address must be a registered token owner");
+      _;
+  }
+
+  /**
+  * @notice Throws if called by any account other than the KYC provider for this buyer
+  * @dev This works on EINs, not on addresses
+  */
+  modifier onlyRegisteredKycProvider(uint _buyerEIN, address _tokenAddress) {
+      require(isRegisteredKycProvider(_buyerEIN, _tokenAddress),
+       "Caller address must be a registered KYC provider for this buyer");
+      _;
+  }
+
+  /**
+  * @notice Throws if called by any account other than the AML provider for this buyer
+  * @dev This works on EINs, not on addresses
+  */
+  modifier onlyRegisteredAmlProvider(uint _buyerEIN, address _tokenAddress) {
+      require(isRegisteredAmlProvider(_buyerEIN, _tokenAddress),
+       "Caller address must be a registered AML provider for this buyer");
+      _;
+  }
+
+    /**
+  * @notice Throws if called by any account other than the CFT provider for this buyer
+  * @dev This works on EINs, not on addresses
+  */
+  modifier onlyRegisteredCftProvider(uint _buyerEIN, address _tokenAddress) {
+      require(isRegisteredCftProvider(_buyerEIN, _tokenAddress),
+       "Caller address must be a registered CFT provider for this buyer");
+      _;
+  }
+
+
+  /**
   * @notice Check if caller is owner
   * @dev This works on EINs, not on addresses
   *
@@ -198,6 +238,67 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
       uint _senderEIN = identityRegistry.getEIN(msg.sender);
       // compare them
       return (_senderEIN == _tokenEINOwner);
+  }
+
+  /**
+  * @notice Check if caller is a registered token owner
+  * @dev This works on EINs, not on addresses
+  *
+  * @return true if `msg.sender` is the owner of the contract
+  */
+  function isRegisteredTokenOwner() public view returns(bool) {
+      // find out caller EIN
+      uint _senderEIN = identityRegistry.getEIN(msg.sender);
+      // find out if it is a registered owner EIN
+      return tokenRegistry.isRegisteredOwner(_senderEIN);
+  }
+
+  /**
+  * @notice Check if caller is a registered KYC provider for the buyer
+  * @dev This works on EINs, not on addresses
+  *
+  * @return true if `msg.sender` is a registered KYC provider for the buyer
+  */
+  function isRegisteredKycProvider(uint _buyerEIN, address _tokenAddress)
+   public view returns(bool) {
+      // find out caller EIN
+      uint _senderEIN = identityRegistry.getEIN(msg.sender);
+      // find out if it is a registered owner EIN
+      require(serviceDetailForBuyers[_buyerEIN][_tokenAddress].kycProvider == _senderEIN,
+       "Must be the registered KYC provider for this buyer");
+      return true;
+  }
+
+  /**
+  * @notice Check if caller is a registered KYC provider for the buyer
+  * @dev This works on EINs, not on addresses
+  *
+  * @return true if `msg.sender` is a registered KYC provider for the buyer
+  */
+  function isRegisteredAmlProvider(uint _buyerEIN, address _tokenAddress)
+   public view returns(bool) {
+      // find out caller EIN
+      uint _senderEIN = identityRegistry.getEIN(msg.sender);
+      // find out if it is a registered owner EIN
+      require(serviceDetailForBuyers[_buyerEIN][_tokenAddress].amlProvider == _senderEIN,
+       "Must be the registered AML provider for this buyer");
+      return true;
+  }
+
+  /**
+  * @notice Check if caller is a registered CFT provider for the buyer
+  * @dev This works on EINs, not on addresses
+  *
+  * @return true if `msg.sender` is a registered CFT provider for the buyer
+  */
+  function isRegisteredCftProvider(uint _buyerEIN, address _tokenAddress)
+   public view returns(bool) {
+      // find out caller EIN
+      uint _senderEIN = identityRegistry.getEIN(msg.sender);
+      // find out if it is a registered owner EIN
+      require(serviceDetailForBuyers[_buyerEIN][_tokenAddress].cftProvider == _senderEIN,
+       "Must be the registered CFT provider for this buyer");
+      return true;
   }
 
 
@@ -382,8 +483,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         uint8 _dayOfBirth,
         uint64 _netWorth,
         uint32 _salary)
-    //public onlySnowflakeOwner {
-    public {
+    public onlyRegisteredTokenOwner() {
         buyerData memory _bd;
         _bd.firstName = _firstName;
         _bd.lastName = _lastName;
@@ -391,7 +491,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         _bd.birthTimestamp = dateTime.toTimestamp(_yearOfBirth, _monthOfBirth, _dayOfBirth);
         _bd.netWorth = _netWorth;
         _bd.salary = _salary;
-        buyerRegistry[_buyerEIN] = _bd;
+        buyerRegistryDetail[_buyerEIN] = _bd;
         emit AddBuyer(_buyerEIN, _firstName, _lastName);
     }
 
@@ -402,7 +502,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return _firstName First name of the buyer
     */
     function getBuyerFirstName(uint _buyerEIN) public view returns (string memory) {
-        return buyerRegistry[_buyerEIN].firstName;
+        return buyerRegistryDetail[_buyerEIN].firstName;
     }
 
     /**
@@ -412,7 +512,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return _lastName Last name of the buyer
     */
     function getBuyerLastName(uint _buyerEIN) public view returns (string memory) {
-        return buyerRegistry[_buyerEIN].lastName;
+        return buyerRegistryDetail[_buyerEIN].lastName;
     }
 
     /**
@@ -422,7 +522,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return _isoCountryCode ISO country code for the buyer
     */
     function getBuyerIsoCountryCode(uint _buyerEIN) public view returns (bytes32) {
-        return buyerRegistry[_buyerEIN].isoCountryCode;
+        return buyerRegistryDetail[_buyerEIN].isoCountryCode;
     }
 
     /**
@@ -432,7 +532,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return birthTimestamp Timestamp for birthday of the buyer
     */
     function getBuyerBirthTimestamp(uint _buyerEIN) public view returns (uint) {
-        return buyerRegistry[_buyerEIN].birthTimestamp;
+        return buyerRegistryDetail[_buyerEIN].birthTimestamp;
     }
 
     /**
@@ -442,7 +542,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return _netWorth Net worth declared by the buyer
     */
     function getBuyerNetWorth(uint _buyerEIN) public view returns (uint64) {
-        return buyerRegistry[_buyerEIN].netWorth;
+        return buyerRegistryDetail[_buyerEIN].netWorth;
     }
 
     /**
@@ -452,7 +552,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return _salary Salary declared by the buyer
     */
     function getBuyerSalary(uint _buyerEIN) public view returns (uint32) {
-        return buyerRegistry[_buyerEIN].salary;
+        return buyerRegistryDetail[_buyerEIN].salary;
     }
 
     /**
@@ -462,7 +562,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return _accreditedInvestorStatus Investor status for the buyer
     */
     function getBuyerInvestorStatus(uint _buyerEIN) public view returns (bool) {
-        return buyerRegistry[_buyerEIN].accreditedInvestorStatus;
+        return buyerRegistryDetail[_buyerEIN].accreditedInvestorStatus;
     }
 
     /**
@@ -470,8 +570,9 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     *
     * @param _buyerKycStatus KYC status for the buyer
     */
-    function setBuyerKycStatus(uint _buyerEIN, bool _buyerKycStatus) public {
-        buyerRegistry[_buyerEIN].kycWhitelisted = _buyerKycStatus;
+    function setBuyerKycStatus(uint _buyerEIN, address _tokenAddress, bool _buyerKycStatus)
+    public onlyRegisteredKycProvider(_buyerEIN, _tokenAddress) {
+        buyerRegistryDetail[_buyerEIN].kycWhitelisted = _buyerKycStatus;
     }
 
     /**
@@ -479,8 +580,9 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     *
     * @param _buyerAmlStatus AML status for the buyer
     */
-    function setBuyerAmlStatus(uint _buyerEIN, bool _buyerAmlStatus) public {
-        buyerRegistry[_buyerEIN].amlWhitelisted = _buyerAmlStatus;
+    function setBuyerAmlStatus(uint _buyerEIN, address _tokenAddress, bool _buyerAmlStatus)
+    public onlyRegisteredAmlProvider(_buyerEIN, _tokenAddress) {
+        buyerRegistryDetail[_buyerEIN].amlWhitelisted = _buyerAmlStatus;
     }
 
     /**
@@ -488,8 +590,9 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     *
     * @param _buyerCftStatus CFT status for the buyer
     */
-    function setBuyerCftStatus(uint _buyerEIN, bool _buyerCftStatus) public {
-        buyerRegistry[_buyerEIN].cftWhitelisted = _buyerCftStatus;
+    function setBuyerCftStatus(uint _buyerEIN, address _tokenAddress, bool _buyerCftStatus)
+    public onlyRegisteredCftProvider(_buyerEIN, _tokenAddress) {
+        buyerRegistryDetail[_buyerEIN].cftWhitelisted = _buyerCftStatus;
     }
 
     /**
@@ -499,7 +602,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return _kycWhitelisted KYC status for the buyer
     */
     function getBuyerKycStatus(uint _buyerEIN) public view returns (bool) {
-        return buyerRegistry[_buyerEIN].kycWhitelisted;
+        return buyerRegistryDetail[_buyerEIN].kycWhitelisted;
     }
 
     /**
@@ -509,7 +612,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return _amlWhitelisted KYC status for the buyer
     */
     function getBuyerAmlStatus(uint _buyerEIN) public view returns (bool) {
-        return buyerRegistry[_buyerEIN].amlWhitelisted;
+        return buyerRegistryDetail[_buyerEIN].amlWhitelisted;
     }
 
     /**
@@ -519,7 +622,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @return _cftWhitelisted KYC status for the buyer
     */
     function getBuyerCftStatus(uint _buyerEIN) public view returns (bool) {
-        return buyerRegistry[_buyerEIN].cftWhitelisted;
+        return buyerRegistryDetail[_buyerEIN].cftWhitelisted;
     }
 
 
@@ -530,6 +633,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     *
     * @param _buyerEIN EIN of the buyer
     * @param _tokenFor Token that uses this service
+    * @param _serviceProviderEIN The new KYC service provider for this buyer
     */
     function addKycServiceToBuyer(
         uint _buyerEIN,
@@ -543,14 +647,31 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         // control buyer
         require(_buyerEIN != 0, "Buyer EIN cannot be blank");
         // control that caller is owner
-        uint _callerEIN = identityRegistry.getEIN(msg.sender);
-        require(_callerEIN == tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenFor),
-            "Caller must be the token owner");
+        // uint _callerEIN = identityRegistry.getEIN(msg.sender);
+        // require(_callerEIN == tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenFor),
+        //     "Caller must be the token owner");
         // control that service provider is registered
-        require(serviceRegistry.getService(_tokenFor, _serviceProviderEIN) == "KYC",
-            "Service provider must be a registered provider for KYC in Service Registry");
+        // require(serviceRegistry.getService(_tokenFor, _serviceProviderEIN) == "KYC",
+        //     "Service provider must be a registered provider for KYC in Service Registry");
         serviceDetailForBuyers[_buyerEIN][_tokenFor].kycProvider = _serviceProviderEIN;
         emit AddKycServiceToBuyer(_buyerEIN, _tokenFor, _serviceProviderEIN);
+    }
+
+    /**
+    * @notice Get KYC service for a buyer
+    *
+    * @param _buyerEIN EIN of the buyer
+    * @param _tokenFor Token that uses this service
+    *
+    * @return The KYC service provider for buyer and token
+    */
+    function getKycServiceForBuyer(
+        uint _buyerEIN,
+        address _tokenFor)
+    public view
+    returns (uint)
+    {
+        return serviceDetailForBuyers[_buyerEIN][_tokenFor].kycProvider;
     }
 
     /**
@@ -571,12 +692,12 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         // control buyer
         require(_buyerEIN != 0, "Buyer EIN cannot be blank");
         // control that caller is owner
-        uint _callerEIN = identityRegistry.getEIN(msg.sender);
-        require(_callerEIN == tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenFor),
-            "Caller must be the token owner");
+        // uint _callerEIN = identityRegistry.getEIN(msg.sender);
+        // require(_callerEIN == tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenFor),
+        //     "Caller must be the token owner");
         // control that service provider is registered
-        require(serviceRegistry.getService(_tokenFor, _serviceProviderEIN) == "AML",
-            "Service provider must be a registered provider for AML in Service Registry");
+        // require(serviceRegistry.getService(_tokenFor, _serviceProviderEIN) == "AML",
+        //     "Service provider must be a registered provider for AML in Service Registry");
         serviceDetailForBuyers[_buyerEIN][_tokenFor].amlProvider = _serviceProviderEIN;
         emit AddAmlServiceToBuyer(_buyerEIN, _tokenFor, _serviceProviderEIN);
     }
@@ -599,12 +720,12 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         // control buyer
         require(_buyerEIN != 0, "Buyer EIN cannot be blank");
         // control that caller is owner
-        uint _callerEIN = identityRegistry.getEIN(msg.sender);
-        require(_callerEIN == tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenFor),
-            "Caller must be the token owner");
+        // uint _callerEIN = identityRegistry.getEIN(msg.sender);
+        // require(_callerEIN == tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenFor),
+        //     "Caller must be the token owner");
         // control that service provider is registered
-        require(serviceRegistry.getService(_tokenFor, _serviceProviderEIN) == "CFT",
-            "Service provider must be a registered provider for CFT in Service Registry");
+        // require(serviceRegistry.getService(_tokenFor, _serviceProviderEIN) == "CFT",
+        //     "Service provider must be a registered provider for CFT in Service Registry");
         serviceDetailForBuyers[_buyerEIN][_tokenFor].cftProvider = _serviceProviderEIN;
         emit AddCftServiceToBuyer(_buyerEIN, _tokenFor, _serviceProviderEIN);
     }
@@ -627,45 +748,54 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
             (tokenData[msg.sender].minimumSalary == 0)) {
             _designatedDefaultValues = false;
             }
-        require(_designatedDefaultValues == true, "Token must have designated default values");
+        require(_designatedDefaultValues == true,
+         "Token must have designated default values");
 
         // KYC restriction (not optional)
-        require (buyerRegistry[_buyerEIN].kycWhitelisted == true, "Buyer must be approved for KYC");
+        require (buyerRegistryDetail[_buyerEIN].kycWhitelisted == true,
+         "Buyer must be approved for KYC");
 
         // AML restriction
         if (tokenData[msg.sender].amlWhitelistingRequired == true) {
-            require (buyerRegistry[_buyerEIN].amlWhitelisted == true, "Buyer must be approved for AML");
+            require (buyerRegistryDetail[_buyerEIN].amlWhitelisted == true,
+             "Buyer must be approved for AML");
         }
 
         // CFT restriction
         if (tokenData[msg.sender].cftWhitelistingRequired == true) {
-            require (buyerRegistry[_buyerEIN].cftWhitelisted == true, "Buyer must be approved for CFT");
+            require (buyerRegistryDetail[_buyerEIN].cftWhitelisted == true,
+             "Buyer must be approved for CFT");
         }
 
         // age restriction
         if (tokenData[msg.sender].minimumAge > 0) {
-            uint256 _buyerAgeSeconds = now - buyerRegistry[_buyerEIN].birthTimestamp;
+            uint256 _buyerAgeSeconds = now - buyerRegistryDetail[_buyerEIN].birthTimestamp;
             uint16 _buyerAgeYears = dateTime.getYear(_buyerAgeSeconds);
-            require (_buyerAgeYears >= tokenData[msg.sender].minimumAge, "Buyer must reach minimum age");
+            require (_buyerAgeYears >= tokenData[msg.sender].minimumAge,
+             "Buyer must reach minimum age");
         }
 
         // net-worth restriction
         if (tokenData[msg.sender].minimumNetWorth > 0) {
-            require (buyerRegistry[_buyerEIN].netWorth >= tokenData[msg.sender].minimumNetWorth, "Buyer must reach minimum net worth");
+            require (buyerRegistryDetail[_buyerEIN].netWorth >= tokenData[msg.sender].minimumNetWorth,
+             "Buyer must reach minimum net worth");
         }
 
         // salary restriction
         if (tokenData[msg.sender].minimumSalary > 0) {
-            require (buyerRegistry[_buyerEIN].salary >= tokenData[msg.sender].minimumSalary, "Buyer must  reach minimum salary");
+            require (buyerRegistryDetail[_buyerEIN].salary >= tokenData[msg.sender].minimumSalary,
+             "Buyer must  reach minimum salary");
         }
 
         // accredited investor status
         if (tokenData[msg.sender].accreditedInvestorStatusRequired == true) {
-            require (buyerRegistry[_buyerEIN].accreditedInvestorStatus == true, "Buyer must be an accredited investor");
+            require (buyerRegistryDetail[_buyerEIN].accreditedInvestorStatus == true,
+             "Buyer must be an accredited investor");
         }
 
         // country/geography restrictions on ownership
-        require (bannedCountries[msg.sender][buyerRegistry[_buyerEIN].isoCountryCode] == false, "Country of Buyer must not be banned for token");
+        require (bannedCountries[msg.sender][buyerRegistryDetail[_buyerEIN].isoCountryCode] == false,
+         "Country of Buyer must not be banned for token");
 
     }
 
