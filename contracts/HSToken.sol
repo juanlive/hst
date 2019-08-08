@@ -10,7 +10,7 @@ import './interfaces/IdentityRegistryInterface.sol';
 //import './interfaces/SnowflakeViaInterface.sol';
 import './zeppelin/math/SafeMath.sol';
 import './zeppelin/ownership/Ownable.sol';
-import './modules/SharesPaymentSystem.sol';
+import './modules/PaymentSystem.sol';
 
 //interface IdentityRegistryInterface {
 //    function getEIN(address _address) external view returns (uint ein);
@@ -91,7 +91,7 @@ contract STO_Interests {
 }
 
 
-contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPaymentSystem {
+contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSystem {
 
     using SafeMath for uint256;
 
@@ -230,6 +230,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
 
     constructor(
         uint256 _id,
+        uint8 _stoType,
         bytes32 _name,
         string memory _description,
         bytes32 _symbol,
@@ -248,6 +249,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
         description = _description;
         symbol = _symbol;
         decimals = _decimals;
+
+        setSTOType(_stoType);
 
         exists = true;
         registerDate = now;
@@ -577,7 +580,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     	return uint(stage);
     }
 
-    function _getTokenOwner() private view returns(uint256) {
+    function _getTokenEinOwner() private view returns(uint256) {
     	return einOwner;
     }
 
@@ -683,7 +686,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, SharesPay
     	hydroPrice = _newPrice;
     }
 
-    // PRIVATE GETTERS --------------------------------------------------------------------
+    // PRIVATE FUNCTIONS --------------------------------------------------------------------
+
+    function setSTOType(uint8 _stoType) private {
+        require(_stoType < 3, "STO Type not recognized. 0: Shares, 1: Units, 3: Bonds");
+        stoType = STOTypes(_stoType);
+    }
 
     function tokenInSetupStage() private view returns(bool) {
         // Stage is SETUP and 15 days to complete setup has not passed yet
