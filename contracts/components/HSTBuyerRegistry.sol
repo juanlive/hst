@@ -4,7 +4,7 @@ import './DateTime.sol';
 import './HSTokenRegistry.sol';
 import './HSTServiceRegistry.sol';
 import './SnowflakeOwnable.sol';
-import '../interfaces/IdentityRegistryInterface.sol';
+import '../interfaces/IdentityRegistryInterfaceShort.sol';
 
 
 /**
@@ -750,7 +750,7 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     *
     * @param _buyerEIN EIN of the buyer
     */
-    function checkRules(uint _buyerEIN) public view isContract(msg.sender) {
+    function checkRules(uint _buyerEIN) public view {
         // check if token has designated values
         bool _designatedDefaultValues = true;
         if ((tokenData[msg.sender].minimumAge == 0) ||
