@@ -1,11 +1,9 @@
 pragma solidity ^0.5.0;
 
-
-import './components/HSTBuyerRegistry.sol';
+import './interfaces/HSTBuyerRegistryInterface.sol';
 import './interfaces/HydroInterface.sol';
-import './interfaces/IdentityRegistryInterface.sol';
+import './interfaces/IdentityRegistryInterfaceShort.sol';
 import './zeppelin/math/SafeMath.sol';
-import './zeppelin/ownership/Ownable.sol';
 import './modules/PaymentSystem.sol';
 
 // Rinkeby testnet addresses
@@ -47,10 +45,8 @@ contract STO_FLAGS {
     bool public PERIOD_LOCKED;  // Locked period active or inactive
     bool public PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
     bool public HYDRO_AMOUNT_TYPE; // is Hydro amount limited
-    bool public HYDRO_ALLOWED; // Is Hydro allowed to purchase
     bool public WHITELIST_RESTRICTED;
     bool public BLACKLIST_RESTRICTED;
-    bool public HYDRO_ORACLE;
 }
 
 contract STO_PARAMS {
@@ -69,7 +65,10 @@ contract STO_Interests {
     uint256[] internal periods;
 }
 
+contract TOken {
 
+
+}
 contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSystem {
 
     using SafeMath for uint256;
@@ -78,15 +77,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         SETUP, PRELAUNCH, PRESALE, SALE, LOCK, MARKET, FINALIZED
     }
 
-    // For date analysis
-    struct Batch {
-        uint initial; // Initial quantity received in a batch. Not modified in the future
-        uint quantity; // Current quantity of tokens in a batch.
-        uint age; // Creation of the batch (timestamp)
-    }
-
     // Basic states
-    bool public exists; // Flag to deactivate it
     bool public locked; // Locked token transfers
 
 	// Main parameters
@@ -103,16 +94,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     // State Memory
     Stage public stage; // SETUP, PRELAUNCH, PRESALE, SALE, LOCK, MARKET, FINALIZED
-    bool public legalApproved;
     // uint256 public issuedTokens; // It is in the payment modules
-    uint256 public burnedTokens;
     uint256 public hydroReceived;
-    uint256 public ethReceived;
     uint256 public investorsQuantity;
-    uint256 hydrosReleased; // Quantity of Hydros released by owner
-    mapping(uint256 => uint256) issuedTokensAt;
-    mapping(uint256 => uint256) hydroPriceAt;
-    // mapping(uint256 => uint256) results; // It is in the payment module
+    uint256 public hydrosReleased; // Quantity of Hydros released by owner
 
     address public raindropAddress;
 
@@ -132,7 +117,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     // Declaring interfaces
     IdentityRegistryInterface public IdentityRegistry;
     HydroInterface public HydroToken;
-    HSTBuyerRegistry public BuyerRegistry;
+    HSTBuyerRegistryInterface public BuyerRegistry;
 
     event HydroSTCreated(
         uint256 indexed id,
@@ -160,7 +145,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         uint256 _amount
     );
 
-    // Feature #9 & #10
     modifier isUnlocked() {
         require(!locked, "Token locked");
         if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
@@ -171,11 +155,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         require(!freezed[IdentityRegistry.getEIN(_to)], "Target EIN is freezed");
         require(!freezed[IdentityRegistry.getEIN(_from)], "Source EIN is freezed");
         _;
-    }
-
-    modifier onlyAtPreLaunch() {
-        require(stage == Stage.PRELAUNCH, "Not in Prelaunch stage");
-    	_;
     }
 
     modifier onlyActive() {
@@ -196,12 +175,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     modifier escrowReleased() {
         require(escrowLimitPeriod < now, "Escrow limit period is still active");
-        require(legalApproved, "Legal conditions are not met");
+        require(BuyerRegistry.getTokenLegalStatus(address(this)), "Legal conditions are not met");
         _;
     }
 
     modifier onlyAtSetup() {
-        require(stage == Stage.SETUP, "Stage is not setup");
+        require(stage == Stage.SETUP && (now - registerDate) < (15 * 24 * 60 * 60), "This is not setup stage");
         _;
     }
 
@@ -228,7 +207,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
         setSTOType(_stoType);
 
-        exists = true;
         registerDate = now;
         // locked = true;
 
@@ -236,13 +214,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         stage = Stage.SETUP;
 
         periods.push(now);
-        // Links to Modules
-        // RegistryRules = 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20;
-        // InterestSolver = address(0x0);
 
+        // Links to Modules
         HydroToken = HydroInterface(_hydroToken); // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
         IdentityRegistry = IdentityRegistryInterface(_identityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
-        BuyerRegistry = HSTBuyerRegistry(_buyerRegistry);
+        BuyerRegistry = HSTBuyerRegistryInterface(_buyerRegistry);
         // raindropAddress = _RaindropAddress;
 
         Owner = _owner;
@@ -287,10 +263,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         bool _PERIOD_LOCKED,
         bool _PERC_OWNERSHIP_TYPE,
         bool _HYDRO_AMOUNT_TYPE,
-        bool _HYDRO_ALLOWED,
         bool _WHITELIST_RESTRICTED,
-        bool _BLACKLIST_RESTRICTED,
-        bool _HYDRO_ORACLE
+        bool _BLACKLIST_RESTRICTED
     )
         public onlyAdmin onlyAtSetup
     {
@@ -300,10 +274,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         PERIOD_LOCKED = _PERIOD_LOCKED;
         PERC_OWNERSHIP_TYPE = _PERC_OWNERSHIP_TYPE;
         HYDRO_AMOUNT_TYPE = _HYDRO_AMOUNT_TYPE;
-        HYDRO_ALLOWED = _HYDRO_ALLOWED;
         WHITELIST_RESTRICTED = _WHITELIST_RESTRICTED;
         BLACKLIST_RESTRICTED = _BLACKLIST_RESTRICTED;
-        HYDRO_ORACLE = _HYDRO_ORACLE;
         // Set flag
         STO_FLAGS_ready = true;
     }
@@ -340,7 +312,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
         require(STO_PARAMS_ready, "STO_PARAMS not setted");
-        require(EXT_PARAMS_ready, "EXT_PARAMS not setted"); // Parameters required for payment modules
+        require(EXT_PARAMS_ready, "EXT_PARAMS not setted"); // Parameters required for payment module
         stage = Stage.PRELAUNCH;
     }
 
@@ -348,6 +320,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         public onlyAdmin
     {
     	require(stage == Stage.PRELAUNCH, "Stage should be Prelaunch");
+        require(BuyerRegistry.getTokenLegalStatus(address(this)));
         stage = Stage.PRESALE;
     }
 
@@ -362,6 +335,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         public onlyAdmin
     {
     	require(stage == Stage.SALE, "Stage should be Sale");
+        require(investorsQuantity >= minInvestors, "Investors quantity has not reached the minimum");
         stage = Stage.LOCK;
     }
 
@@ -404,7 +378,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     function changeBuyerRegistry(address _newBuyerRegistry) public onlyAdmin {
     	require(stage == Stage.SETUP, "Stage should be Setup to change this registry");
-		BuyerRegistry = HSTBuyerRegistry(_newBuyerRegistry);
+		BuyerRegistry = HSTBuyerRegistryInterface(_newBuyerRegistry);
     }
 
     function lock() public onlyAdmin {
@@ -454,8 +428,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
 
     function addPaymentPeriodBoundaries(uint256[] memory _periods) public onlyAdmin {
+        require(_periods.length > 0);
         for (uint i = 0; i < _periods.length; i++) {
-          require(periods[periods.length-1] < _periods[i], "Period must be after previous one"); 
+          require(periods[periods.length-1] < _periods[i], "New periods must be after last period registered"); 
           periods.push(_periods[i]);
         }
         emit PaymentPeriodBoundariesAdded(_periods);
@@ -470,6 +445,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     function addHydroOracle(address _newAddress) public onlyAdmin {
     	hydroOracle = _newAddress;
     }
+
 
     // Release gains Only after escrow is released
     function releaseHydroTokens() public onlyAdmin escrowReleased {
@@ -516,7 +492,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         investors[_ein].hydroSent = investors[_ein].hydroSent.add(_amount);
         hydroReceived = hydroReceived.add(_amount);
         issuedTokens = issuedTokens.add(total);
-        issuedTokensAt[0] = issuedTokens;
         balance[msg.sender] = balance[msg.sender].add(total);
         balanceAt[0][msg.sender] = balance[msg.sender];
 
@@ -598,7 +573,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         //  allowance to zero by calling `approve(_spender,0)` if it is not
         //  already 0 to mitigate the race condition described here:
         //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-        require((_amount == 0) || (allowed[msg.sender][_spender] == 0), "Approved amount should be zero before changing it");
+        require(_amount == 0 || allowed[msg.sender][_spender] == 0, "Approved amount should be zero before changing it");
         allowed[msg.sender][_spender] = _amount;
         emit Approval(msg.sender, _spender, _amount);
         return true;
@@ -625,6 +600,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         balance[_from] = balance[_from].sub(_amount);
         balanceAt[_period][_to] = balance[_to];
         balanceAt[_period][_from] = balance[_from];
+        lastBalance[_from] = _period;
+        lastBalance[_to] = _period;
         emit Transfer(_from, _to, _amount);
     }
 
@@ -637,7 +614,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
     function isTokenAlive() public view returns(bool) {
-        if (!exists) return false;
+        if (stage != Stage.SETUP) return true;
         if (!tokenInSetupStage()) return false;
         return true;
     }
@@ -652,14 +629,30 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         for (uint i = 1; i < periods.length; i++) {
           if (periods[i] > now) return i-1;
         }
-        return 0;
+        return periods[periods.length-1];
     }
 
     // ONLY FOR ORACLES ------------------------------------------------------------------
 
     function updateHydroPrice(uint256 _newPrice) external {
-    	require(msg.sender == hydroOracle, "This can only be executed by the registered Oracle");
+    	require(msg.sender == hydroOracle, "Only registered Oracle can set Hydro price");
     	hydroPrice = _newPrice;
+    }
+
+    function notifyPeriodProfits(uint256 _profits) public {
+        require(msg.sender == hydroOracle, "Only registered oracle can notify profits");
+        require(_profits > 0, "Profits has to be greater than zero");
+        uint256 _periodToPay = getPeriod();
+        require(profits[_periodToPay] == 0, "Period already notified");
+
+        profits[_periodToPay] = _profits;
+
+        if (stoType == STOTypes.UNITS) {
+            uint256 _paymentForManager = _profits.mul(carriedInterestRate) / 1 ether;
+            require(_transferHydroToken(msg.sender, _paymentForManager), "Error while releasing Tokens");
+        }
+
+        emit PeriodNotified(_periodToPay, _profits);
     }
 
     // PRIVATE FUNCTIONS --------------------------------------------------------------------

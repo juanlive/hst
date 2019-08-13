@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import '../HSToken.sol';
-import '../interfaces/IdentityRegistryInterface.sol';
+import '../interfaces/IdentityRegistryInterfaceShort.sol';
 import './HSTServiceRegistry.sol';
 import './SnowflakeOwnable.sol';
 
@@ -50,6 +50,8 @@ contract HSTokenRegistry is SnowflakeOwnable {
   // Token name => Name data structure
   mapping(bytes32 => NameData) public names;
 
+  // Token owner EIN => exists
+  mapping(uint => bool) public owners;
 
   event TokenAppointedToRegistry(
     address _tokenAddress,
@@ -182,10 +184,12 @@ contract HSTokenRegistry is SnowflakeOwnable {
 
     lastID++;
 
+    uint _ownerEIN = identityRegistry.getEIN(msg.sender);
+
     tokens[_tokenAddress].id = lastID;
     tokens[_tokenAddress].tokenSymbol = _tokenSymbol;
     tokens[_tokenAddress].tokenName = _tokenName;
-    tokens[_tokenAddress].ownerEIN = identityRegistry.getEIN(msg.sender);
+    tokens[_tokenAddress].ownerEIN = _ownerEIN;
     tokens[_tokenAddress].tokenDescription = _tokenDescription;
     tokens[_tokenAddress].tokenDecimals = _tokenDecimals;
     tokens[_tokenAddress].tokenHasLegalApproval = false;
@@ -198,6 +202,8 @@ contract HSTokenRegistry is SnowflakeOwnable {
     names[_tokenName].id = lastID;
     names[_tokenName].nameExists = true;
     names[_tokenName].tokenAddress = _tokenAddress;
+
+    owners[_ownerEIN] = true;
 
     serviceRegistry.addDefaultCategories(_tokenAddress);
 
@@ -213,6 +219,15 @@ contract HSTokenRegistry is SnowflakeOwnable {
   */
   function isRegisteredToken(address _tokenAddress) public view returns(bool) {
     return tokens[_tokenAddress].tokenExists;
+  }
+
+  /**
+  * @notice Find out if owner is registered
+  * @param  _ownerEIN The EIN of the Token owner
+  * @return true if the owner is registered
+  */
+  function isRegisteredOwner(uint _ownerEIN) public view returns(bool) {
+    return owners[_ownerEIN];
   }
 
   /**

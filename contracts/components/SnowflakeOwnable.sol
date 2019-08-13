@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import '../interfaces/IdentityRegistryInterface.sol';
+import '../interfaces/IdentityRegistryInterfaceShort.sol';
 import '../zeppelin/ownership/Ownable.sol';
 
 // DONE
