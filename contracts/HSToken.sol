@@ -65,10 +65,6 @@ contract STO_Interests {
     uint256[] internal periods;
 }
 
-contract TOken {
-
-
-}
 contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSystem {
 
     using SafeMath for uint256;
@@ -145,7 +141,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         uint256 _amount
     );
 
-    modifier isUnlocked() {
+/*    modifier isUnlocked() {
         require(!locked, "Token locked");
         if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
         _;
@@ -156,6 +152,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         require(!freezed[IdentityRegistry.getEIN(_from)], "Source EIN is freezed");
         _;
     }
+
+    modifier onlyAtSetup() {
+        require(stage == Stage.SETUP && (now - registerDate) < (15 * 24 * 60 * 60), "This is not setup stage");
+        _;
+    }*/
 
     modifier onlyActive() {
         require(
@@ -176,11 +177,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     modifier escrowReleased() {
         require(escrowLimitPeriod < now, "Escrow limit period is still active");
         require(BuyerRegistry.getTokenLegalStatus(address(this)), "Legal conditions are not met");
-        _;
-    }
-
-    modifier onlyAtSetup() {
-        require(stage == Stage.SETUP && (now - registerDate) < (15 * 24 * 60 * 60), "This is not setup stage");
         _;
     }
 
@@ -238,8 +234,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         uint256 _maxSupply,
         uint256 _escrowLimitPeriod
     )
-        public onlyAdmin onlyAtSetup
+        public onlyAdmin
     {
+        checkSetup();
+
         // Validations
         require(
             _hydroPrice > 0 &&
@@ -266,8 +264,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         bool _WHITELIST_RESTRICTED,
         bool _BLACKLIST_RESTRICTED
     )
-        public onlyAdmin onlyAtSetup
+        public onlyAdmin
     {
+        checkSetup();
         require(!STO_FLAGS_ready, "Flags already setted");
         // Load values
         LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP;
@@ -288,8 +287,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         uint256 _maxInvestors,
         address _hydroOracle
     )
-        public onlyAdmin onlyAtSetup
+        public onlyAdmin
     {
+        checkSetup();
         require(!STO_PARAMS_ready, "Params already setted");
         require(STO_FLAGS_ready, "STO_FLAGS has not been set");
         // Load values
@@ -307,8 +307,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     // ADMIN CHANGING STAGES -------------------------------------------------------------------
 
     function stagePrelaunch()
-        public onlyAdmin onlyAtSetup
+        public onlyAdmin
     {
+        checkSetup();
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
         require(STO_PARAMS_ready, "STO_PARAMS not setted");
@@ -543,9 +544,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     // Token ERC-20 wrapper ---------------------------------------------------------------------
 
     function transfer(address _to, uint256 _amount)
-        public isUnlocked isUnfreezed(msg.sender, _to)
+        public
         returns(bool success)
     {
+        checkUnlocked();
+        checkUnfreezed(msg.sender, _to);
+
         BuyerRegistry.checkRules(IdentityRegistry.getEIN(_to));
 
         _doTransfer(msg.sender, _to, _amount);
@@ -553,9 +557,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
     function transferFrom(address _from, address _to, uint256 _amount)
-        public isUnlocked isUnfreezed(_from, _to)
+        public
         returns(bool success)
     {
+        checkUnlocked();
+        checkUnfreezed(_from, _to);
+
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
 
         BuyerRegistry.checkRules(IdentityRegistry.getEIN(_to));
@@ -657,6 +664,25 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     // PRIVATE FUNCTIONS --------------------------------------------------------------------
 
+    // Modifiers type 
+    // Modifiers are compiled each time, so we replace some with functions to optimize bytecode
+
+    function checkSetup() private view { // replaces onlyAtSetup() modifier
+        require(stage == Stage.SETUP && (now - registerDate) < (15 * 24 * 60 * 60), "This is not setup stage");
+    }
+
+    function checkUnlocked() private view {
+        require(!locked, "Token locked");
+        if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
+    }
+
+    function checkUnfreezed(address _from, address _to) private view {
+        require(!freezed[IdentityRegistry.getEIN(_to)], "Target EIN is freezed");
+        require(!freezed[IdentityRegistry.getEIN(_from)], "Source EIN is freezed");
+    }
+
+    // Other functions
+
     function setSTOType(uint8 _stoType) private {
         require(_stoType < 3, "STO Type not recognized. 0: Shares, 1: Units, 3: Bonds");
         stoType = STOTypes(_stoType);
@@ -674,5 +700,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     function _checkBlacklist(uint256 _einUser) private view {
         require(!blacklist[_einUser], "EIN address is blacklisted");
     }
+
 
 }
