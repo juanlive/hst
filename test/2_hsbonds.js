@@ -250,13 +250,12 @@ console.log(users)
         )
     })
 
+
     it('HSToken set Bond Properties', async () => {
-      await newToken.setIssuerProperties(
-          "Company Name", // Company name
-          "1234567890", // RegisteredNumber,
-          "NYC, USA", // jurisdiction,
-          users[9].address, // fundManager (can be 0x0 for Shares and Bonds),
-          "0", // carriedInterestRate
+      await newToken.setBondsProperties(
+          6, // Number of capital dues (1 = single capital at exp date)
+          0, // Fixed interest rate (0 = not fixed),
+          0, // Expiration date when cap dues = 1 (0 = no exp date),
         { from: users[9].address }
         )
     })
@@ -286,22 +285,6 @@ console.log(users)
         { from: users[1].address })
     })
 
-    it('HSTBuyerRegistry - get buyer data - kyc status: false', async () => {
-      _buyerKycStatus = await instances.BuyerRegistry.getBuyerKycStatus(
-        '2',
-        {from: users[9].address}
-      )
-      console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
-    })
-
-    it('HSToken Reverts buy for EIN user 3', async () => {
-        await truffleAssert.reverts(
-          newToken.buyTokens(
-          "10",
-          { from: users[2].address }),
-          "Buyer must be approved for KYC"
-        )
-    })
 
     it('Set buyer kyc status true for user 1', async () => {
       await instances.BuyerRegistry.setBuyerKycStatus(
@@ -312,13 +295,6 @@ console.log(users)
       )
     })
 
-    it('HSTBuyerRegistry - get buyer data - kyc status: true', async () => {
-      _buyerKycStatus = await instances.BuyerRegistry.getBuyerKycStatus(
-        '2',
-        {from: users[9].address}
-      )
-      console.log("      HSTBuyerRegistry kyc status", _buyerKycStatus)
-    })
 
     it('HSToken buyTokens from EIN user 2', async () => {
       await newToken.buyTokens(
@@ -336,14 +312,12 @@ console.log(users)
 
     it('Store periods', async() => {
 
-      // var now = parseInt(new Date().getTime() / 1000) + 20
-      // Get now from blockchain (to avoid errors from previous timetravels)
       var nowReceived = await newToken.getNow()
       var now = parseInt(nowReceived.toNumber())
       console.log("NOW: ", now)
       var periods = []
-      for (i=1; i < 25; i++) {
-        // Stablish 24 periods of payment, separated 200 seconds from eachother
+      for (i = 1; i < 6; i++) {
+        // Stores 6 periods of payment, separated 200 seconds from eachother
         periods.push(now + i * 200)
       }
 
@@ -352,6 +326,7 @@ console.log(users)
       var tx = await newToken.addPaymentPeriodBoundaries(
           periods,
           { from: users[9].address })
+
       console.log("Gas:",tx.receipt.gasUsed)
     })
 
@@ -369,20 +344,6 @@ console.log(users)
     })
 
 
-    it('HSToken reverts transfer 1.2 HSTokens to Account 2', async () => {
-      await truffleAssert.reverts(
-        newToken.transfer(
-          users[2].address,
-          web3.utils.toWei("1.2"),
-          { from: users[1].address })
-      )
-      //after(async()=>{
-          console.log("Balance user 1:", web3.utils.fromWei(await newToken.balanceOf(users[1].address)))
-          console.log("Balance user 3:", web3.utils.fromWei(await newToken.balanceOf(users[2].address)))
-      //})
-    })
-
-
     it('Set buyer kyc status true for user 2', async () => {
       await instances.BuyerRegistry.setBuyerKycStatus(
         '3', // buyer EIN
@@ -391,7 +352,6 @@ console.log(users)
         {from: users[8].address} // kyc provider
       )
     })
-
 
 
     it('HSToken transfer 1.2 HSTokens to Account 2', async () => {
@@ -413,13 +373,12 @@ console.log(users)
     })
 
 
-
-
     it('Setting oracle address', async() => {
       await newToken.addHydroOracle(
         users[5].address,
         { from: users[9].address })
     })
+
 
     it('Oracle notifies profits of 5 Hydros for this period', async() => {
       await newToken.notifyPeriodProfits(
@@ -432,11 +391,14 @@ console.log(users)
       var payment = await newToken.claimPayment(
         { from: users[1].address })
 
-      console.log("Period payed:", payment.receipt.logs[1].args.periodToPay.toNumber())
-      console.log("Participation rate:", web3.utils.fromWei(payment.receipt.logs[1].args.investorParticipationRate))
-      console.log("Period profits:", web3.utils.fromWei(payment.receipt.logs[1].args.periodProfits))
-      console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[1].args.paymentForInvestor))
-      console.log("Amount from transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
+      // console.log("LOGS:", JSON.stringify(payment.receipt.logs))
+      console.log("Period payed:", payment.receipt.logs[3].args.periodToPay.toNumber())
+      console.log("Participation rate:", web3.utils.fromWei(payment.receipt.logs[3].args.investorParticipationRate))
+      console.log("Period profits:", web3.utils.fromWei(payment.receipt.logs[3].args.periodProfits))
+      console.log("Capital payed:", web3.utils.fromWei(payment.receipt.logs[2].args.capitalPayed))
+      console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[3].args.paymentForInvestor))
+      console.log("Interests transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
+      console.log("Capital transfer log:", web3.utils.fromWei(payment.receipt.logs[1].args._amount))
       console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(users[1].address)))
 
     })
@@ -453,11 +415,13 @@ console.log(users)
     it('User claims payment 2', async() => {
       var payment = await newToken.claimPayment(
         { from: users[1].address })
-      console.log("Period payed:", payment.receipt.logs[1].args.periodToPay.toNumber())
-      console.log("Participation rate:", web3.utils.fromWei(payment.receipt.logs[1].args.investorParticipationRate))
-      console.log("Period profits:", web3.utils.fromWei(payment.receipt.logs[1].args.periodProfits))
-      console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[1].args.paymentForInvestor))
-      console.log("Amount from transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
+      console.log("Period payed:", payment.receipt.logs[3].args.periodToPay.toNumber())
+      console.log("Participation rate:", web3.utils.fromWei(payment.receipt.logs[3].args.investorParticipationRate))
+      console.log("Period profits:", web3.utils.fromWei(payment.receipt.logs[3].args.periodProfits))
+      console.log("Capital payed:", web3.utils.fromWei(payment.receipt.logs[2].args.capitalPayed))
+      console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[3].args.paymentForInvestor))
+      console.log("Interests transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
+      console.log("Capital transfer log:", web3.utils.fromWei(payment.receipt.logs[1].args._amount))
       console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(users[1].address)))
 
     })
@@ -503,34 +467,38 @@ console.log(users)
         { from: users[5].address })
     })
 
-
-    it('User claims payment 1 but there is nothing, once', async() => {
+    it('User claims payment 1 but there is nothing once', async() => {
       var payment = await newToken.claimPayment(
         { from: users[1].address })
-      console.log("Period payed:", payment.logs[0].args.periodToPay.toNumber())
-      console.log("Participation rate:", web3.utils.fromWei(payment.logs[0].args.investorParticipationRate))
-      console.log("Period profits:", web3.utils.fromWei(payment.logs[0].args.periodProfits))
-      console.log("Amount payed:", web3.utils.fromWei(payment.logs[0].args.paymentForInvestor))
+      //console.log("LOGS2:", payment.logs);
+      console.log("Period payed:", payment.logs[1].args.periodToPay.toNumber())
+      console.log("Participation rate:", web3.utils.fromWei(payment.logs[1].args.investorParticipationRate))
+      console.log("Period profits:", web3.utils.fromWei(payment.logs[1].args.periodProfits))
+      console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[1].args.paymentForInvestor))
     })
 
 
     it('User claims payment 1 but there is nothing twice', async() => {
       var payment = await newToken.claimPayment(
         { from: users[1].address })
-      console.log("Period payed:", payment.logs[0].args.periodToPay.toNumber())
-      console.log("Participation rate:", web3.utils.fromWei(payment.logs[0].args.investorParticipationRate))
-      console.log("Period profits:", web3.utils.fromWei(payment.logs[0].args.periodProfits))
-      console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[0].args.paymentForInvestor))
+      //console.log("LOGS1:", payment.logs);
+      console.log("Period payed:", payment.logs[2].args.periodToPay.toNumber())
+      console.log("Participation rate:", web3.utils.fromWei(payment.logs[2].args.investorParticipationRate))
+      console.log("Period profits:", web3.utils.fromWei(payment.logs[2].args.periodProfits))
+      console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[2].args.paymentForInvestor))
     })
 
     it('User claims payment 1 and now it works', async() => {
       var payment = await newToken.claimPayment(
         { from: users[1].address })
-      console.log("Period payed:", payment.receipt.logs[1].args.periodToPay.toNumber())
-      console.log("Participation rate:", web3.utils.fromWei(payment.receipt.logs[1].args.investorParticipationRate))
-      console.log("Period profits:", web3.utils.fromWei(payment.receipt.logs[1].args.periodProfits))
-      console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[1].args.paymentForInvestor))
-      console.log("Amount from transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
+      //console.log("LOGS3:", payment.logs);
+      console.log("Period payed:", payment.receipt.logs[2].args.periodToPay.toNumber())
+      console.log("Participation rate:", web3.utils.fromWei(payment.receipt.logs[2].args.investorParticipationRate))
+      console.log("Period profits:", web3.utils.fromWei(payment.receipt.logs[2].args.periodProfits))
+      console.log("Capital payed:", web3.utils.fromWei(payment.receipt.logs[1].args.capitalPayed))
+      console.log("Amount payed:", web3.utils.fromWei(payment.receipt.logs[2].args.paymentForInvestor))
+      console.log("Interests transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
+      //console.log("Capital transfer log:", web3.utils.fromWei(payment.receipt.logs[1].args._amount))
       console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(users[1].address)))
 
     })
