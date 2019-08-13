@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import '../HSToken.sol';
-import '../interfaces/IdentityRegistryInterface.sol';
+import '../interfaces/IdentityRegistryInterfaceShort.sol';
 import './HSTServiceRegistry.sol';
 import './SnowflakeOwnable.sol';
 

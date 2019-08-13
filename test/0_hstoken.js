@@ -8,6 +8,11 @@ let instances // all contracts
 let users // all users
 let owner // system deployer and owner
 
+
+const sleep = async(_seconds) => {
+  await new Promise(resolve => setTimeout(resolve, _seconds * 1000));
+}
+
 contract('Testing HSToken', function (accounts) {
 
   it('Users created', async () => {
@@ -36,22 +41,22 @@ console.log(users)
   })*/
 
 
-  describe('Checking HSToken functionality', async() =>{
+  describe('Checking HSToken functionality (SHARES)', async() =>{
 
 
     it('HSToken can be created', async () => {
 
       newToken = await HSToken.new(
-          1, // Id
+          1, // Token Id
           0, // STO Type (0: Shares, 1: Units, 2: Bonds)
-          web3.utils.stringToHex("HydroSecurityToken"),
-          "Hydro Security",
-          web3.utils.fromAscii("HTST"),
-          18,
-          instances.HydroToken.address, 
-          instances.IdentityRegistry.address,
-          instances.BuyerRegistry.address,
-          users[9].address,
+          web3.utils.stringToHex("HydroSecurityToken"), // Name
+          "Hydro Security", // Description
+          web3.utils.fromAscii("HTST"), // Symbol
+          18, // Decimals
+          instances.HydroToken.address, // HydroToken address
+          instances.IdentityRegistry.address, // IdentityRegistry address
+          instances.BuyerRegistry.address, // BuyerRegistry address
+          users[9].address, // Owner address (Ein owner will be taken from this)
           {from: users[9].address}
         )
         console.log("      HSToken Address", newToken.address)
@@ -72,6 +77,7 @@ console.log(users)
         {from: users[9].address} // will be assigned as token owner in token registry
       )
     })
+
 
     // ------------------------------ BuyerRegistry settings
 
@@ -118,6 +124,24 @@ console.log(users)
         {from: users[9].address} // can be any registered token owner
       )
     })
+
+    it('HSTServiceRegistry - add legal advisor', async () => {
+      await instances.ServiceRegistry.addService(
+        newToken.address, // token address
+        '8', // service provider EIN (user 7)
+        web3.utils.fromAscii("MLA"), // category symbol
+        {from: users[9].address} // must be (and it is) the token owner
+      )
+    })
+
+
+    it('Grant legal approval for token', async () => {
+      await instances.TokenRegistry.grantLegalApproval(
+        newToken.address, // token address
+        {from: users[7].address} // Legal advisor provider (setted in previous test)
+      )
+    })
+
 
     it('HSTServiceRegistry - add service', async () => {
       await instances.ServiceRegistry.addService(
@@ -201,10 +225,8 @@ console.log(users)
           false, // _PERIOD_LOCKED,
           true, // _PERC_OWNERSHIP_TYPE,
           true, // _HYDRO_AMOUNT_TYPE,
-          true, // _HYDRO_ALLOWED,
           true, // WHITELIST_RESTRICTED
           true, // BLACKLIST_RESTRICTED
-          false, // HYDRO_ORACLE
         { from: users[9].address }
         )
     })
@@ -415,20 +437,16 @@ console.log(users)
 
     })
 
-    it('Go to next period', async() => {
-      await utilities.timeTravel(200)
-      period = await newToken.getPeriod(
-        { from: users[9].address });
-      console.log("Current Period:", period.toNumber())
-    })
 
     it('Oracle notifies profits of 4 Hydros for this period', async() => {
+      await utilities.timeTravel(300)
+
       await newToken.notifyPeriodProfits(
         web3.utils.toWei("4"),
         { from: users[5].address })
     })
 
-    it('User claims payment 1', async() => {
+    it('User claims payment 2', async() => {
       var payment = await newToken.claimPayment(
         { from: users[1].address })
       console.log("Period payed:", payment.receipt.logs[1].args.periodToPay.toNumber())
