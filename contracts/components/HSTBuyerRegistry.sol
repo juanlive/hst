@@ -402,6 +402,16 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
         return tokenData[_tokenAddress].accreditedInvestorStatusRequired;
     }
 
+  /**
+  * @notice Get legal approval status for a security token
+  *
+  * @param  _tokenAddress The address of the Token
+  * @return true if the token has legal approval
+  */
+  function getTokenLegalStatus(address _tokenAddress) public view returns(bool) {
+    return tokenRegistry.checkLegalApproval(_tokenAddress);
+  }
+
 
     // country ban functions
 
