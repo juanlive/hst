@@ -59,6 +59,9 @@ console.log(users)
           users[9].address, // Owner address (Ein owner will be taken from this)
           {from: users[9].address}
         )
+
+        receipt = await web3.eth.getTransactionReceipt(newToken.transactionHash);
+        console.log("      Gas used: ", receipt.gasUsed);
         console.log("      HSToken Address", newToken.address)
         console.log("      Token owner", users[9].address)
     })

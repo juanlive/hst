@@ -66,15 +66,15 @@ contract PaymentSystem is BONDS_PARAMS, UNITS_PARAMS, TOKEN_PARAMS {
         uint256 profits
         );
 
-    modifier isTokenOwner {
-		require(_getEIN(msg.sender) == _getTokenEinOwner(), "Only for token owner");
-    	_;
-    }
+    // Modifiers as functions to avoid compilation bloat
 
-    modifier isSetUpStage {
-		require(tokenInSetupStage(), "Only at Setup stage");	
-    	_;
-    }
+    function onlyTokenOwner() internal view {
+		require(_getEIN(msg.sender) == _getTokenEinOwner(), "Only for token owner");
+	}
+
+	function onlySetupStage() internal view {
+		require(tokenInSetupStage(), "Only at Setup stage");
+	}
 
     // PUBLIC SETTERS FOR SETUP STAGE, only for admin -----------------------------------------------------------
 
@@ -84,8 +84,10 @@ contract PaymentSystem is BONDS_PARAMS, UNITS_PARAMS, TOKEN_PARAMS {
         string memory _jurisdiction,
         address payable _fundManager, // Can be 0x0 for Shares and Bonds
         uint256 _carriedInterestRate // Can be 0 for Shares and Bonds
-        ) public isTokenOwner isSetUpStage
+        ) public
     {
+    	onlyTokenOwner();
+    	onlySetupStage();
 
         if (stoType == STOTypes.UNITS) {
             require(_fundManager != address(0x0), "fundManager address is required");
@@ -112,8 +114,11 @@ contract PaymentSystem is BONDS_PARAMS, UNITS_PARAMS, TOKEN_PARAMS {
     	uint256 _numberOfCapitalDues, // 1 for single capital at expiration date
     	uint256 _fixedInterestRate, // It can be 0 for variable interest rate
     	uint256 _expirationDate // It can be 0 to be setted later
-    	) public isTokenOwner isSetUpStage
+    	) public
     {
+    	onlyTokenOwner();
+    	onlySetupStage();
+
         require(_numberOfCapitalDues > 0, "Number of capital dues should be greater than zero");
 
         // Set bonds properties
@@ -130,8 +135,9 @@ contract PaymentSystem is BONDS_PARAMS, UNITS_PARAMS, TOKEN_PARAMS {
 
     // For Bonds. It let set expirationDate if it was 0
 
-    function setExpirationDate(uint256 _expirationDate) public isTokenOwner {
-    	require(expirationDate == 0, "Expiration date can not be modified");
+    function setExpirationDate(uint256 _expirationDate) public {
+    	onlyTokenOwner();
+    	require(expirationDate == 0, "Expiration date can not be modified more than once");
     	expirationDate = _expirationDate;
     }
 
@@ -158,18 +164,18 @@ contract PaymentSystem is BONDS_PARAMS, UNITS_PARAMS, TOKEN_PARAMS {
         }
 
         if (stoType == STOTypes.BONDS) {
-        	// require(_periodToPay <= numberOfCapitalDues, "All periods has been payed");
+        	require(_periodToPay <= numberOfCapitalDues, "All periods has been payed");
         	if (numberOfCapitalDues == 1) {
-        	//	require(expirationDate > 0, "Expiration date has not been set yet");
-        	//	require(expirationDate < now, "Expiration date has not arrived yet");
+        		require(expirationDate > 0, "Expiration date has not been set yet");
+        		require(expirationDate < now, "Expiration date has not arrived yet");
         	}
         	uint256 _capitalPayment = _userBalance / numberOfCapitalDues;
 
-        	//if (_capitalPayment > 0) {
-            //	require(_transferHydroToken(msg.sender, _capitalPayment), "Error while releasing Tokens for capital payment");
-        	//} 
+        	if (_capitalPayment > 0) {
+            	require(_transferHydroToken(msg.sender, _capitalPayment), "Error while releasing Tokens for capital payment");
+        	} 
 
-        	// emit CapitalPayed(_ein, _periodToPay, _capitalPayment, _participationRate);
+        	emit CapitalPayed(_ein, _periodToPay, _capitalPayment, _participationRate);
         }
 
        emit SharesPayed(_ein, _periodToPay, profits[_periodToPay], _participationRate, _paymentForInvestor);
