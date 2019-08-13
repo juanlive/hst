@@ -66,16 +66,6 @@ contract PaymentSystem is BONDS_PARAMS, UNITS_PARAMS, TOKEN_PARAMS {
         uint256 profits
         );
 
-    // Modifiers as functions to avoid compilation bloat
-
-    function onlyTokenOwner() internal view {
-		require(_getEIN(msg.sender) == _getTokenEinOwner(), "Only for token owner");
-	}
-
-	function onlySetupStage() internal view {
-		require(tokenInSetupStage(), "Only at Setup stage");
-	}
-
     // PUBLIC SETTERS FOR SETUP STAGE, only for admin -----------------------------------------------------------
 
     function setIssuerProperties(
@@ -190,6 +180,16 @@ contract PaymentSystem is BONDS_PARAMS, UNITS_PARAMS, TOKEN_PARAMS {
         ][_address];
     }
 
+    // Modifiers as functions to avoid compilation bloat
+
+    function onlyTokenOwner() private view {
+		require(_getEIN(msg.sender) == _getTokenEinOwner(), "Only for token owner");
+	}
+
+	function onlySetupStage() private view {
+		require(tokenInSetupStage(), "Only at Setup stage");
+	}
+	
 
     // Dummy functions (to be overwritten by main contract)
     function getPeriod() public view returns(uint256);
