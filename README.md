@@ -1,4 +1,6 @@
-<h1>HST - Hydro Security Tokens Generator and Manager</h1>
+<h1>HST - Hydro Security Tokens Framework</h1>
+
+<h2>Security Tokens Generator and Manager</h2>
 
 <h3>Description</h3>
 
@@ -69,38 +71,82 @@ You can find an example test run in the file test.txt
 
 <h3>HSTOken - General Description and Usage</h3>
 
-Constructor
-
-Required values
-
-Provided by owner:
-
-Tutorial: How to issue a token
+<h4>Tutorial: How to issue a token</h4>
 
 
 This tutorial shows you how to issue a new token using the Hydro Securities Token framework. Token creation and setup will be performed by calling functions in the HSToken smart contract. Instructions follow.
 
 
-Token creation
+<h5>Token creation</h5>
 
-1. Call the HSToken Constructor
+Call the HSToken Constructor
 
 The following are required values for the creation of a new token, and must be provided by the owner/issuer of the token, possibly through a dApp, or as parameters if invoking the smart contract directly.
 
+        uint256 id: Token iD
+        uint8 stoType: STO type: (0: Shares, 1: Units, 2: Bonds)
+        bytes32 name: Name of the token
+        string memory description: Description
+        bytes32 symbol: Symbol
+        uint8 decimals: Decimals
 
-Provided by system (HSToken Fabric):
-- id
-- HydroToken address
-- IdentityRegistry address
-- Raindrop address?
-- ServiceRegistry address
+The following values (along with the first id) will be provided by the system itself (in the future, by means of HSToken Factory or a dApp) meanwhile (for testing purposes) they must be manually provided:
 
-Token initializes in stage = SETUP
-The owner has 15 days to fill the main parameters to setup the token*.
-3 functions shall be called to setup the token, each one with their corresponding parameters:
-- set_MAIN_PARAMS
-- set_STO_FLAGS
-- set_STO_PARAMS
+        address hydroToken: Address of HydroToken*
+        address identityRegistry: Address of Identity Registry*
+        address buyerRegistry: Address of Buyer Registry*
+        address payable owner: Owner address. EIN of owner/issuer will be obtained from this address and will be used to authenticate internally with the einOwner variable.
+
+* these addresses are expected for, in the constructor, to allow for testing to be performed in different blockchains (Rinkeby, Kovan, MainNet, and so)
+
+Once created, a new token initializes itself as being in stage = SETUP
+
+During this stage the token:
+is not active
+its name is protected
+
+The owner/issuer has 15 days to fill the main parameters to setup the token. This was made to facilitate the life of the token owner/issuer.
+
+<h5>Token setup</h5>
+
+To setup the token, 4 different functions shall be called, each one with their corresponding parameters:
+
+    function set_MAIN_PARAMS(
+        uint256 _hydroPrice, Price in HydroTokens
+        uint256 _lockEnds, Date of unlocking of token
+        uint256 _maxSupply, Max supply of tokens
+        uint256 _escrowLimitPeriod, amount of time in seconds for escrow
+    )
+
+    function set_STO_FLAGS(
+        bool _LIMITED_OWNERSHIP, Will the ownership be limited?
+        bool _PERIOD_LOCKED, Will the token will be limited for a period?
+        bool _PERC_OWNERSHIP_TYPE, Will ownership be limited by percentage?
+        bool _HYDRO_AMOUNT_TYPE, Will be restricted by amount of hydrotokens?
+        bool _WHITELIST_RESTRICTED, Whitelist restriction
+        bool _BLACKLIST_RESTRICTED, Blacklist restriction
+    )
+
+    function set_STO_PARAMS(
+        uint256 _percAllowedTokens, if _PERC_OWNERSHIP_TYPE is true, this will be the percentage*
+        uint256 _hydroAllowed, if _HYDRO_AMOUNT_TYPE is true, this will be the limit
+        uint256 _lockPeriod, if _PERIOD_LOCKED is true, this will be the period
+        uint256 _minInvestors, minimum of investors allowed
+        uint256 _maxInvestors, maximum of investors allowed
+        address _hydroOracle, address of oracle to update hydro price of token (if any)
+    )
+
+    function setIssuerProperties(
+        string issuerName, company Name
+        string registeredNumber, registered Number
+        string jurisdiction, jurisdiction
+        address payable fundManager, fund manager address
+        uint256 carriedInterestRate, carried interest rate
+    )
+
+* For convenience in internal calculations, percentages are expressed in weiss. 1 ether represents 100%, 0.5 ethers 50% and so on.
+
+<h5>Token pre-launch</h5>
 
 After calling these three functions, the owner can call 
 - stagePrelaunch() 
