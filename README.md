@@ -92,12 +92,12 @@ The following are required values for the creation of a new token, and must be p
 
 The following values (along with the first id) will be provided by the system itself (in the future, by means of HSToken Factory or a dApp) meanwhile (for testing purposes) they must be manually provided:
 
-        address hydroToken: Address of HydroToken*
-        address identityRegistry: Address of Identity Registry*
-        address buyerRegistry: Address of Buyer Registry*
+        address hydroToken: Address of HydroToken (*)
+        address identityRegistry: Address of Identity Registry (*)
+        address buyerRegistry: Address of Buyer Registry (*)
         address payable owner: Owner address. EIN of owner/issuer will be obtained from this address and will be used to authenticate internally with the einOwner variable.
 
-* these addresses are expected for, in the constructor, to allow for testing to be performed in different blockchains (Rinkeby, Kovan, MainNet, and so)
+ (*) these addresses are expected for, in the constructor, to allow for testing to be performed in different blockchains (Rinkeby, Kovan, MainNet, and so)
 
 Once created, a new token initializes itself as being in stage = SETUP
 
