@@ -128,7 +128,7 @@ To setup the token, 4 different functions shall be called, each one with their c
     )
 
     function set_STO_PARAMS(
-        uint256 _percAllowedTokens, if _PERC_OWNERSHIP_TYPE is true, this will be the percentage*
+        uint256 _percAllowedTokens, if _PERC_OWNERSHIP_TYPE is true, this will be the percentage (*)
         uint256 _hydroAllowed, if _HYDRO_AMOUNT_TYPE is true, this will be the limit
         uint256 _lockPeriod, if _PERIOD_LOCKED is true, this will be the period
         uint256 _minInvestors, minimum of investors allowed
@@ -144,7 +144,7 @@ To setup the token, 4 different functions shall be called, each one with their c
         uint256 carriedInterestRate, carried interest rate
     )
 
-* For convenience in internal calculations, percentages are expressed in weiss. 1 ether represents 100%, 0.5 ethers 50% and so on.
+ (*) For convenience in internal calculations, percentages are expressed in weiss. 1 ether represents 100%, 0.5 ethers 50% and so on.
 
 <h5>Token pre-launch</h5>
 
@@ -176,11 +176,11 @@ Once activated, buyers can start buying the tokens. According with the configura
 The following values will be provided by the system itself (in the future, by means of HSToken Factory or a dApp) meanwhile (for testing purposes) they must be manually provided:
 
 - uint id
-- address HydroToken: address of HydroToken*
-- address IdentityRegistry: address of Identity Registry*
+- address HydroToken: address of HydroToken (*)
+- address IdentityRegistry: address of Identity Registry (*)
 - address owner: EIN of owner/issuer will be obtained from this address and will be used to authenticate internally with the einOwner variable.
 
-* these addresses are expected for in the constructor to allow for testing to be performed in different blockchains (Rinkeby, Kovan, MainNet, and so)
+ (*) these addresses are expected for in the constructor to allow for testing to be performed in different blockchains (Rinkeby, Kovan, MainNet, and so)
 
 
 
@@ -279,7 +279,7 @@ Issuing will end once endDate parameter has been reached.
 token will be in stage = FINALIZED
 Once issuing has finalized, the HSToken will be able to be transacted as normal tokens.
 
-* The dApp responsible of generating the HSTokens could opt to require all parameters at a time and make all the calls at a time. The system is designed for the dApp to be able to allow users to create their token first, without much to consider, and then give them 15 days to think about all the details. The token will be reserved in the blockhain for 15 days. If it has not been configured after that time, the token will be considered non existent.
+ (*) The dApp responsible of generating the HSTokens could opt to require all parameters at a time and make all the calls at a time. The system is designed for the dApp to be able to allow users to create their token first, without much to consider, and then give them 15 days to think about all the details. The token will be reserved in the blockhain for 15 days. If it has not been configured after that time, the token will be considered non existent.
 
 
 There can be restrictions of amount per investor, total amount of tokens, quantity of investors, or new rules that can be added in the future.
