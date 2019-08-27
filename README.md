@@ -1,4 +1,6 @@
-<h1>HST - Hydro Security Tokens Generator and Manager</h1>
+<h1>HST - Hydro Security Tokens Framework</h1>
+
+<h2>Security Tokens Generator and Manager</h2>
 
 <h3>Description</h3>
 
@@ -69,95 +71,51 @@ You can find an example test run in the file test.txt
 
 <h3>HSTOken - General Description and Usage</h3>
 
-Constructor
-
-Required values
-
-Provided by owner:
-
-Tutorial: How to issue a token
+<h4>Tutorial: How to issue a token</h4>
 
 
 This tutorial shows you how to issue a new token using the Hydro Securities Token framework. Token creation and setup will be performed by calling functions in the HSToken smart contract. Instructions follow.
 
 
-Token creation
+<h5>Token creation</h5>
 
-1. Call the HSToken Constructor
+Call the HSToken Constructor
 
 The following are required values for the creation of a new token, and must be provided by the owner/issuer of the token, possibly through a dApp, or as parameters if invoking the smart contract directly.
 
+        uint256 id: Token iD
+        uint8 stoType: STO type: (0: Shares, 1: Units, 2: Bonds)
+        bytes32 name: Name of the token
+        string memory description: Description
+        bytes32 symbol: Symbol
+        uint8 decimals: Decimals
 
-Provided by system (HSToken Fabric):
-- id
-- HydroToken address
-- IdentityRegistry address
-- Raindrop address?
-- ServiceRegistry address
+The following values (along with the first id) will be provided by the system itself (in the future, by means of HSToken Factory or a dApp) meanwhile (for testing purposes) they must be manually provided:
 
-Token initializes in stage = SETUP
-The owner has 15 days to fill the main parameters to setup the token*.
-3 functions shall be called to setup the token, each one with their corresponding parameters:
-- set_MAIN_PARAMS
-- set_STO_FLAGS
-- set_STO_PARAMS
+        address hydroToken: Address of HydroToken (*)
+        address identityRegistry: Address of Identity Registry (*)
+        address buyerRegistry: Address of Buyer Registry (*)
+        address payable owner: Owner address. EIN of owner/issuer will be obtained from this address and will be used to authenticate internally with the einOwner variable.
 
-After calling these three functions, the owner can call 
-- stagePrelaunch() 
-
-to initiate the Token. stage = PRELAUNCH
-
-During Prelaunch, the owner can add up to 3 KYC, AML and Legal resolvers with:
-- addKYCResolver(address)
-- addAMLResolver(address)
-- addLegalResolver(address)
-
-As well as:
-- removeKYCResolver(address)
-- etc
-
-At any time, the owner can add or remove bulk EIN identities from whitelist or to the blacklist
-- addWhitelist(uint[])
-- addBlacklist(uint[])
-
-Owner can activate the token with:
-- stageActivate()
-Token will change to stage = ACTIVE
-
-Once activated, buyers can start buying the tokens. According with the configuration at setup, the token can accept Ethers and/or HydroTokens.
-- buyTokens(string _coin, uint _amount)
-
-The following values will be provided by the system itself (in the future, by means of HSToken Factory or a dApp) meanwhile (for testing purposes) they must be manually provided:
-
-- uint id
-- address HydroToken: address of HydroToken*
-- address IdentityRegistry: address of Identity Registry*
-- address owner: EIN of owner/issuer will be obtained from this address and will be used to authenticate internally with the einOwner variable.
-
-* these addresses are expected for in the constructor to allow for testing to be performed in different blockchains (Rinkeby, Kovan, MainNet, and so)
-
-
+ (*) these addresses are expected for, in the constructor, to allow for testing to be performed in different blockchains (Rinkeby, Kovan, MainNet, and so)
 
 Once created, a new token initializes itself as being in stage = SETUP
 
 During this stage the token:
 is not active
 its name is protected
-The owner/issuer has 15 days to fill the main parameters to setup the token. This was made to facilitate the life of the token owner/issuer.
-
-2. Token setup
 
-To setup the token, 3 different functions shall be called, each one with their corresponding parameters:
+The owner/issuer has 15 days to fill the main parameters to setup the token. This was made to facilitate the life of the token owner/issuer.
+
+<h5>Token setup</h5>
+
+To setup the token, 4 different functions shall be called, each one with their corresponding parameters:
 
     function set_MAIN_PARAMS(
         uint256 _hydroPrice, Price in HydroTokens
-        uint256 _ethPrice, Price in ethers (will be deprecated)
-        uint256 _beginningDate, Date of beginning of sale
         uint256 _lockEnds, Date of unlocking of token
-        uint256 _endDate, End date of the presale
         uint256 _maxSupply, Max supply of tokens
         uint256 _escrowLimitPeriod, amount of time in seconds for escrow
-
     )
 
     function set_STO_FLAGS(
@@ -165,30 +123,30 @@ To setup the token, 3 different functions shall be called, each one with their c
         bool _PERIOD_LOCKED, Will the token will be limited for a period?
         bool _PERC_OWNERSHIP_TYPE, Will ownership be limited by percentage?
         bool _HYDRO_AMOUNT_TYPE, Will be restricted by amount of hydrotokens?
-        bool _ETH_AMOUNT_TYPE, Will be restricted by amount of ethers=
-        bool _HYDRO_ALLOWED, This will be ever true
-        bool _ETH_ALLOWED, This will be ever false
-        bool _KYC_RESTRICTED, Will buyers be restricted by KYC?
-        bool _AML_RESTRICTED, WIll buyers be restricted by AML?
         bool _WHITELIST_RESTRICTED, Whitelist restriction
         bool _BLACKLIST_RESTRICTED, Blacklist restriction
-        bool _ETH_ORACLE, Will be an oracle for price in ethers (depr)
-        bool _HYDRO_ORACLE Will be an oracle for price in Hydro Tokens?
     )
 
     function set_STO_PARAMS(
-        uint256 _percAllowedTokens, if _PERC_OWNERSHIP_TYPE is true, this will be the percentage
+        uint256 _percAllowedTokens, if _PERC_OWNERSHIP_TYPE is true, this will be the percentage (*)
         uint256 _hydroAllowed, if _HYDRO_AMOUNT_TYPE is true, this will be the limit
-        uint256 _ethAllowed, if _ETH_AMOUNT_TYPE is true, this will be the limit
         uint256 _lockPeriod, if _PERIOD_LOCKED is true, this will be the period
         uint256 _minInvestors, minimum of investors allowed
         uint256 _maxInvestors, maximum of investors allowed
-        address _ethOracle, address of oracle to update eth price of token (if any)
         address _hydroOracle, address of oracle to update hydro price of token (if any)
     )
 
+    function setIssuerProperties(
+        string issuerName, company Name
+        string registeredNumber, registered Number
+        string jurisdiction, jurisdiction
+        address payable fundManager, fund manager address
+        uint256 carriedInterestRate, carried interest rate
+    )
 
-3. Token pre-launch
+ (*) For convenience in internal calculations, percentages are expressed in weiss. 1 ether represents 100%, 0.5 ethers 50% and so on.
+
+<h5>Token pre-launch</h5>
 
 After calling these three functions, the owner/issuer can call:
 
@@ -196,73 +154,145 @@ function stagePrelaunch()
 
 If all previously shown settings were correctly made, the token will be activated and it will be in stage = PRELAUNCH
 
-During the pre-launch stage, the owner/issuer can add or remove KYC, AML and Legal resolvers by calling the following functions:
+During the pre-launch stage, the owner/issuer can add or remove bulk EIN identities from whitelist or blacklist by calling the following functions:
 
-addKYCResolver(address)
-addAMLResolver(address)
-addLegalResolver(address)
+addWhitelist(uint[])
+addBlacklist(uint[])
 
-removeKYCResolver(address)
-removeAMLResolver(address)
-removeLegalResolver(address)
+Setting KYC, AML and Legal providers:
+
+1. Token owner must call ServiceRegistry to appoint a provider using the following function:
+
+addService(
+    address tokenAddress, ethereum address of the token
+    uint serviceProviderEIN, EIN of service provider
+    bytes32 categorySymbol, (“KYC”, “AML”, “MLA”, “CFT”)
+)
+
+2. Token owner can select KYC service for each user calling to BuyerRegistry:
+
+addKycServiceToBuyer(
+        uint buyerEI, EIN of the buyer
+        address tokenFor, address of the token
+        uint serviceProviderEIN, EIN of KYC provider
+)
+
+Same with all other services:
+
+addAmlServiceToBuyer
+addCftServiceToBuyer
 
 At any time, the owner/issuer can add or remove bulk EIN identities from whitelist or blacklist by calling the following functions:
 
 addWhitelist(uint[])
 addBlacklist(uint[])
 
-
+Before changing to presale state, token must be approved by the “Main Legal Advisor”.
 
-4. Token activation
+1. Appoint the “Main legal advisor” by calling ServiceRegistry:
 
-Owner/issuer can activate the token by calling the function
+addService(
+address, token address
+uint, service provider EIN
+bytes32, “MLA”
+)
 
-stageActivate()
+2. Then the “Main Legal Advisor” should grant legal approval for the token calling to TokenRegistry:
 
-Token will change to stage = ACTIVE
+grantLegalApproval(
+address, token address
+)
 
-Once activated, buyers can start buying the tokens. According with the configuration at setup, the token can be bought using Ethers and/or Hydro Tokens.
+This call should be done by an address pertaining to the EIN registered as the MLA service.
 
-Function to buy tokens during the active stage:
+<h5>Token pre-sale</h5>
 
-buyTokens(string _coin, uint _amount)
+Owner/issuer can activate the presale stage of the token by calling the function
 
-There can be restrictions of amount per investor, total amount of tokens, etc.
+stagePresale()
 
-Issuing will end once endDate parameter has been reached.
-token will be in stage = FINALIZED
-Once issuing has finalized, the HSToken will be able to be transacted as normal tokens.
+Token should be approved by the “Main Legal Advisor” in order to advance to this stage.
+Once activated, buyers in the whitelist can start buying tokens. 
 
-* The dApp responsible of generating the HSTokens could opt to require all parameters at a time and make all the calls at a time. The system is designed for the dApp to be able to allow users to create their token first, without much to consider, and then give them 15 days to think about all the details. The token will be reserved in the blockhain for 15 days. If it has not been configured after that time, the token will be considered non existent.
+To buy tokens during the active stages:
 
+buyTokens(uint _amount)
+
+_amount specifies the amount of HydroTokens that will be paid, which should be approved in the HydroToken for the HSToken to use.
+
+Buyer should be approved by KYC as a minimum, and according to token parameters, by AML and/or CFT service providers.
 
 There can be restrictions of amount per investor, total amount of tokens, quantity of investors, or new rules that can be added in the future.
 
-
+The token will call the function checkRules in BuyerRegistry to check if the buyer is authorized to buy.
 
-Token issuing closes
+<h5>Token sale</h5>
 
-Issuing will end once endDate parameter has been reached. When that occurs, token will change to stage = FINALIZED
+Owner/issuer can advance to the sale stage of the token by calling the function
 
-Once issuing has finalized, the HSToken will be able to be transacted as ERC20 tokens, except that they should follow additional rules, as to be approved by external KYC or AML resolvers, and fulfill any other rules. They can also track the date of each portion of tokens sent in any transaction, if that can influentiate its value according to some pre-configured rule.
+stageSale()
 
+This stage have characteristics similar to the previous one, with the exception that whitelists and blacklists are not checked. Other providers and token rules continue having effect, as token will continue calling checkRules in BuyerRegistry.
 
-Token oraclizing
+<h5>Token lock</h5>
 
-An Oracle can be assigned to the token, and it should call the following function to update the price of the token in Ethers:
+Owner/issuer can activate the lock by calling the function
 
-updateEthPrice(uint)
+stageLock()
+
+The minimum investors quantity should be reached.
+
+<h5>Market stage</h5>
+
+Owner/issuer can activate the market stage by calling the function
+
+stageMarket()
+
+ERC-20 functions will be activated.
+
+<h5>Token oraclizing</h5>
+
+An Oracle can be assigned to the token, and it should call the following function to update the price of the token in Hydro tokens:
+
+updateHydroPrice(uint)
 
 Oracles can be assigned, replaced or revoked (by assigning a passive address) by the owner/issuer of the token, at any time, calling the function:
 
-addEthOracle(address)
+addHydroOracle(address)
 
-
-Other administrative functions
+<h5>Setting payments</h5>
+
+Token owner must set periods for payment:
+
+addPaymentPeriodBoundaries(
+    uint[] periods
+)
+
+Each payment date is specified in timestamp in seconds.
+
+<h5>Notifying profits</h5>
+
+Oracle must notify each period profit calling to this function:
+
+notifyPeriodProfits(
+    uint profits
+)
+
+Value will be assigned to the last period without notification.
+
+<h5>Claiming payments</h5>
+
+Buyer must call this function:
+
+claimPayment()
+
+Each invocation will pay the last period pending.
+
+<h5>Other administrative functions</h5>
 
 setLockUpPeriod(uint _lockEnds)
 
-Locks the token for a period of time. Date of unlock expressed in unix timestamp.
+Locks the token for a predetermined period. Date of unlock expressed as unix timestamp.
 
 lock() / unLock()
 
@@ -276,82 +306,23 @@ releaseHydroTokens()
 
 Release HydroTokens held in escrow to the owner/issuer.
 
-
-Public Getters
-
-getTokenEINOwner()
-
-isLocked()
-
-isAlive()
-
-getStage()
-
-isSetupTime()
-
-isPrelaunchTime( )
-
-There can be restrictions of amount per investor, total amount of tokens, quantity of investors, or new rules that can be added in the future.
-
-
-5. Token issuing closes
-
-Issuing will end once endDate parameter has been reached. When that occurs, token will change to stage = FINALIZED
-
-Once issuing has finalized, the HSToken will be able to be transacted as ERC20 tokens, except that they should follow additional rules, as to be approved by external KYC or AML resolvers, and fulfill any other rules. They can also track the date of each portion of tokens sent in any transaction, if that can influentiate its value according to some pre-configured rule.
-
-
-6. Token oraclizing
-
-An Oracle can be assigned to the token, and it should call the following function to update the price of the token in Ethers:
-
-updateEthPrice(uint)
-
-Oracles can be assigned, replaced or revoked (by assigning a passive address) by the owner/issuer of the token, at any time, calling the function:
-
-addEthOracle(address)
-
-
-7. Other administrative functions
-
-setLockUpPeriod(uint _lockEnds)
-
-Locks the token for a period of time. Date of unlock expressed in unix timestamp.
-
-lock() / unLock()
-
-Lock/unlocks the token.
-
-freeze(uint[]) / unfreeze(uint[])
-
-Freezes/unfreezes bulk or individual EIN identities for using the token.
-
-releaseHydroTokens()
-
-Release HydroTokens held in escrow to the owner/issuer.
-
-
-8. Public Getters
+<h5>Public Getters</h5>
 
 getTokenEINOwner()
 
-isLocked()
+isTokenLocked()
 
-isAlive()
+isTokenAlive()
 
-getStage()
+tokenInSetUpStage()
 
-isSetupTime()
+getPaymentPeriodBoundaries()
 
-isPrelaunchTime( )
-
-
-<h3>Granting a user the OK to buy a Token - Javascript Example</h3>
+<h3>Granting a user permission to buy a Token - Javascript Example</h3>
 
 We use a  group of pre-loaded contracts which we stored in the “instances” object array.
 Also note that most steps are done by user number 1 (the token owner) but changing the user KYC status must be done by user number 2 (the service provider).
 To allow a buyer to buy a Hydro Security Token, you need to follow this 6-steps recipe.
-
 
 1. Appoint the Token to the Token Registry
 
@@ -427,4 +398,3 @@ await instances.BuyerRegistry.setBuyerKycStatus(
             {from: users[2].address}
       )
 </code></pre>
-
