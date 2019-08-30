@@ -585,7 +585,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         public
         returns(bool success)
     {
-        checkUnlocked();
+        checkMarketStage();
         checkUnfreezed(msg.sender, _to);
 
         BuyerRegistry.checkRules(IdentityRegistry.getEIN(_to));
@@ -598,7 +598,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         public
         returns(bool success)
     {
-        checkUnlocked();
+        checkMarketStage();
         checkUnfreezed(_from, _to);
 
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
@@ -713,7 +713,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         require(stage == Stage.SETUP && (now - registerDate) < (15 * 24 * 60 * 60), "This is not setup stage");
     }
 
-    function checkUnlocked() private view {
+    function checkMarketStage() private view {
+        require(stage == Stage.MARKET, "Token is not in market stage yet");
         require(!locked, "Token locked");
         if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
     }
