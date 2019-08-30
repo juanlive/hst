@@ -162,7 +162,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
     modifier onlyAtSetup() {
-        require(stage == Stage.SETUP && (now - registrationDate) < (15 * 24 * 60 * 60), "This is not setup stage");
+        require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "This is not setup stage");
         _;
     }
 
@@ -675,7 +675,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     function getPeriod() public view returns(uint256) {
         if (periods.length < 2) return 0;
         for (uint i = 1; i < periods.length; i++) {
-          if (periods[i] > now) return i-1;
+          if (periods[i] > block.timestamp) return i-1;
         }
         return periods[periods.length-1];
     }
