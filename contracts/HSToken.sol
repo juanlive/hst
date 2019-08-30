@@ -357,11 +357,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
 
     function stageMarket()
-<<<<<<< HEAD:contracts/HSToken.fati.sol
-    	public onlyAdmin
-=======
     	public  
->>>>>>> 07f07da0dc7ea2b4f0cd21eb8442c8c20f4a9ff0:contracts/HSToken.sol
     {
         onlyAdmin();
     	require(stage == Stage.LOCK, "Stage should be Lock");
@@ -467,15 +463,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
 
-<<<<<<< HEAD:contracts/HSToken.fati.sol
-    function addPaymentPeriodBoundaries(uint256[] memory _periods) public onlyAdmin {
-        require(_periods.length > 0, "There should be at least one period set");
-=======
     function addPaymentPeriodBoundaries(uint256[] memory _periods) public  
     {
         onlyAdmin();
-        require(_periods.length > 0);
->>>>>>> 07f07da0dc7ea2b4f0cd21eb8442c8c20f4a9ff0:contracts/HSToken.sol
+        require(_periods.length > 0, "There should be at least one period set");
         for (uint i = 0; i < _periods.length; i++) {
           require(periods[periods.length-1] < _periods[i], "New periods must be after last period registered");
           periods.push(_periods[i]);
@@ -714,17 +705,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     // PRIVATE FUNCTIONS --------------------------------------------------------------------
 
-<<<<<<< HEAD:contracts/HSToken.fati.sol
-    // Modifiers type
-    // Modifiers are compiled each time, so we replace some with functions to optimize bytecode
-=======
     // Used as modifiers to optimize bytecode at deployment
 
     function onlyAdmin() private view {
         // Check if EIN of sender is the same as einOwner
         require(IdentityRegistry.getEIN(msg.sender) == einOwner, "Only for admins");
     }
->>>>>>> 07f07da0dc7ea2b4f0cd21eb8442c8c20f4a9ff0:contracts/HSToken.sol
 
     function checkSetup() private view { // replaces onlyAtSetup() modifier
         require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "This is not setup stage");
@@ -733,7 +719,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     function checkMarketStage() private view {
         require(stage == Stage.MARKET, "Token is not in market stage yet");
         require(!locked, "Token locked");
-        if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
+        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period active");
     }
 
     function checkUnfreezed(address _from, address _to) private view {
