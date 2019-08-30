@@ -13,7 +13,7 @@ const sleep = async(_seconds) => {
   await new Promise(resolve => setTimeout(resolve, _seconds * 1000));
 }
 
-contract('Testing HSToken', function (accounts) {
+contract('Testing HSToken Payment', function (accounts) {
 
   it('Users created', async () => {
       users = await common.createUsers(accounts);
@@ -35,6 +35,7 @@ console.log(users)
 
 
   describe('Checking HSToken functionality (BONDS)', async() =>{
+
 
 
     it('HSToken can be created', async () => {
@@ -231,7 +232,7 @@ console.log(users)
           web3.utils.toWei("0.2"), // _percAllowedTokens: 1 ether = 100%, 0.2 ether = 20%
           web3.utils.toWei("1000"), // _hydroAllowed,
           utilities.daysToSeconds(12).toString(), // _lockPeriod,
-          "1", // _minInvestors,
+          "0", // _minInvestors,
           "4", // _maxInvestors
           users[5].address, // hydroOracle
         { from: users[9].address }
@@ -272,6 +273,13 @@ console.log(users)
       await newToken.stageSale({ from: users[9].address });
     })
 
+    it('HSToken activate Lock', async () => {
+      await newToken.stageLock({ from: users[9].address });
+    })
+
+    it('HSToken activate Market', async () => {
+      await newToken.stageMarket({ from: users[9].address });
+    })
 
     it('HSToken adds EIN 2 to whitelist', async() => {
       await newToken.addWhitelist(["2"],
@@ -501,14 +509,6 @@ console.log(users)
       //console.log("Capital transfer log:", web3.utils.fromWei(payment.receipt.logs[1].args._amount))
       console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(users[1].address)))
 
-    })
-
-    it('HSToken activate Lock', async () => {
-      await newToken.stageLock({ from: users[9].address });
-    })
-
-    it('HSToken activate Market', async () => {
-      await newToken.stageMarket({ from: users[9].address });
     })
 
 

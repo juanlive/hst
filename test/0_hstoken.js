@@ -332,6 +332,13 @@ console.log(users)
           { from: users[1].address })
     })
 
+    it('HSToken activate Lock', async () => {
+      await newToken.stageLock({ from: users[9].address });
+    })
+
+    it('HSToken activate Market', async () => {
+      await newToken.stageMarket({ from: users[9].address });
+    })
 
     it('Store periods', async() => {
 
@@ -532,14 +539,6 @@ console.log(users)
       console.log("Amount from transfer log:", web3.utils.fromWei(payment.receipt.logs[0].args._amount))
       console.log("HydroToken Balance user 1 AFTER:", web3.utils.fromWei(await instances.HydroToken.balanceOf(users[1].address)))
 
-    })
-
-    it('HSToken activate Lock', async () => {
-      await newToken.stageLock({ from: users[9].address });
-    })
-
-    it('HSToken activate Market', async () => {
-      await newToken.stageMarket({ from: users[9].address });
     })
 
 
