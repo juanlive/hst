@@ -12,8 +12,10 @@ import './modules/PaymentSystem.sol';
 
 /**
  * @title HSToken
- * @notice The Hydro Security Token is a system to allow people to create their own Security Tokens,
- *         related to their Snowflake identities and attached to external KYC, AML and other rules.
+ * @notice The Hydro Security Token is part of the Hydro Security Tokens Framework,
+ * a system to allow organizations to create their own Security Tokens,
+ * related to their Snowflake identities, serviced by external KYC, AML and CFT services,
+ * and restrainable by some rules.
  * @author Juan Livingston <juanlivingston@gmail.com>
  */
 
@@ -33,7 +35,7 @@ contract MAIN_PARAMS {
     bool public MAIN_PARAMS_ready;
 
     uint256 public hydroPrice;
-    uint256 public lockEnds; // Date of end of locking period
+    uint256 public lockEnds; // Ending date of locking period
     uint256 public maxSupply;
     uint256 public escrowLimitPeriod;
 }
@@ -43,8 +45,8 @@ contract STO_FLAGS {
 
     bool public LIMITED_OWNERSHIP;
     bool public PERIOD_LOCKED;  // Locked period active or inactive
-    bool public PERC_OWNERSHIP_TYPE; // is ownership percentage limited type
-    bool public HYDRO_AMOUNT_TYPE; // is Hydro amount limited
+    bool public PERC_OWNERSHIP_TYPE; // is percentage of ownership limited?
+    bool public HYDRO_AMOUNT_TYPE; // is Hydro amount limited?
     bool public WHITELIST_RESTRICTED;
     bool public BLACKLIST_RESTRICTED;
 }
@@ -61,7 +63,7 @@ contract STO_PARAMS {
 }
 
 contract STO_Interests {
-    uint256 public marketStarted; // Date of market stage
+    uint256 public marketStarted; // Date for market stage
     uint256[] internal periods;
 }
 
@@ -73,11 +75,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         SETUP, PRELAUNCH, PRESALE, SALE, LOCK, MARKET, FINALIZED
     }
 
-    // Basic states
-    bool public locked; // Locked token transfers
+    // Lock state
+    bool public locked; // Mark if token transfers are locked
 
 	// Main parameters
-    uint256 public registerDate; // Date of creation of token
+    uint256 public registrationDate; // Token creation and registration date
 
 	uint256 public id; // Unique HSToken id
 	bytes32 public name;
@@ -90,10 +92,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     // State Memory
     Stage public stage; // SETUP, PRELAUNCH, PRESALE, SALE, LOCK, MARKET, FINALIZED
-    // uint256 public issuedTokens; // It is in the payment modules
+
+    // uint256 public issuedTokens; // Moved to payment module
     uint256 public hydroReceived;
-    uint256 public investorsQuantity;
-    uint256 public hydrosReleased; // Quantity of Hydros released by owner
+    uint256 public numberOfInvestors;
+    uint256 public hydrosReleased; // Number of Hydros released by owner
 
     address public raindropAddress;
 
@@ -108,7 +111,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     // Balances
     mapping(address => uint256) public balance;
-    // mapping(uint256 => mapping(address => uint256)) public balanceAt; // It is at the payment module
+    // This was moved to the payment module
+    // mapping(uint256 => mapping(address => uint256)) public balanceAt;
 
     // Declaring interfaces
     IdentityRegistryInterface public IdentityRegistry;
@@ -147,7 +151,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
 /*    modifier isUnlocked() {
         require(!locked, "Token locked");
-        if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
+        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period active");
         _;
     }
 
@@ -158,7 +162,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
     modifier onlyAtSetup() {
-        require(stage == Stage.SETUP && (now - registerDate) < (15 * 24 * 60 * 60), "This is not setup stage");
+        require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "This is not setup stage");
         _;
     }
 
@@ -171,16 +175,16 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     modifier onlyActive() {
         require(
-            stage == Stage.PRESALE || 
-            stage == Stage.SALE || 
-            stage == Stage.MARKET, 
+            stage == Stage.PRESALE ||
+            stage == Stage.SALE ||
+            stage == Stage.MARKET,
             "Not in active stage"
             );
         _;
     }
 
     modifier escrowReleased() {
-        require(escrowLimitPeriod < now, "Escrow limit period is still active");
+        require(escrowLimitPeriod < block.timestamp, "Escrow limit period is still active");
         require(BuyerRegistry.getTokenLegalStatus(address(this)), "Legal conditions are not met");
         _;
     }
@@ -196,10 +200,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         address _identityRegistry,
         address _buyerRegistry,
         address payable _owner
-    )
-        public
-    {
-
+    ) public {
         id = _id;
         name = _name;
         description = _description;
@@ -208,17 +209,19 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
         setSTOType(_stoType);
 
-        registerDate = now;
+        registrationDate = block.timestamp;
         // locked = true;
 
         // State Memory
         stage = Stage.SETUP;
 
-        periods.push(now);
+        periods.push(block.timestamp);
 
         // Links to Modules
-        HydroToken = HydroInterface(_hydroToken); // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
-        IdentityRegistry = IdentityRegistryInterface(_identityRegistry); // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
+        HydroToken = HydroInterface(_hydroToken);
+        // 0x4959c7f62051D6b2ed6EaeD3AAeE1F961B145F20
+        IdentityRegistry = IdentityRegistryInterface(_identityRegistry);
+        // 0xa7ba71305bE9b2DFEad947dc0E5730BA2ABd28EA
         BuyerRegistry = HSTBuyerRegistryInterface(_buyerRegistry);
         // raindropAddress = _RaindropAddress;
 
@@ -247,7 +250,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         // Validations
         require(
             _hydroPrice > 0 &&
-            _lockEnds > now &&
+            _lockEnds > block.timestamp &&
             _maxSupply > 10000 &&
             _escrowLimitPeriod > (10 * 24 * 60 * 60),
             "Incorrect input data"
@@ -331,7 +334,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     {
         onlyAdmin();
     	require(stage == Stage.PRELAUNCH, "Stage should be Prelaunch");
-        require(BuyerRegistry.getTokenLegalStatus(address(this)));
+        require(BuyerRegistry.getTokenLegalStatus(address(this)), "Token needs legal approval");
         stage = Stage.PRESALE;
     }
 
@@ -348,7 +351,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     {
         onlyAdmin();
     	require(stage == Stage.SALE, "Stage should be Sale");
-        require(investorsQuantity >= minInvestors, "Investors quantity has not reached the minimum");
+        require(numberOfInvestors >= minInvestors, "Number of investors has not reached the minimum");
         stage = Stage.LOCK;
     }
 
@@ -359,7 +362,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         onlyAdmin();
     	require(stage == Stage.LOCK, "Stage should be Lock");
     	stage = Stage.MARKET;
-    	marketStarted = now;
+    	marketStarted = block.timestamp;
     }
 
 
@@ -385,7 +388,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
             return;
             }
         // Add lock period
-        require(_lockEnds > now + 24 * 60 * 60, "Lock ending should be at least 24 hours in the future");
+        require(_lockEnds > block.timestamp + 24 * 60 * 60, "Lock ending should be at least 24 hours in the future");
         PERIOD_LOCKED = true;
         lockEnds = _lockEnds;
     }
@@ -463,9 +466,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     function addPaymentPeriodBoundaries(uint256[] memory _periods) public  
     {
         onlyAdmin();
-        require(_periods.length > 0);
+        require(_periods.length > 0, "There should be at least one period set");
         for (uint i = 0; i < _periods.length; i++) {
-          require(periods[periods.length-1] < _periods[i], "New periods must be after last period registered"); 
+          require(periods[periods.length-1] < _periods[i], "New periods must be after last period registered");
           periods.push(_periods[i]);
         }
         emit PaymentPeriodBoundariesAdded(_periods);
@@ -506,9 +509,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         uint256 _ein = IdentityRegistry.getEIN(msg.sender);
 
         if (!investors[_ein].exists) {
-            investorsQuantity++;
+            numberOfInvestors++;
             investors[_ein].exists = true;
-            require(investorsQuantity <= maxInvestors || maxInvestors == 0, "Maximum investors reached");
+            require(numberOfInvestors <= maxInvestors || maxInvestors == 0, "Maximum number of investors reached");
         }
 
         // Check for limits
@@ -654,7 +657,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     function isTokenLocked() public view returns(bool) {
         if (locked) return true;
-        if (PERIOD_LOCKED && now < lockEnds) return true;
+        if (PERIOD_LOCKED && block.timestamp < lockEnds) return true;
         return false;
     }
 
@@ -666,18 +669,18 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
 
     function getNow() public view returns(uint256) {
-    	return now;
+    	return block.timestamp;
     }
 
     function getPeriod() public view returns(uint256) {
         if (periods.length < 2) return 0;
         for (uint i = 1; i < periods.length; i++) {
-          if (periods[i] > now) return i-1;
+          if (periods[i] > block.timestamp) return i-1;
         }
         return periods[periods.length-1];
     }
 
-    // ONLY FOR ORACLES ------------------------------------------------------------------
+    // FUNCTIONS TO BE USED EXCLUSIVELY BY ORACLES
 
     function updateHydroPrice(uint256 _newPrice) external {
     	require(msg.sender == hydroOracle, "Only registered Oracle can set Hydro price");
@@ -710,13 +713,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
     function checkSetup() private view { // replaces onlyAtSetup() modifier
-        require(stage == Stage.SETUP && (now - registerDate) < (15 * 24 * 60 * 60), "This is not setup stage");
+        require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "This is not setup stage");
     }
 
     function checkMarketStage() private view {
         require(stage == Stage.MARKET, "Token is not in market stage yet");
         require(!locked, "Token locked");
-        if (PERIOD_LOCKED) require (now > lockEnds, "Locked period active");
+        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period active");
     }
 
     function checkUnfreezed(address _from, address _to) private view {
@@ -734,7 +737,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
     function tokenInSetupStage() private view returns(bool) {
         // Stage is SETUP and 15 days to complete setup has not passed yet
-        return(stage == Stage.SETUP && (now - registerDate) < (15 * 24 * 60 * 60));
+        return(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60));
     }
 
     function _checkWhitelist(uint256 _einUser) private view {

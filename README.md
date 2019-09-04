@@ -131,8 +131,8 @@ To setup the token, 4 different functions shall be called, each one with their c
         uint256 _percAllowedTokens, if _PERC_OWNERSHIP_TYPE is true, this will be the percentage (*)
         uint256 _hydroAllowed, if _HYDRO_AMOUNT_TYPE is true, this will be the limit
         uint256 _lockPeriod, if _PERIOD_LOCKED is true, this will be the period
-        uint256 _minInvestors, minimum of investors allowed
-        uint256 _maxInvestors, maximum of investors allowed
+        uint256 _minInvestors, minimum number of investors allowed
+        uint256 _maxInvestors, maximum number of investors allowed
         address _hydroOracle, address of oracle to update hydro price of token (if any)
     )
 
@@ -222,7 +222,7 @@ _amount specifies the amount of HydroTokens that will be paid, which should be a
 
 Buyer should be approved by KYC as a minimum, and according to token parameters, by AML and/or CFT service providers.
 
-There can be restrictions of amount per investor, total amount of tokens, quantity of investors, or new rules that can be added in the future.
+There can be restrictions of amount per investor, total amount of tokens, number of investors, or new rules that can be added in the future.
 
 The token will call the function checkRules in BuyerRegistry to check if the buyer is authorized to buy.
 
@@ -240,7 +240,7 @@ Owner/issuer can activate the lock by calling the function
 
 stageLock()
 
-The minimum investors quantity should be reached.
+The minimum number of investors should be reached.
 
 <h5>Market stage</h5>
 
