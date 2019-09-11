@@ -235,11 +235,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @notice Token constructor
    *
    * @param _id Token ID
-   * @param _stoType,
-   * @param _name,
-   * @param _description,
-   * @param _symbol,
-   * @param _decimals,
+   * @param _stoType Token type (0: Shares, 1: Units, 3: Bonds)
+   * @param _name Token name
+   * @param _description Token description
+   * @param _symbol Token symbol
+   * @param _decimals Token decimals
    * @param _hydroToken Address of the Hydro Token contract
    * @param _identityRegistry Address of the Identity Registry contract
    * @param _buyerRegistry Address of the Buyer Registry contract
@@ -487,7 +487,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Set the date to end the lock-up period
    *
-   * @param The date in which the lock-up period ends
+   * @param _lockEnds The date in which the lock-up period ends
    */
     function setLockupPeriod(uint256 _lockEnds)
         public
@@ -510,7 +510,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    *
    * @dev Token must be in the setup stage
    *
-   * @param The address for the buyer registry
+   * @param _newBuyerRegistry The address for the buyer registry
    */
     function changeBuyerRegistry(address _newBuyerRegistry) public
     {
@@ -894,11 +894,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     // PUBLIC GETTERS --------------------------------------------------------------------------
 
   /**
-   * @notice finishing documentation
+   * @notice Answer if token is locked
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @return true if locked, false if not
    */
     function isTokenLocked() public view returns(bool) {
         if (locked) return true;
@@ -907,11 +905,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice finishing documentation
+   * @notice Answer if token is alive & kicking
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @return true if locked, false if not // Juan?
    */
     function isTokenAlive() public view returns(bool) {
         if (stage != Stage.SETUP) return true;
@@ -920,22 +916,18 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice finishing documentation
+   * @notice get timestamp for current network block
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @return timestamp for the current network block
    */
     function getNow() public view returns(uint256) {
     	return block.timestamp;
     }
 
   /**
-   * @notice finishing documentation
+   * @notice get current running period
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @return current running period end date // Juan?
    */
     function getPeriod() public view returns(uint256) {
         if (periods.length < 2) return 0;
@@ -945,14 +937,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         return periods[periods.length-1];
     }
 
-    // FUNCTIONS TO BE USED EXCLUSIVELY BY ORACLES
+
+    // FUNCTIONS TO BE USED EXCLUSIVELY BY ORACLES --------------------------------------------------------------------
 
   /**
-   * @notice finishing documentation
+   * @notice update the Hydro token price in dollars
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @param _newPrice new Hydro token price in dollars
    */
     function updateHydroPrice(uint256 _newPrice) external {
     	require(msg.sender == hydroOracle, "Only registered Oracle can set Hydro price");
@@ -960,11 +951,9 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice finishing documentation
+   * @notice notify the token about profits for the current period
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @param _profits profits in dollars // Juan?
    */
     function notifyPeriodProfits(uint256 _profits) public {
         require(msg.sender == hydroOracle, "Only registered oracle can notify profits");
@@ -982,16 +971,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         emit PeriodNotified(_periodToPay, _profits);
     }
 
+
     // PRIVATE FUNCTIONS --------------------------------------------------------------------
 
     // Used as modifiers to optimize bytecode at deployment
 
   /**
-   * @notice finishing documentation
-   *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @notice to qualify functions so only the administrator can execute them
    */
     function onlyAdmin() private view {
         // Check if EIN of sender is the same as einOwner
@@ -999,22 +985,14 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice finishing documentation
-   *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @notice verify if the token is in the setup stage
    */
     function checkSetup() private view { // replaces onlyAtSetup() modifier
         require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "This is not setup stage");
     }
 
   /**
-   * @notice finishing documentation
-   *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @notice verify if the token is in the market stage
    */
     function checkMarketStage() private view {
         require(stage == Stage.MARKET, "Token is not in market stage yet");
@@ -1023,11 +1001,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice finishing documentation
+   * @notice verify if source and target addresses are unfreezed
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @param _from source address
+   * @param _to target address
    */
     function checkUnfreezed(address _from, address _to) private view {
         require(!freezed[IdentityRegistry.getEIN(_to)], "Target EIN is freezed");
@@ -1038,11 +1015,13 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     // Other private functions
 
   /**
-   * @notice finishing documentation
+   * @notice set the type for the token to determine
+   *         which of the following securities it represents:
+   *            0: Shares
+   *            1: Units
+   *            3: Bonds
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @param _stoType token type
    */
     function setSTOType(uint8 _stoType) private {
         require(_stoType < 3, "STO Type not recognized. 0: Shares, 1: Units, 3: Bonds");
@@ -1050,11 +1029,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice finishing documentation
+   * @notice verify if token is in the setup stage
    *
-   * @param _something finishing documentation
+   * @dev this function may duplicate checkSetup() // Juan?
    *
-   * @return finishing documentation
+   * @return true if yes, false if not
    */
     function tokenInSetupStage() private view returns(bool) {
         // Stage is SETUP and 15 days to complete setup has not passed yet
@@ -1062,22 +1041,18 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice finishing documentation
+   * @notice check if the EIN for a user is in the white list
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @param _einUser the EIN for the user in question
    */
     function _checkWhitelist(uint256 _einUser) private view {
         require(whitelist[_einUser], "EIN address not in whitelist");
     }
 
   /**
-   * @notice finishing documentation
+   * @notice check if the EIN for a user is in the black list
    *
-   * @param _something finishing documentation
-   *
-   * @return finishing documentation
+   * @param _einUser the EIN for the user in question
    */
     function _checkBlacklist(uint256 _einUser) private view {
         require(!blacklist[_einUser], "EIN address is blacklisted");
