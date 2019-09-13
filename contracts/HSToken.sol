@@ -90,10 +90,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 	// Main parameters
     uint256 public registrationDate; // Token creation and registration date
 
-	uint256 public id; // Unique HSToken id
-	bytes32 public name;
-	string public description;
-	bytes32 public symbol;
+	  uint256 public id; // Unique HSToken id
+	  bytes32 public name;
+	  string public description;
+	  bytes32 public symbol;
     uint8 public decimals;
     address payable public Owner;
     uint256 public einOwner;
@@ -120,7 +120,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     // EIN => yes/no
     mapping(uint256 => bool) public freezed;
 
-    // Juan?
+    // ERC20 allowance
     mapping(address => mapping(address => uint256)) public allowed;
 
     // EIN => Investor Data
@@ -297,7 +297,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @param _hydroPrice The price of the Hydro token for calculations
    * @param _lockEnds Date in which token lock period ends
    * @param _maxSupply Maximum supply of the token
-   * @param _escrowLimitPeriod Juan?
+   * @param _escrowLimitPeriod
    */
     function set_MAIN_PARAMS(
         uint256 _hydroPrice,
@@ -334,7 +334,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @param _LIMITED_OWNERSHIP The price of the Hydro token for calculations
    * @param _PERIOD_LOCKED Date in which token lock period ends
    * @param _PERC_OWNERSHIP_TYPE Maximum supply of the token
-   * @param _HYDRO_AMOUNT_TYPE Juan?
+   * @param _HYDRO_AMOUNT_TYPE Will the token be restricted by amount of hydrotokens?
    * @param _WHITELIST_RESTRICTED Will the token be restricted by a whitelist?
    * @param _BLACKLIST_RESTRICTED Will the token be restricted by a blacklist?
    */
@@ -365,12 +365,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Set flags for the token
    *
-   * @param _percAllowedTokens Juan?
-   * @param _hydroAllowed Juan?
-   * @param _lockPeriod Maximum supply of the token
-   * @param _minInvestors Juan?
-   * @param _maxInvestors Juan?
-   * @param _hydroOracle Juan?
+   * @param _percAllowedTokens if _PERC_OWNERSHIP_TYPE is true, this will be the percentage
+   * @param _hydroAllowed if _HYDRO_AMOUNT_TYPE is true, this will be the limit?
+   * @param _lockPeriod if _PERIOD_LOCKED is true, this will be the period
+   * @param _minInvestors minimum number of investors allowed
+   * @param _maxInvestors maximum number of investors allowed
+   * @param _hydroOracle address of oracle to update hydro price of token (if any)
    */
     function set_STO_PARAMS(
         uint256 _percAllowedTokens,
@@ -583,7 +583,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice Juan?
+   * @notice Freeze token
    */
     function freeze(uint256[] memory _einList) public
     {
@@ -594,7 +594,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice Juan?
+   * @notice Unfreeze token
    */
     function unFreeze(uint256[] memory _einList) public
     {
@@ -607,7 +607,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Appoint boundaries for payment periods
    *
-   * @param _periods End date/s for the payment period/s Juan?
+   * @param _periods End date/s for the payment period/s
    */
     function addPaymentPeriodBoundaries(uint256[] memory _periods) public
     {
@@ -751,7 +751,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Get current stage for the token
    *
-   * @return Code corresponding to the current stage (see Stage enumeration) Juan?
+   * @return Number of current stage (see Stage enumeration)
    */
     function _getStage() private view returns(uint256) {
     	return uint(stage);
@@ -852,11 +852,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice Get current Hydro tokens balance for the token contract
+   * @notice ERC20 Approveandcall function
    *
    * @param _spender Address to allow token transfers
-   * @param _value Juan?
-   * @param _extraData Juan?
+   * @param _value quantity of tokens
+   * @param _extraData extra data (if any)
    *
    * @return True if all goes well
    */
@@ -907,7 +907,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Answer if token is alive & kicking
    *
-   * @return true if locked, false if not // Juan?
+   * @return true if token is functional, false if it was abandoned in setup stage?
    */
     function isTokenAlive() public view returns(bool) {
         if (stage != Stage.SETUP) return true;
@@ -916,7 +916,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-   * @notice get timestamp for current network block
+   * @notice get timestamp for current network block (for testing purposes)
    *
    * @return timestamp for the current network block
    */
@@ -927,7 +927,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice get current running period
    *
-   * @return current running period end date // Juan?
+   * @return next period to come
    */
     function getPeriod() public view returns(uint256) {
         if (periods.length < 2) return 0;
@@ -953,7 +953,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice notify the token about profits for the current period
    *
-   * @param _profits profits in dollars // Juan?
+   * @param _profits profits in HydroToken
    */
     function notifyPeriodProfits(uint256 _profits) public {
         require(msg.sender == hydroOracle, "Only registered oracle can notify profits");
@@ -1030,8 +1030,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
   /**
    * @notice verify if token is in the setup stage
-   *
-   * @dev this function may duplicate checkSetup() // Juan?
    *
    * @return true if yes, false if not
    */
