@@ -89,11 +89,10 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
 	// Main parameters
     uint256 public registrationDate; // Token creation and registration date
-
-	  uint256 public id; // Unique HSToken id
-	  bytes32 public name;
-	  string public description;
-	  bytes32 public symbol;
+    uint256 public id; // Unique HSToken id
+    bytes32 public name;
+    string public description;
+    bytes32 public symbol;
     uint8 public decimals;
     address payable public Owner;
     uint256 public einOwner;
@@ -182,10 +181,11 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
 
     /**
-    * @dev Most repeated modifiers are replaced by functions to optimize bytecode at deployment
+    * @dev Most repeated modifiers were replaced by functions to optimize bytecode at deployment
     */
 
-/*    modifier isUnlocked() {
+/*
+    modifier isUnlocked() {
         require(!locked, "Token locked");
         if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period active");
         _;
@@ -297,16 +297,14 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @param _hydroPrice The price of the Hydro token for calculations
    * @param _lockEnds Date in which token lock period ends
    * @param _maxSupply Maximum supply of the token
-   * @param _escrowLimitPeriod
+   * @param _escrowLimitPeriod Lenght of escrow period in seconds
    */
     function set_MAIN_PARAMS(
         uint256 _hydroPrice,
         uint256 _lockEnds,
         uint256 _maxSupply,
         uint256 _escrowLimitPeriod
-    )
-        public
-    {
+    ) public {
         onlyAdmin();
         checkSetup();
 
@@ -345,9 +343,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         bool _HYDRO_AMOUNT_TYPE,
         bool _WHITELIST_RESTRICTED,
         bool _BLACKLIST_RESTRICTED
-    )
-        public
-    {
+    ) public {
         onlyAdmin();
         checkSetup();
         require(!STO_FLAGS_ready, "Flags already setted");
@@ -379,9 +375,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         uint256 _minInvestors,
         uint256 _maxInvestors,
         address _hydroOracle
-    )
-        public
-    {
+    ) public {
         onlyAdmin();
         checkSetup();
         require(!STO_PARAMS_ready, "Params already setted");
@@ -403,9 +397,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to pre-launch stage
    */
-    function stagePrelaunch()
-        public
-    {
+    function stagePrelaunch() public {
         onlyAdmin();
         checkSetup();
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
@@ -418,9 +410,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to pre-sale stage
    */
-    function stagePresale()
-        public
-    {
+    function stagePresale() public {
         onlyAdmin();
     	require(stage == Stage.PRELAUNCH, "Stage should be Prelaunch");
         require(BuyerRegistry.getTokenLegalStatus(address(this)), "Token needs legal approval");
@@ -430,9 +420,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to sale stage
    */
-    function stageSale()
-        public
-    {
+    function stageSale() public {
         onlyAdmin();
     	require(stage == Stage.PRESALE, "Stage should be Presale");
         stage = Stage.SALE;
@@ -441,9 +429,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to lock stage
    */
-    function stageLock()
-        public
-    {
+    function stageLock() public {
         onlyAdmin();
     	require(stage == Stage.SALE, "Stage should be Sale");
         require(numberOfInvestors >= minInvestors, "Number of investors has not reached the minimum");
@@ -453,15 +439,12 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to market stage
    */
-    function stageMarket()
-    	public
-    {
+    function stageMarket() public {
         onlyAdmin();
     	require(stage == Stage.LOCK, "Stage should be Lock");
     	stage = Stage.MARKET;
     	marketStarted = block.timestamp;
     }
-
 
 
     // ADMIN GENERAL FUNCTIONS ----------------------------------------------------------------
@@ -489,9 +472,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    *
    * @param _lockEnds The date in which the lock-up period ends
    */
-    function setLockupPeriod(uint256 _lockEnds)
-        public
-    {
+    function setLockupPeriod(uint256 _lockEnds) public {
         onlyAdmin();
         // Remove lock period
         if (_lockEnds == 0) {
@@ -787,8 +768,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @return True if all goes well
    */
     function transfer(address _to, uint256 _amount)
-        public
-        returns(bool success)
+     public returns(bool success)
     {
         checkMarketStage();
         checkUnfreezed(msg.sender, _to);
@@ -809,8 +789,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @return True if all goes well
    */
     function transferFrom(address _from, address _to, uint256 _amount)
-        public
-        returns(bool success)
+     public returns(bool success)
     {
         checkMarketStage();
         checkUnfreezed(_from, _to);
