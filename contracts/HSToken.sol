@@ -184,28 +184,27 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     * @dev Modifiers are paired with functions to optimize bytecode size at deployment time
     */
 
+
   /**
-   * @notice verify if the token is in the setup stage
-   */
-    modifier onlyInSetupStage() {
-        _onlyInSetupStage();
+  * @notice Throws if buyer registry does not approve the transaction
+  */
+    modifier checkRules(address addr) {
+        _checkRules(addr);
         _;
     }
-    function _onlyInSetupStage() private view {
-        require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "Token is not currently in setup stage");
+    function _checkRules(address addr) private view {
+        BuyerRegistry.checkRules(IdentityRegistry.getEIN(addr));
     }
 
   /**
-   * @notice verify if the token is in the market stage
-   */
-    modifier onlyInMarketStage() {
-        _onlyInMarketStage();
+  * @notice Throws if called while inside escrow period
+  */
+    modifier escrowReleased() {
+        _escrowReleased();
         _;
     }
-    function _onlyInMarketStage() private view {
-        require(stage == Stage.MARKET, "Token is not currently in market stage");
-        require(!locked, "Token is currently locked");
-        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period is currently active");
+    function _escrowReleased() private legalStatusOK() view {
+        require(escrowLimitPeriod < block.timestamp, "Escrow limit period is still active");
     }
 
   /**
@@ -224,15 +223,26 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-  * @notice Throws if called while inside escrow period
+  * @notice Throws if called while token is locked
   */
-    modifier escrowReleased() {
-        _escrowReleased();
+    modifier isUnlocked() {
+        _isUnlocked();
         _;
     }
-    function _escrowReleased() private view {
-        require(escrowLimitPeriod < block.timestamp, "Escrow limit period is still active");
-        require(BuyerRegistry.getTokenLegalStatus(address(this)), "Legal conditions are not met");
+    function _isUnlocked() private view {
+        require(!locked, "Token locked");
+        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period active");
+    }
+
+  /**
+  * @notice Check if token has legal approval
+  */
+    modifier legalStatusOK() {
+        _legalStatusOK();
+        _;
+    }
+    function _legalStatusOK() private view {
+        require(BuyerRegistry.getTokenLegalStatus(address(this)), "Token must have legal approval");
     }
 
   /**
@@ -265,18 +275,30 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
     }
 
   /**
-  * @notice Throws if called while token is locked
-  */
-    modifier isUnlocked() {
-        _isUnlocked();
+   * @notice verify if the token is in the market stage
+   */
+    modifier onlyInMarketStage() {
+        _onlyInMarketStage();
         _;
     }
-    function _isUnlocked() private view {
-        require(!locked, "Token locked");
-        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period active");
+    function _onlyInMarketStage() private view {
+        require(stage == Stage.MARKET, "Token is not currently in market stage");
+        require(!locked, "Token is currently locked");
+        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period is currently active");
     }
 
+  /**
+   * @notice verify if the token is in the setup stage
+   */
+    modifier onlyInSetupStage() {
+        _onlyInSetupStage();
+        _;
+    }
+    function _onlyInSetupStage() private view {
+        require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "Token is not currently in setup stage");
+    }
 
+    
   /**
    * @notice Token constructor
    *
@@ -447,9 +469,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to pre-sale stage
    */
-    function stagePresale() public onlyAdmin() {
-    	require(stage == Stage.PRELAUNCH, "Stage should be Prelaunch");
-        require(BuyerRegistry.getTokenLegalStatus(address(this)), "Token needs legal approval");
+    function stagePresale() public onlyAdmin() legalStatusOK() {
+    	  require(stage == Stage.PRELAUNCH, "Stage should be Prelaunch");
         stage = Stage.PRESALE;
     }
 
@@ -656,7 +677,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @return True if everything goes well
    */
     function buyTokens(uint256 _amount)
-        public onlyActive payable
+        public checkRules(msg.sender) onlyActive() payable
         returns(bool)
     {
         uint256 total;
@@ -674,7 +695,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         }
 
         // Check with KYC and AML providers
-        BuyerRegistry.checkRules(_ein);
+        //BuyerRegistry.checkRules(_ein);
 
         // If Stage is PRESALE, check with whitelist and blacklist
         if (stage == Stage.PRESALE) {
@@ -776,8 +797,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @return True if all goes well
    */
     function transfer(address _to, uint256 _amount)
-     public isUnfreezed(msg.sender, _to) onlyInMarketStage() returns(bool success) {
-        BuyerRegistry.checkRules(IdentityRegistry.getEIN(_to));
+     public checkRules(_to) isUnfreezed(msg.sender, _to) onlyInMarketStage() returns(bool success) {
         _doTransfer(msg.sender, _to, _amount);
         return true;
     }
@@ -792,9 +812,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @return True if all goes well
    */
     function transferFrom(address _from, address _to, uint256 _amount)
-     public isUnfreezed(_from, _to) onlyInMarketStage() returns(bool success) {
+     public checkRules(_to) isUnfreezed(_from, _to) onlyInMarketStage() returns(bool success) {
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
-        BuyerRegistry.checkRules(IdentityRegistry.getEIN(_to));
         _doTransfer(_from, _to, _amount);
         return true;
     }
