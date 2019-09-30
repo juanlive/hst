@@ -145,7 +145,9 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     }
 
 
-    // modifiers
+    /**
+    * @dev Modifiers are paired with functions to optimize bytecode size at deployment time
+    */
 
     /**
     * @dev Validate that a contract exists in an address received as such
@@ -153,153 +155,155 @@ contract HSTBuyerRegistry is SnowflakeOwnable {
     * @param _addr The address of a smart contract
     */
     modifier isContract(address _addr) {
+        _isContract(_addr);
+        _;
+    }
+    function _isContract(address _addr) private view {
         uint length;
         assembly { length := extcodesize(_addr) }
         require(length > 0, "Address cannot be blank");
-        _;
     }
-
 
    /**
     * @dev Validate that a token exists in token registry
     */
     modifier isRegisteredToken(address _tokenAddress) {
-        require(tokenRegistry.isRegisteredToken(_tokenAddress) == true, "Token must be registered in Token Registry");
+        _isRegisteredToken(_tokenAddress);
         _;
+    }
+    function _isRegisteredToken(address _tokenAddress) private view {
+        require(tokenRegistry.isRegisteredToken(_tokenAddress) == true, "Token must be registered in Token Registry");
     }
 
    /**
     * @dev Validate that an EIN exists as provider for a token
     */
     modifier isRegisteredProvider(address _tokenAddress, uint _providerEIN) {
-        require(serviceRegistry.isProvider(_tokenAddress, _providerEIN) == true, "Provider must be registered in Service Registry");
+        _isRegisteredProvider(_tokenAddress, _providerEIN);
         _;
     }
-
-  /**
-  * @notice Throws if called by any account other than the owner
-  * @dev This works on EINs, not on addresses
-  */
-  modifier onlyTokenOwner(address _tokenAddress) {
-      require(isTokenOwner(_tokenAddress), "Caller must be the token EIN owner");
-      _;
-  }
-
-  /**
-  * @notice Throws if called by any account who is not a registered token owner
-  * @dev This works on EINs, not on addresses
-  */
-  modifier onlyRegisteredTokenOwner() {
-      require(isRegisteredTokenOwner(), "Caller address must be a registered token owner");
-      _;
-  }
-
-  /**
-  * @notice Throws if called by any account other than the KYC provider for this buyer
-  * @dev This works on EINs, not on addresses
-  */
-  modifier onlyRegisteredKycProvider(uint _buyerEIN, address _tokenAddress) {
-      require(isRegisteredKycProvider(_buyerEIN, _tokenAddress),
-       "Caller address must be a registered KYC provider for this buyer");
-      _;
-  }
-
-  /**
-  * @notice Throws if called by any account other than the AML provider for this buyer
-  * @dev This works on EINs, not on addresses
-  */
-  modifier onlyRegisteredAmlProvider(uint _buyerEIN, address _tokenAddress) {
-      require(isRegisteredAmlProvider(_buyerEIN, _tokenAddress),
-       "Caller address must be a registered AML provider for this buyer");
-      _;
-  }
+    function _isRegisteredProvider(address _tokenAddress, uint _providerEIN) private view {
+        require(serviceRegistry.isProvider(_tokenAddress, _providerEIN) == true, "Provider must be registered in Service Registry");
+    }
 
     /**
-  * @notice Throws if called by any account other than the CFT provider for this buyer
-  * @dev This works on EINs, not on addresses
-  */
-  modifier onlyRegisteredCftProvider(uint _buyerEIN, address _tokenAddress) {
-      require(isRegisteredCftProvider(_buyerEIN, _tokenAddress),
-       "Caller address must be a registered CFT provider for this buyer");
-      _;
-  }
+    * @notice Throws if called by any account other than the owner
+    * @dev This works on EINs, not on addresses
+    */
+    modifier onlyTokenOwner(address _tokenAddress) {
+        _onlyTokenOwner(_tokenAddress);
+        _;
+    }
+    function _onlyTokenOwner(address _tokenAddress) private view {
+        require(isTokenOwner(_tokenAddress), "Caller must be the token EIN owner");
+    }
+    /**
+    * @return true if `msg.sender` is the owner of the contract
+    */
+    function isTokenOwner(address _tokenAddress) public view returns(bool) {
+        // find out owner EIN
+        uint _tokenEINOwner = tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenAddress);
+        // find out caller EIN
+        uint _senderEIN = identityRegistry.getEIN(msg.sender);
+        // compare them
+        return (_senderEIN == _tokenEINOwner);
+    }
 
+    /**
+    * @notice Throws if called by any account who is not a registered token owner
+    * @dev This works on EINs, not on addresses
+    */
+    modifier onlyRegisteredTokenOwner() {
+        _onlyRegisteredTokenOwner();
+        _;
+    }
+    function _onlyRegisteredTokenOwner() private view {
+        require(isRegisteredTokenOwner(), "Caller address must be a registered token owner");
+    }
+    /**
+    * @return true if `msg.sender` is the owner of the contract
+    */
+    function isRegisteredTokenOwner() public view returns(bool) {
+        // find out caller EIN
+        uint _senderEIN = identityRegistry.getEIN(msg.sender);
+        // find out if it is a registered owner EIN
+        return tokenRegistry.isRegisteredOwner(_senderEIN);
+    }
 
-  /**
-  * @notice Check if caller is owner
-  * @dev This works on EINs, not on addresses
-  *
-  * @return true if `msg.sender` is the owner of the contract
-  */
-  function isTokenOwner(address _tokenAddress) public view returns(bool) {
-      // find out owner EIN
-      uint _tokenEINOwner = tokenRegistry.getSecuritiesTokenOwnerEIN(_tokenAddress);
-      // find out caller EIN
-      uint _senderEIN = identityRegistry.getEIN(msg.sender);
-      // compare them
-      return (_senderEIN == _tokenEINOwner);
-  }
+    /**
+    * @notice Throws if called by any account other than the KYC provider for this buyer
+    * @dev This works on EINs, not on addresses
+    */
+    modifier onlyRegisteredKycProvider(uint _buyerEIN, address _tokenAddress) {
+        _onlyRegisteredKycProvider(_buyerEIN, _tokenAddress);
+        _;
+    }
+    function _onlyRegisteredKycProvider(uint _buyerEIN, address _tokenAddress) private view {
+        require(isRegisteredKycProvider(_buyerEIN, _tokenAddress),
+        "Caller address must be a registered KYC provider for this buyer");
+    }
+    /**
+    * @return true if `msg.sender` is a registered KYC provider for the buyer
+    */
+    function isRegisteredKycProvider(uint _buyerEIN, address _tokenAddress)
+    public view returns(bool) {
+        // find out caller EIN
+        uint _senderEIN = identityRegistry.getEIN(msg.sender);
+        // find out if it is a registered owner EIN
+        require(serviceDetailForBuyers[_buyerEIN][_tokenAddress].kycProvider == _senderEIN,
+        "Must be the registered KYC provider for this buyer");
+        return true;
+    }
 
-  /**
-  * @notice Check if caller is a registered token owner
-  * @dev This works on EINs, not on addresses
-  *
-  * @return true if `msg.sender` is the owner of the contract
-  */
-  function isRegisteredTokenOwner() public view returns(bool) {
-      // find out caller EIN
-      uint _senderEIN = identityRegistry.getEIN(msg.sender);
-      // find out if it is a registered owner EIN
-      return tokenRegistry.isRegisteredOwner(_senderEIN);
-  }
+    /**
+    * @notice Throws if called by any account other than the AML provider for this buyer
+    * @dev This works on EINs, not on addresses
+    */
+    modifier onlyRegisteredAmlProvider(uint _buyerEIN, address _tokenAddress) {
+        _onlyRegisteredAmlProvider(_buyerEIN, _tokenAddress);
+        _;
+    }
+    function _onlyRegisteredAmlProvider(uint _buyerEIN, address _tokenAddress) private view {
+        require(isRegisteredAmlProvider(_buyerEIN, _tokenAddress),
+        "Caller address must be a registered AML provider for this buyer");
+    }
+    /**
+    * @return true if `msg.sender` is a registered KYC provider for the buyer
+    */
+    function isRegisteredAmlProvider(uint _buyerEIN, address _tokenAddress)
+    public view returns(bool) {
+        // find out caller EIN
+        uint _senderEIN = identityRegistry.getEIN(msg.sender);
+        // find out if it is a registered owner EIN
+        require(serviceDetailForBuyers[_buyerEIN][_tokenAddress].amlProvider == _senderEIN,
+        "Must be the registered AML provider for this buyer");
+        return true;
+    }
 
-  /**
-  * @notice Check if caller is a registered KYC provider for the buyer
-  * @dev This works on EINs, not on addresses
-  *
-  * @return true if `msg.sender` is a registered KYC provider for the buyer
-  */
-  function isRegisteredKycProvider(uint _buyerEIN, address _tokenAddress)
-   public view returns(bool) {
-      // find out caller EIN
-      uint _senderEIN = identityRegistry.getEIN(msg.sender);
-      // find out if it is a registered owner EIN
-      require(serviceDetailForBuyers[_buyerEIN][_tokenAddress].kycProvider == _senderEIN,
-       "Must be the registered KYC provider for this buyer");
-      return true;
-  }
-
-  /**
-  * @notice Check if caller is a registered KYC provider for the buyer
-  * @dev This works on EINs, not on addresses
-  *
-  * @return true if `msg.sender` is a registered KYC provider for the buyer
-  */
-  function isRegisteredAmlProvider(uint _buyerEIN, address _tokenAddress)
-   public view returns(bool) {
-      // find out caller EIN
-      uint _senderEIN = identityRegistry.getEIN(msg.sender);
-      // find out if it is a registered owner EIN
-      require(serviceDetailForBuyers[_buyerEIN][_tokenAddress].amlProvider == _senderEIN,
-       "Must be the registered AML provider for this buyer");
-      return true;
-  }
-
-  /**
-  * @notice Check if caller is a registered CFT provider for the buyer
-  * @dev This works on EINs, not on addresses
-  *
-  * @return true if `msg.sender` is a registered CFT provider for the buyer
-  */
-  function isRegisteredCftProvider(uint _buyerEIN, address _tokenAddress)
-   public view returns(bool) {
-      // find out caller EIN
-      uint _senderEIN = identityRegistry.getEIN(msg.sender);
-      // find out if it is a registered owner EIN
-      require(serviceDetailForBuyers[_buyerEIN][_tokenAddress].cftProvider == _senderEIN,
-       "Must be the registered CFT provider for this buyer");
-      return true;
-  }
+    /**
+    * @notice Throws if called by any account other than the CFT provider for this buyer
+    * @dev This works on EINs, not on addresses
+    */
+    modifier onlyRegisteredCftProvider(uint _buyerEIN, address _tokenAddress) {
+        _onlyRegisteredCftProvider(_buyerEIN, _tokenAddress);
+        _;
+    }
+    function _onlyRegisteredCftProvider(uint _buyerEIN, address _tokenAddress) private view {
+        require(isRegisteredCftProvider(_buyerEIN, _tokenAddress),
+        "Caller address must be a registered CFT provider for this buyer");
+    }
+    /**
+    * @return true if `msg.sender` is a registered CFT provider for the buyer
+    */
+    function isRegisteredCftProvider(uint _buyerEIN, address _tokenAddress)
+    public view returns(bool) {
+        // find out caller EIN
+        uint _senderEIN = identityRegistry.getEIN(msg.sender);
+        // find out if it is a registered owner EIN
+        require(serviceDetailForBuyers[_buyerEIN][_tokenAddress].cftProvider == _senderEIN,
+        "Must be the registered CFT provider for this buyer");
+        return true;
+    }
 
 
     // functions for contract configuration
