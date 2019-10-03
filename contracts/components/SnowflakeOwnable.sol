@@ -49,13 +49,17 @@ contract SnowflakeOwnable is Ownable {
     */
     event OwnershipTransferred(uint _previousOwnerEIN, uint _newOwnerEIN);
 
+
     /**
     * @notice Throws if called by any account other than the owner
     * @dev This works on EINs, not on addresses
     */
     modifier onlySnowflakeOwner() {
-        require(isEINowner(), "Must be the EIN owner to call this function");
+        _onlySnowflakeOwner();
         _;
+    }
+    function _onlySnowflakeOwner() private view {
+        require(isEINowner(), "Must be the EIN owner to call this function");
     }
 
 

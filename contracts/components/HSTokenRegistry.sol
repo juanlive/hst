@@ -89,10 +89,13 @@ contract HSTokenRegistry is SnowflakeOwnable {
    * @param _addr The address of a smart contract
    */
   modifier isContract(address _addr) {
+    _isContract(_addr);
+    _;
+  }
+  function _isContract(address _addr) private view {
     uint length;
     assembly { length := extcodesize(_addr) }
     require(length > 0, "This is not a contract");
-    _;
   }
 
 

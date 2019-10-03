@@ -62,10 +62,13 @@ contract HSTServiceRegistry is SnowflakeOwnable {
    * @param _addr The address of a smart contract
    */
   modifier isContract(address _addr) {
+    _isContract(_addr);
+    _;
+  }
+  function _isContract(address _addr) private view {
     uint length;
     assembly { length := extcodesize(_addr) }
     require(length > 0, "This is not a contract");
-    _;
   }
 
   /**
@@ -73,14 +76,13 @@ contract HSTServiceRegistry is SnowflakeOwnable {
   * @dev This works on EINs, not on addresses
   */
   modifier onlyTokenOwner(address _tokenAddress) {
-      require(isTokenOwner(_tokenAddress), "Caller must be the token EIN owner");
+    _onlyTokenOwner(_tokenAddress);
       _;
   }
-
+  function _onlyTokenOwner(address _tokenAddress) private view {
+      require(isTokenOwner(_tokenAddress), "Caller must be the token EIN owner");
+  }
   /**
-  * @notice Check if caller is owner
-  * @dev This works on EINs, not on addresses
-  *
   * @return true if `msg.sender` is the owner of the contract
   */
   function isTokenOwner(address _tokenAddress) public view returns(bool) {

@@ -181,56 +181,124 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
 
     /**
-    * @dev Most repeated modifiers were replaced by functions to optimize bytecode at deployment
+    * @dev Modifiers are paired with functions to optimize bytecode size at deployment time
     */
 
-/*
-    modifier isUnlocked() {
-        require(!locked, "Token locked");
-        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period active");
-        _;
-    }
-
-    modifier isUnfreezed(address _from, address _to) {
-        require(!freezed[IdentityRegistry.getEIN(_to)], "Target EIN is freezed");
-        require(!freezed[IdentityRegistry.getEIN(_from)], "Source EIN is freezed");
-        _;
-    }
-
-    modifier onlyAtSetup() {
-        require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "This is not setup stage");
-        _;
-    }
-
-    modifier onlyAdmin() {
-        // Check if EIN of sender is the same as einOwner
-        require(IdentityRegistry.getEIN(msg.sender) == einOwner, "Only for admins");
-        _;
-    }
-*/
 
   /**
-  * @notice Throws if called while in a non-active stage
+  * @notice Throws if buyer registry does not approve the transaction
   */
-    modifier onlyActive() {
-        require(
-            stage == Stage.PRESALE ||
-            stage == Stage.SALE ||
-            stage == Stage.MARKET,
-            "Not in active stage"
-            );
+    modifier checkRules(address addr) {
+        _checkRules(addr);
         _;
+    }
+    function _checkRules(address addr) private view {
+        BuyerRegistry.checkRules(IdentityRegistry.getEIN(addr));
     }
 
   /**
   * @notice Throws if called while inside escrow period
   */
     modifier escrowReleased() {
-        require(escrowLimitPeriod < block.timestamp, "Escrow limit period is still active");
-        require(BuyerRegistry.getTokenLegalStatus(address(this)), "Legal conditions are not met");
+        _escrowReleased();
         _;
     }
+    function _escrowReleased() private legalStatusOK() view {
+        require(escrowLimitPeriod < block.timestamp, "Escrow limit period is still active");
+    }
 
+  /**
+   * @notice verify if source and target addresses are unfreezed
+   *
+   * @param _from source address
+   * @param _to target address
+   */
+    modifier isUnfreezed(address _from, address _to) {
+        _isUnfreezed(_from, _to);
+        _;
+    }
+    function _isUnfreezed(address _from, address _to) private view {
+        require(!freezed[IdentityRegistry.getEIN(_to)], "Target EIN is freezed");
+        require(!freezed[IdentityRegistry.getEIN(_from)], "Source EIN is freezed");
+    }
+
+  /**
+  * @notice Throws if called while token is locked
+  */
+    modifier isUnlocked() {
+        _isUnlocked();
+        _;
+    }
+    function _isUnlocked() private view {
+        require(!locked, "Token locked");
+        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period active");
+    }
+
+  /**
+  * @notice Check if token has legal approval
+  */
+    modifier legalStatusOK() {
+        _legalStatusOK();
+        _;
+    }
+    function _legalStatusOK() private view {
+        require(BuyerRegistry.getTokenLegalStatus(address(this)), "Token must have legal approval");
+    }
+
+  /**
+  * @notice Throws if called while in a non-active stage
+  */
+    modifier onlyActive() {
+        _onlyActive();
+        _;
+    }
+    function _onlyActive() private view {
+        require(
+            stage == Stage.PRESALE ||
+            stage == Stage.SALE ||
+            stage == Stage.MARKET,
+            "Not in active stage"
+            );
+    }
+
+  /**
+   * @notice Qualify functions so only the administrator can execute them
+   */
+    modifier onlyAdmin() {
+        _onlyAdmin();
+        _;
+
+    }
+    function _onlyAdmin() private view {
+        // Check if EIN of sender is the same as einOwner
+        require(IdentityRegistry.getEIN(msg.sender) == einOwner, "Only administrators can execute this function");
+    }
+
+  /**
+   * @notice verify if the token is in the market stage
+   */
+    modifier onlyInMarketStage() {
+        _onlyInMarketStage();
+        _;
+    }
+    function _onlyInMarketStage() private view {
+        require(stage == Stage.MARKET, "Token is not currently in market stage");
+        require(!locked, "Token is currently locked");
+        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period is currently active");
+    }
+
+  /**
+   * @notice verify if the token is in the setup stage
+   */
+    modifier onlyInSetupStage() {
+        _onlyInSetupStage();
+        _;
+    }
+    function _onlyInSetupStage() private view {
+        require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "Token is not currently in setup stage");
+    }
+
+    
   /**
    * @notice Token constructor
    *
@@ -304,10 +372,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         uint256 _lockEnds,
         uint256 _maxSupply,
         uint256 _escrowLimitPeriod
-    ) public {
-        onlyAdmin();
-        checkSetup();
-
+    ) public onlyAdmin() onlyInSetupStage() {
         // Validations
         require(
             _hydroPrice > 0 &&
@@ -343,9 +408,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         bool _HYDRO_AMOUNT_TYPE,
         bool _WHITELIST_RESTRICTED,
         bool _BLACKLIST_RESTRICTED
-    ) public {
-        onlyAdmin();
-        checkSetup();
+    ) public onlyAdmin() onlyInSetupStage() {
         require(!STO_FLAGS_ready, "Flags already setted");
         // Load values
         LIMITED_OWNERSHIP = _LIMITED_OWNERSHIP;
@@ -375,9 +438,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         uint256 _minInvestors,
         uint256 _maxInvestors,
         address _hydroOracle
-    ) public {
-        onlyAdmin();
-        checkSetup();
+    ) public onlyAdmin() onlyInSetupStage() {
         require(!STO_PARAMS_ready, "Params already setted");
         require(STO_FLAGS_ready, "STO_FLAGS has not been set");
         // Load values
@@ -397,9 +458,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to pre-launch stage
    */
-    function stagePrelaunch() public {
-        onlyAdmin();
-        checkSetup();
+    function stagePrelaunch() public onlyAdmin() onlyInSetupStage() {
         require(MAIN_PARAMS_ready, "MAIN_PARAMS not setted");
         require(STO_FLAGS_ready, "STO_FLAGS not setted");
         require(STO_PARAMS_ready, "STO_PARAMS not setted");
@@ -410,18 +469,15 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to pre-sale stage
    */
-    function stagePresale() public {
-        onlyAdmin();
-    	require(stage == Stage.PRELAUNCH, "Stage should be Prelaunch");
-        require(BuyerRegistry.getTokenLegalStatus(address(this)), "Token needs legal approval");
+    function stagePresale() public onlyAdmin() legalStatusOK() {
+    	  require(stage == Stage.PRELAUNCH, "Stage should be Prelaunch");
         stage = Stage.PRESALE;
     }
 
   /**
    * @notice Move token to sale stage
    */
-    function stageSale() public {
-        onlyAdmin();
+    function stageSale() public onlyAdmin() {
     	require(stage == Stage.PRESALE, "Stage should be Presale");
         stage = Stage.SALE;
     }
@@ -429,8 +485,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to lock stage
    */
-    function stageLock() public {
-        onlyAdmin();
+    function stageLock() public onlyAdmin() {
     	require(stage == Stage.SALE, "Stage should be Sale");
         require(numberOfInvestors >= minInvestors, "Number of investors has not reached the minimum");
         stage = Stage.LOCK;
@@ -439,8 +494,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Move token to market stage
    */
-    function stageMarket() public {
-        onlyAdmin();
+    function stageMarket() public onlyAdmin() {
     	require(stage == Stage.LOCK, "Stage should be Lock");
     	stage = Stage.MARKET;
     	marketStarted = block.timestamp;
@@ -472,8 +526,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    *
    * @param _lockEnds The date in which the lock-up period ends
    */
-    function setLockupPeriod(uint256 _lockEnds) public {
-        onlyAdmin();
+    function setLockupPeriod(uint256 _lockEnds) public onlyAdmin() {
         // Remove lock period
         if (_lockEnds == 0) {
             PERIOD_LOCKED = false;
@@ -493,9 +546,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    *
    * @param _newBuyerRegistry The address for the buyer registry
    */
-    function changeBuyerRegistry(address _newBuyerRegistry) public
-    {
-        onlyAdmin();
+    function changeBuyerRegistry(address _newBuyerRegistry) public onlyAdmin() {
     	require(stage == Stage.SETUP, "Stage should be Setup to change this registry");
 		BuyerRegistry = HSTBuyerRegistryInterface(_newBuyerRegistry);
     }
@@ -503,27 +554,21 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Lock token transfers
    */
-    function lock() public
-    {
-        onlyAdmin();
+    function lock() public onlyAdmin() {
         locked = true;
     }
 
   /**
    * @notice Unlock token transfers
    */
-    function unLock() public
-    {
-        onlyAdmin();
+    function unLock() public onlyAdmin() {
         locked = false;
     }
 
   /**
    * @notice Add one or many EIN/s to the whitelist
    */
-    function addWhitelist(uint256[] memory _einList) public
-    {
-        onlyAdmin();
+    function addWhitelist(uint256[] memory _einList) public onlyAdmin() {
         for (uint i = 0; i < _einList.length; i++) {
           whitelist[_einList[i]] = true;
         }
@@ -532,9 +577,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Add one or many EIN/s to the blacklist
    */
-    function addBlacklist(uint256[] memory _einList) public
-    {
-        onlyAdmin();
+    function addBlacklist(uint256[] memory _einList) public onlyAdmin() {
         for (uint i = 0; i < _einList.length; i++) {
           blacklist[_einList[i]] = true;
         }
@@ -543,9 +586,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Remove one or many EIN/s from the whitelist
    */
-    function removeWhitelist(uint256[] memory _einList) public
-    {
-        onlyAdmin();
+    function removeWhitelist(uint256[] memory _einList) public onlyAdmin() {
         for (uint i = 0; i < _einList.length; i++) {
           whitelist[_einList[i]] = false;
         }
@@ -555,9 +596,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Remove one or many EIN/s from the blacklist
    */
-    function removeBlacklist(uint256[] memory _einList) public
-    {
-        onlyAdmin();
+    function removeBlacklist(uint256[] memory _einList) public onlyAdmin() {
         for (uint i = 0; i < _einList.length; i++) {
           blacklist[_einList[i]] = false;
         }
@@ -566,9 +605,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Freeze token
    */
-    function freeze(uint256[] memory _einList) public
-    {
-        onlyAdmin();
+    function freeze(uint256[] memory _einList) public onlyAdmin() {
         for (uint i = 0; i < _einList.length; i++) {
           freezed[_einList[i]] = true;
         }
@@ -577,9 +614,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
   /**
    * @notice Unfreeze token
    */
-    function unFreeze(uint256[] memory _einList) public
-    {
-        onlyAdmin();
+    function unFreeze(uint256[] memory _einList) public onlyAdmin() {
         for (uint i = 0; i < _einList.length; i++) {
           freezed[_einList[i]] = false;
         }
@@ -590,9 +625,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    *
    * @param _periods End date/s for the payment period/s
    */
-    function addPaymentPeriodBoundaries(uint256[] memory _periods) public
-    {
-        onlyAdmin();
+    function addPaymentPeriodBoundaries(uint256[] memory _periods) public onlyAdmin() {
         require(_periods.length > 0, "There should be at least one period set");
         for (uint i = 0; i < _periods.length; i++) {
           require(periods[periods.length-1] < _periods[i], "New periods must be after last period registered");
@@ -615,9 +648,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    *
    * @param _newAddress Address for the oracle
    */
-    function addHydroOracle(address _newAddress) public
-    {
-        onlyAdmin();
+    function addHydroOracle(address _newAddress) public onlyAdmin() {
     	hydroOracle = _newAddress;
     }
 
@@ -626,9 +657,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    *
    * @dev Can only be performed after the escrow is released
    */
-    function releaseHydroTokens() public escrowReleased
-    {
-        onlyAdmin();
+    function releaseHydroTokens() public escrowReleased() onlyAdmin() {
         uint256 thisBalance = HydroToken.balanceOf(address(this));
         require(thisBalance > 0, "There are no HydroTokens in this account");
         hydrosReleased = hydrosReleased + thisBalance;
@@ -648,7 +677,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @return True if everything goes well
    */
     function buyTokens(uint256 _amount)
-        public onlyActive payable
+        public checkRules(msg.sender) onlyActive() payable
         returns(bool)
     {
         uint256 total;
@@ -666,7 +695,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
         }
 
         // Check with KYC and AML providers
-        BuyerRegistry.checkRules(_ein);
+        //BuyerRegistry.checkRules(_ein);
 
         // If Stage is PRESALE, check with whitelist and blacklist
         if (stage == Stage.PRESALE) {
@@ -768,13 +797,7 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @return True if all goes well
    */
     function transfer(address _to, uint256 _amount)
-     public returns(bool success)
-    {
-        checkMarketStage();
-        checkUnfreezed(msg.sender, _to);
-
-        BuyerRegistry.checkRules(IdentityRegistry.getEIN(_to));
-
+     public checkRules(_to) isUnfreezed(msg.sender, _to) onlyInMarketStage() returns(bool success) {
         _doTransfer(msg.sender, _to, _amount);
         return true;
     }
@@ -789,15 +812,8 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
    * @return True if all goes well
    */
     function transferFrom(address _from, address _to, uint256 _amount)
-     public returns(bool success)
-    {
-        checkMarketStage();
-        checkUnfreezed(_from, _to);
-
+     public checkRules(_to) isUnfreezed(_from, _to) onlyInMarketStage() returns(bool success) {
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
-
-        BuyerRegistry.checkRules(IdentityRegistry.getEIN(_to));
-
         _doTransfer(_from, _to, _amount);
         return true;
     }
@@ -952,46 +968,6 @@ contract HSToken is MAIN_PARAMS, STO_FLAGS, STO_PARAMS, STO_Interests, PaymentSy
 
 
     // PRIVATE FUNCTIONS --------------------------------------------------------------------
-
-    // Used as modifiers to optimize bytecode at deployment
-
-  /**
-   * @notice to qualify functions so only the administrator can execute them
-   */
-    function onlyAdmin() private view {
-        // Check if EIN of sender is the same as einOwner
-        require(IdentityRegistry.getEIN(msg.sender) == einOwner, "Only for admins");
-    }
-
-  /**
-   * @notice verify if the token is in the setup stage
-   */
-    function checkSetup() private view { // replaces onlyAtSetup() modifier
-        require(stage == Stage.SETUP && (block.timestamp - registrationDate) < (15 * 24 * 60 * 60), "This is not setup stage");
-    }
-
-  /**
-   * @notice verify if the token is in the market stage
-   */
-    function checkMarketStage() private view {
-        require(stage == Stage.MARKET, "Token is not in market stage yet");
-        require(!locked, "Token locked");
-        if (PERIOD_LOCKED) require (block.timestamp > lockEnds, "Locked period active");
-    }
-
-  /**
-   * @notice verify if source and target addresses are unfreezed
-   *
-   * @param _from source address
-   * @param _to target address
-   */
-    function checkUnfreezed(address _from, address _to) private view {
-        require(!freezed[IdentityRegistry.getEIN(_to)], "Target EIN is freezed");
-        require(!freezed[IdentityRegistry.getEIN(_from)], "Source EIN is freezed");
-    }
-
-
-    // Other private functions
 
   /**
    * @notice set the type for the token to determine
